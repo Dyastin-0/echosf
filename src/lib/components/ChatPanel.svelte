@@ -1,5 +1,5 @@
 <script>
-  import ChatMessage from "./Message.svelte";
+  import ChatMessage from "./ChatMessage.svelte";
 
   export let onSendMessage;
   export let showChat;

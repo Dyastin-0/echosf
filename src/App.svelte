@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import "@fortawesome/fontawesome-free/css/all.min.css";
   import VideoControls from "./lib/components/Controls.svelte";
-  import ChatPanel from "./lib/components/Chat.svelte";
+  import ChatPanel from "./lib/components/ChatPanel.svelte";
   import RemoteVideos from "./lib/components/Videos.svelte";
   import { newWRTC } from "./lib/services/webrtc.js";
   import { newWS } from "./lib/services/websocket.js";
