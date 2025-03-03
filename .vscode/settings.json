@@ -1,0 +1,12 @@
+{
+	"editor.tabSize": 4,
+	"editor.insertSpaces": false,
+	"editor.formatOnSave": true,
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
+	},
+	"[javascript]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
+	}
+}	
+  
