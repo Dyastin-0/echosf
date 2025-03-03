@@ -1,0 +1,15 @@
+[Unit]
+Description=echosf
+After=network.target multi-user.target
+
+[Service]
+User=ubuntu
+
+WorkingDirectory=/home/ubuntu/echosf
+ExecStart=/usr/bin/npm start
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=echosf
+
+[Install]
+WantedBy=multi-user.target
