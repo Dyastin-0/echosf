@@ -16,7 +16,7 @@
 </script>
 
 <section
-  class="flex-col min-w-[300px] h-[500px] bg-[var(--bg-secondary)] gap-4 p-4 rounded-md"
+  class="flex-col min-w-[300px] max-h-[400px] bg-[var(--bg-secondary)] gap-4 p-4 rounded-md"
   class:flex={showChat}
   class:hidden={!showChat}
 >

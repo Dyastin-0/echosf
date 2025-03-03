@@ -5,6 +5,11 @@ class WRTC {
     this.videoTrack = null;
     this.screenStream = null;
     this.ws = null;
+	this.mediaState = {
+		isMuted: false,
+		isCameraOn: true,
+		isScreenSharing: false,
+	  };
   }
 
   getPeerConnection() {
@@ -32,13 +37,17 @@ class WRTC {
     }
   }
 
-  async startScreenSharing() {
+  async startScreenSharing(stopScreenSharing) {
     try {
       this.screenStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
         audio: true,
       });
-      this.screenStream.getTracks().forEach(track => this.pc.addTrack(track, this.screenStream));
+      this.screenStream.getTracks().forEach(track => {
+		track.onended = () => stopScreenSharing();
+		this.pc.addTrack(track, this.screenStream)
+	  });
+	  await this.renegotiate()
       return true;
     } catch (error) {
       console.error("Error starting screen share:", error);
@@ -55,6 +64,7 @@ class WRTC {
           this.pc.removeTrack(sender);
         }
       });
+	  this.renegotiate()
       this.screenStream = null;
     }
   }

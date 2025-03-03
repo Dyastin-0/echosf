@@ -1,21 +1,20 @@
 <script>
   import { onMount } from "svelte";
+  import { writable, get } from "svelte/store";
   import "@fortawesome/fontawesome-free/css/all.min.css";
   import VideoControls from "./lib/components/Controls.svelte";
   import ChatPanel from "./lib/components/ChatPanel.svelte";
   import RemoteVideos from "./lib/components/Videos.svelte";
   import { newWRTC } from "./lib/services/webrtc.js";
   import { newWS } from "./lib/services/websocket.js";
+  import Video from "./lib/components/Video.svelte";
 
-  let localVideo;
+  let localStream;
   let showChat = false;
-  let mediaState = {
-    isMuted: false,
-    isCameraOn: true,
-    isScreenSharing: false,
-  };
 
-  let webrtcService;
+  const webrtcService = writable(newWRTC());
+  const webrtc = get(webrtcService);
+
   let webSocketService;
 
   let remoteVideos = [];
@@ -23,14 +22,12 @@
 
   onMount(async () => {
     try {
-      webrtcService = newWRTC();
-
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          localVideo.srcObject = stream;
+        .then(async (stream) => {
+          localStream = stream;
 
-          webrtcService.setOnTrackCallback((event) => {
+          webrtc.setOnTrackCallback((event) => {
             if (event.track.kind === "audio") return;
 
             const trackId = event.track.id;
@@ -55,21 +52,19 @@
             };
           });
 
-          webrtcService.setLocalTracks(stream);
-          stream
-            .getTracks()
-            .forEach((track) => webrtcService.addTrack(track, stream));
+          webrtc.setLocalTracks(stream);
+          stream.getTracks().forEach((track) => webrtc.addTrack(track, stream));
 
           webSocketService = newWS(
             `${import.meta.env.VITE_WEBSOCKET_URL}?room=test`,
-            webrtcService
+            webrtc
           );
 
           webSocketService.setChatMessageCallback((msg) => {
             messages = [...messages, msg];
           });
 
-          webrtcService.setWebsocketService(webSocketService);
+          webrtc.setWebsocketService(webSocketService);
         });
     } catch (error) {
       alert(error);
@@ -79,24 +74,25 @@
   const toggleChat = () => (showChat = !showChat);
 
   function toggleMute() {
-    webrtcService.toggleAudio();
-    mediaState.isMuted = !mediaState.isMuted;
+    webrtc.toggleAudio();
+    webrtc.mediaState.isMuted = !webrtc.mediaState.isMuted;
   }
 
   function toggleCamera() {
-    webrtcService.toggleVideo();
-    mediaState.isCameraOn = !mediaState.isCameraOn;
-    webrtcService.renegotiate();
+    webrtc.toggleVideo();
+    webrtc.mediaState.isCameraOn = !webrtc.mediaState.isCameraOn;
   }
 
   async function toggleScreenShare() {
-    if (!mediaState.isScreenSharing) {
-      await webrtcService.startScreenSharing();
+    if (!webrtc.mediaState.isScreenSharing) {
+      await webrtc.startScreenSharing(() => {
+        webrtc.stopScreenSharing();
+        webrtc.mediaState.isScreenSharing = !webrtc.mediaState.isScreenSharing;
+      });
     } else {
-      webrtcService.stopScreenSharing();
+      webrtc.stopScreenSharing();
     }
-    await webrtcService.renegotiate();
-    mediaState.isScreenSharing = !mediaState.isScreenSharing;
+    webrtc.mediaState.isScreenSharing = !webrtc.mediaState.isScreenSharing;
   }
 
   function sendChatMessage(message) {
@@ -105,27 +101,23 @@
 </script>
 
 <main
-  class="flex justify-center w-full h-screen gap-4 p-4 bg-[var(--bg-primary)] text-sm text-[var(--text-primary)]"
+  class="relative flex flex-col justify-center w-full h-screen gap-4 p-4 bg-[var(--bg-primary)] text-sm text-[var(--text-primary)]"
 >
-  <video
-    bind:this={localVideo}
-    class="absolute bottom-4 right-4 h-[100px] rounded-lg border border-[var(--accent)]"
-    muted
-    autoplay
-  ></video>
+  <Video {localStream} />
 
-  <RemoteVideos {remoteVideos} />
+  <div class="flex h-full gap-4">
+    <RemoteVideos {remoteVideos} />
+    <ChatPanel onSendMessage={sendChatMessage} {messages} {showChat} />
+  </div>
 
   <VideoControls
     {toggleMute}
     {toggleCamera}
     {toggleScreenShare}
     {toggleChat}
-    {mediaState}
+    {webrtc}
     {showChat}
   />
-
-  <ChatPanel onSendMessage={sendChatMessage} {messages} {showChat} />
 </main>
 
 <style lang="postcss">
