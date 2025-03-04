@@ -24,15 +24,48 @@ export class WRTC {
 	}
 
 	public close(): void {
+		const senders = this.pc.getSenders();
+		senders.forEach((sender) => {
+			if (sender.track) {
+				sender.track.stop();
+				this.pc.removeTrack(sender);
+			}
+		});
+
 		this.pc.close();
+
+		this.audioTrack = null;
+		this.videoTrack = null;
+
+		if (this.screenStream) {
+			this.screenStream.getTracks().forEach((track) => track.stop());
+			this.screenStream = null;
+		}
+		this.mediaState = {
+			isMuted: false,
+			isCameraOn: true,
+			isScreenSharing: false
+		};
+
+		this.ws = null;
+
+		this.setOnTrackCallback(null);
+		this.setOnIceCandidateCallback(null);
 	}
 
-	public setLocalTracks(stream: MediaStream): void {
+	public reset(): void {
+		this.close();
+		this.pc = new RTCPeerConnection();
+	}
+
+	public setLocalTracks(stream: MediaStream | null): void {
+		if (!stream) return;
 		this.audioTrack = stream.getAudioTracks()[0] || null;
 		this.videoTrack = stream.getVideoTracks()[0] || null;
 	}
 
-	public addTrack(track: MediaStreamTrack, stream: MediaStream): void {
+	public addTrack(track: MediaStreamTrack, stream: MediaStream | null): void {
+		if (!stream) return;
 		this.pc.addTrack(track, stream);
 	}
 

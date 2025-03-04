@@ -2,11 +2,21 @@ export class WS {
 	private ws: WebSocket;
 	private webrtcService: App.IWRTCService;
 	private chatMessageCallback: ((msg: App.WebsocketMessage) => void) | null;
+	private id: string | null;
 
-	constructor(url: string | URL, webrtcService: App.IWRTCService) {
+	constructor(url: string | URL, webrtcService: App.IWRTCService, id: string | null) {
 		this.ws = new WebSocket(url);
+		this.id = id;
 		this.webrtcService = webrtcService;
 		this.chatMessageCallback = (msg: App.WebsocketMessage) => {};
+
+		this.ws.onopen = () => {
+			this.sendMessage({
+				id: this.id,
+				event: 'message',
+				data: 'Joined the room 👋'
+			});
+		};
 
 		this.ws.onerror = (e: Event) => {
 			console.error(e);
@@ -82,9 +92,10 @@ export class WS {
 
 	public close(): void {
 		this.ws.close();
+		this.chatMessageCallback = null;
 	}
 
-	public sendMessage(message: any): void {
+	public sendMessage(message: App.WebsocketMessage): void {
 		this.ws.send(JSON.stringify(message));
 	}
 
@@ -93,6 +104,10 @@ export class WS {
 	}
 }
 
-export const newWS = (url: string | URL, webrtcService: App.IWRTCService): WS => {
-	return new WS(url, webrtcService);
+export const newWS = (
+	url: string | URL,
+	webrtcService: App.IWRTCService,
+	id: string | null
+): WS => {
+	return new WS(url, webrtcService, id);
 };

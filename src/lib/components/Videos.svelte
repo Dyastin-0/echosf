@@ -27,7 +27,7 @@
 <div class="flex h-full w-full">
 	{#if expandedId}
 		<div class="flex h-full w-full gap-4">
-			<div class="flex flex-grow items-center justify-center p-4">
+			<div class="flex flex-grow items-center justify-center">
 				{#each remoteVideos as video (video.id)}
 					{#if video.id === expandedId}
 						<div class="relative flex max-w-full items-center justify-center">
@@ -50,14 +50,13 @@
 					{/if}
 				{/each}
 			</div>
-
 			<div class="flex flex-col items-center justify-center gap-2 overflow-x-auto">
 				{#each remoteVideos as video (video.id)}
 					{#if video.id !== expandedId}
 						<div class="relative flex items-center justify-center">
 							<video
 								use:setVideoStream={video.stream}
-								class="aspect-video max-h-[100px] w-auto rounded-lg object-cover"
+								class="max-h-[150px] w-auto rounded-lg object-cover"
 								autoplay
 								data-id={video.id}
 							>
@@ -76,9 +75,9 @@
 			</div>
 		</div>
 	{:else}
-		<div class="flex w-full flex-wrap items-center justify-center gap-4 p-4">
+		<div class="flex w-full flex-wrap gap-4">
 			{#each remoteVideos as video (video.id)}
-				<div class="group relative flex items-center justify-center transition-all">
+				<div class="group relative flex h-fit items-center justify-center transition-all">
 					<video
 						use:setVideoStream={video.stream}
 						class="aspect-video max-h-[150px] w-auto rounded-lg object-cover"

@@ -23,9 +23,9 @@ declare global {
 			kind: string;
 		}
 		export interface WebsocketMessage {
+			id: string | null;
 			event: string;
 			data: string;
-			message: string;
 		}
 	}
 }

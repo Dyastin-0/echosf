@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Controls from '$lib/components/Controls.svelte';
 	import ChatPanel from '$lib/components/ChatPanel.svelte';
 	import RemoteVideos from '$lib/components/Videos.svelte';
@@ -6,38 +7,42 @@
 	import { newWRTC } from '$lib/services/webrtc';
 	import { newWS } from '$lib/services/websocket';
 	import { PUBLIC_WEBSOCKET_URL } from '$env/static/public';
+	import JoinRoom from '$lib/components/JoinRoom.svelte';
 
-	let room: string;
+	let room: string | null;
+	let name: string | null;
 	let joined = false;
 
-	let localStream: MediaStream | undefined;
+	let localStream: MediaStream | null;
 	let showChat = false;
 
 	let webrtc: ReturnType<typeof newWRTC>;
 	let websocket: ReturnType<typeof newWS>;
 
-	let remoteVideos: Array<{ id: string; stream: MediaStream; kind: string }> = [];
+	let videos: Array<{ id: string; stream: MediaStream; kind: string }> = [];
 	let messages: App.WebsocketMessage[] = [];
 
+	navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+		localStream = stream;
+		videos = [
+			...videos,
+			{
+				id: 'local',
+				stream: stream,
+				kind: 'video'
+			}
+		];
+	});
+
 	const leaveRoom = async () => {
-		if (localStream) {
-			localStream.getTracks().forEach((track) => track.stop());
-			localStream = undefined;
-		}
+		document.title = 'echos';
+		await goto('');
 
-		webrtc.stopScreenSharing();
-		webrtc
-			.getPeerConnection()
-			.getSenders()
-			.forEach((sender) => webrtc.getPeerConnection().removeTrack(sender));
-
-		webrtc.close();
-		webrtc.setOnTrackCallback(() => {});
-
+		websocket.sendMessage({ id: name || 'Anonymous', event: 'message', data: 'Left the room 🤷‍♂️' });
 		websocket.close();
 		webrtc.close();
 
-		remoteVideos = [...[]];
+		videos = [...[]];
 		messages = [...[]];
 		joined = false;
 	};
@@ -45,18 +50,23 @@
 	const joinRoom = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 
+		await goto(`?room=${room}`);
+		document.title = `echos - ${room}`;
+
 		webrtc = newWRTC();
-		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${room}`, webrtc);
+		websocket = newWS(
+			`${PUBLIC_WEBSOCKET_URL}?room=${room}&id=${name || 'Anonymous'}`,
+			webrtc,
+			name
+		);
 
 		webrtc.setOnTrackCallback((event: RTCTrackEvent) => {
 			if (event.track.kind === 'audio') return;
 
-			console.log(event);
-
 			const trackId = event.track.id;
-			if (!remoteVideos.some((video) => video.id === trackId)) {
-				remoteVideos = [
-					...remoteVideos,
+			if (!videos.some((video) => video.id === trackId)) {
+				videos = [
+					...videos,
 					{
 						id: trackId,
 						stream: event.streams[0],
@@ -67,17 +77,17 @@
 
 			event.streams[0].onremovetrack = (removeEvent) => {
 				if (removeEvent.track.id === event.track.id) {
-					remoteVideos = remoteVideos.filter((video) => video.id !== trackId);
+					videos = videos.filter((video) => video.id !== trackId);
 				}
 			};
 		});
 
-		const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-		localStream = stream;
-		webrtc.setLocalTracks(stream);
-		stream.getTracks().forEach((track) => webrtc.addTrack(track, stream));
+		webrtc.setLocalTracks(localStream);
+		if (localStream)
+			localStream.getTracks().forEach((track) => webrtc.addTrack(track, localStream));
 
 		websocket.setChatMessageCallback((msg: App.WebsocketMessage) => {
+			if (msg.id === name) return;
 			messages = [...messages, msg];
 		});
 
@@ -110,38 +120,30 @@
 	}
 
 	function sendChatMessage(message: string) {
-		websocket.sendMessage({ event: 'message', data: message });
+		websocket.sendMessage({
+			event: 'message',
+			data: message,
+			id: null
+		});
 	}
 </script>
 
 {#if !joined}
 	<main
-		class="flex h-screen w-full flex-col items-center justify-center bg-[var(--bg-primary)] text-sm text-[var(--text-primary)]"
+		class="flex h-screen w-full flex-wrap items-center justify-center gap-4 bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
 	>
-		<form
-			on:submit={joinRoom}
-			class="flex flex-col gap-4 rounded bg-[var(--bg-secondary)] p-8 shadow"
-		>
-			<h1 class="text-center text-lg font-semibold">Join a Room</h1>
-			<input
-				bind:value={room}
-				name="chatInput"
-				class="w-full rounded-md bg-[var(--bg-primary)] p-2 outline-none"
-				placeholder="room name"
-			/>
-			<button type="submit" class="rounded bg-[var(--bg-primary)] p-2 hover:bg-[var(--accent)]">
-				Join
-			</button>
-		</form>
+		<div class="flex flex-wrap justify-center gap-4">
+			<JoinRoom {joinRoom} bind:room bind:name />
+			<Video {localStream} height="h-[250px]" position="static" />
+		</div>
 	</main>
 {:else}
 	<main
 		class="relative flex h-screen w-full flex-col justify-center gap-4 bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
 	>
 		<div class="relative flex h-full gap-4">
-			<RemoteVideos {remoteVideos} />
+			<RemoteVideos remoteVideos={videos} />
 			<ChatPanel onSendMessage={sendChatMessage} {messages} {showChat} />
-			<Video {localStream} />
 		</div>
 
 		<Controls
