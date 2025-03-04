@@ -58,7 +58,7 @@ export class WS {
 					break;
 				}
 				default:
-					console.warn('Unhandled event:', msg.event);
+					console.warn('Unhandled event:', msg);
 			}
 		};
 
@@ -74,6 +74,10 @@ export class WS {
 				}
 			}
 		);
+	}
+
+	public getConnection(): WebSocket {
+		return this.ws;
 	}
 
 	public close(): void {

@@ -1,7 +1,6 @@
 <script lang="ts">
 	export let remoteVideos: Array<{ id: string; stream: MediaStream; kind: string }>;
 
-	// Directive to set the video stream on the video element.
 	function setVideoStream(node: HTMLVideoElement, stream: MediaStream) {
 		if (stream) {
 			node.srcObject = stream;

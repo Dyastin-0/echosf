@@ -24,25 +24,34 @@
 			localStream.getTracks().forEach((track) => track.stop());
 			localStream = undefined;
 		}
+
 		webrtc.stopScreenSharing();
+		webrtc
+			.getPeerConnection()
+			.getSenders()
+			.forEach((sender) => webrtc.getPeerConnection().removeTrack(sender));
+
+		webrtc.close();
+		webrtc.setOnTrackCallback(() => {});
+
 		websocket.close();
-		remoteVideos = [];
-		messages = [];
+		webrtc.close();
+
+		remoteVideos = [...[]];
+		messages = [...[]];
 		joined = false;
 	};
 
 	const joinRoom = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 
-		if (!webrtc || webrtc.getPeerConnection().connectionState === 'closed') {
-			webrtc = newWRTC();
-		}
-
-		const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-		localStream = stream;
+		webrtc = newWRTC();
+		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${room}`, webrtc);
 
 		webrtc.setOnTrackCallback((event: RTCTrackEvent) => {
 			if (event.track.kind === 'audio') return;
+
+			console.log(event);
 
 			const trackId = event.track.id;
 			if (!remoteVideos.some((video) => video.id === trackId)) {
@@ -63,10 +72,11 @@
 			};
 		});
 
+		const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+		localStream = stream;
 		webrtc.setLocalTracks(stream);
 		stream.getTracks().forEach((track) => webrtc.addTrack(track, stream));
 
-		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${room}`, webrtc);
 		websocket.setChatMessageCallback((msg: App.WebsocketMessage) => {
 			messages = [...messages, msg];
 		});
@@ -112,7 +122,7 @@
 			on:submit={joinRoom}
 			class="flex flex-col gap-4 rounded bg-[var(--bg-secondary)] p-8 shadow"
 		>
-			<h1 class="text-center text-2xl font-semibold">Join a Room</h1>
+			<h1 class="text-center text-lg font-semibold">Join a Room</h1>
 			<input
 				bind:value={room}
 				name="chatInput"
@@ -120,7 +130,7 @@
 				placeholder="room name"
 			/>
 			<button type="submit" class="rounded bg-[var(--bg-primary)] p-2 hover:bg-[var(--accent)]">
-				Join Room
+				Join
 			</button>
 		</form>
 	</main>

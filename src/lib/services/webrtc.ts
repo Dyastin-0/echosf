@@ -23,6 +23,10 @@ export class WRTC {
 		return this.pc;
 	}
 
+	public close(): void {
+		this.pc.close();
+	}
+
 	public setLocalTracks(stream: MediaStream): void {
 		this.audioTrack = stream.getAudioTracks()[0] || null;
 		this.videoTrack = stream.getVideoTracks()[0] || null;
