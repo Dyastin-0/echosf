@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
-	import { messagesStore } from '$lib/stores/roomStore';
-	import { uiStore } from '$lib/stores/roomStore';
+	import { messagesStore } from '$lib/stores/messagesStore';
+	import { uiStore } from '$lib/stores/uiStore';
 
 	$: showChat = $uiStore.showChat;
 	$: messages = $messagesStore;

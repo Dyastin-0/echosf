@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { mediaStore } from '$lib/stores/roomStore';
+	import { mediaStore } from '$lib/stores/mediaStore';
 
 	$: remoteVideos = $mediaStore.videos;
 

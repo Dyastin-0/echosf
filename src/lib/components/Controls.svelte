@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { roomInfoStore, uiStore, mediaStore } from '$lib/stores/roomStore';
+	import { mediaStore } from '$lib/stores/mediaStore';
+	import { roomInfoStore } from '$lib/stores/roomStore';
+	import { uiStore } from '$lib/stores/uiStore';
 
 	export let leaveRoom: () => void;
 	export let toggleMute: () => void;

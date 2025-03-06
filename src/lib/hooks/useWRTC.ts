@@ -3,13 +3,11 @@ import { goto } from '$app/navigation';
 import { newWRTC } from '$lib/services/webrtc';
 import { newWS } from '$lib/services/websocket';
 import { PUBLIC_WEBSOCKET_URL } from '$env/static/public';
-import {
-	roomInfoStore,
-	uiStore,
-	mediaStore,
-	messagesStore,
-	resetRoomState
-} from '$lib/stores/roomStore';
+import { roomInfoStore } from '$lib/stores/roomStore';
+import { resetRoomState } from '$lib/stores/reset';
+import { mediaStore } from '$lib/stores/mediaStore';
+import { messagesStore } from '$lib/stores/messagesStore';
+import { uiStore } from '$lib/stores/uiStore';
 
 export function useWRTC() {
 	let webrtc: ReturnType<typeof newWRTC>;
