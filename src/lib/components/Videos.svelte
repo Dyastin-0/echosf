@@ -1,5 +1,7 @@
 <script lang="ts">
-	export let remoteVideos: Array<{ id: string; stream: MediaStream; kind: string }>;
+	import { mediaStore } from '$lib/stores/roomStore';
+
+	$: remoteVideos = $mediaStore.videos;
 
 	function setVideoStream(node: HTMLVideoElement, stream: MediaStream) {
 		if (stream) {

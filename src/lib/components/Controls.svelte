@@ -1,12 +1,17 @@
 <script lang="ts">
+	import { roomInfoStore, uiStore, mediaStore } from '$lib/stores/roomStore';
+
+	// Function props from parent component
 	export let leaveRoom: () => void;
 	export let toggleMute: () => void;
 	export let toggleCamera: () => void;
 	export let toggleScreenShare: () => void;
-	export let webrtc: any;
 	export let toggleChat: () => void;
-	export let showChat: boolean;
-	export let joined: boolean;
+
+	// We'll use the stores directly instead of props for these values
+	$: joined = $roomInfoStore.joined;
+	$: showChat = $uiStore.showChat;
+	$: mediaState = $mediaStore.mediaSate;
 </script>
 
 <div class="bottom-4 flex w-full justify-center gap-4">
@@ -17,8 +22,8 @@
 	>
 		<i
 			class="fa-solid text-lg"
-			class:fa-microphone={!webrtc?.mediaState.isMuted}
-			class:fa-microphone-slash={webrtc?.mediaState.isMuted}
+			class:fa-microphone={!mediaState?.isMuted}
+			class:fa-microphone-slash={mediaState?.isMuted}
 		></i>
 	</button>
 	<button
@@ -28,8 +33,8 @@
 	>
 		<i
 			class="fa-solid text-lg"
-			class:fa-video={webrtc?.mediaState.isCameraOn}
-			class:fa-video-slash={!webrtc?.mediaState.isCameraOn}
+			class:fa-video={mediaState?.isCameraOn}
+			class:fa-video-slash={!mediaState?.isCameraOn}
 		></i>
 	</button>
 	<button
@@ -48,17 +53,17 @@
 	>
 		<i
 			class="fa-solid text-lg"
-			class:text-[var(--red)]={webrtc?.mediaState.isScreenSharing}
-			class:text-[var(--text-primary)]={!webrtc?.mediaState.isScreenSharing}
-			class:fa-desktop={!webrtc?.mediaState.isScreenSharing}
-			class:fa-stop={webrtc?.mediaState.isScreenSharing}
+			class:text-[var(--red)]={mediaState?.isScreenSharing}
+			class:text-[var(--text-primary)]={!mediaState?.isScreenSharing}
+			class:fa-desktop={!mediaState?.isScreenSharing}
+			class:fa-stop={mediaState?.isScreenSharing}
 		></i>
 	</button>
 	{#if joined && leaveRoom}
 		<button
 			on:click={leaveRoom}
 			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-			aria-label="toggle screen share"
+			aria-label="leave room"
 		>
 			<i class="fa-solid fa-phone rotate-[135deg] text-lg text-[var(--red)]"></i>
 		</button>

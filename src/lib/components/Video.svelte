@@ -1,5 +1,8 @@
 <script lang="ts">
-	export let localStream: MediaStream | null;
+	import { mediaStore } from '$lib/stores/roomStore';
+
+	$: localStream = $mediaStore.localStream;
+
 	export let position: string;
 	export let height: string;
 

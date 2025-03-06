@@ -1,9 +1,12 @@
 <script lang="ts">
 	import ChatMessage from '$lib/components/ChatMessage.svelte';
+	import { messagesStore } from '$lib/stores/roomStore';
+	import { uiStore } from '$lib/stores/roomStore';
+
+	$: showChat = $uiStore.showChat;
+	$: messages = $messagesStore;
 
 	export let onSendMessage: (msg: any) => void;
-	export let showChat: boolean;
-	export let messages: any[];
 
 	function sendMessage(event: Event) {
 		event.preventDefault();
