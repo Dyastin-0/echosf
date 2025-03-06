@@ -30,7 +30,7 @@
 			<JoinRoom
 				joinRoom={(e) => {
 					e.preventDefault();
-					joinRoom($roomInfoStore.room, $roomInfoStore.name);
+					joinRoom($roomInfoStore.room, $roomInfoStore.name, $roomInfoStore.id);
 				}}
 				bind:room={$roomInfoStore.room}
 				bind:name={$roomInfoStore.name}

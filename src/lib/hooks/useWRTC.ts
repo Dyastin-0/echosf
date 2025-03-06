@@ -37,25 +37,21 @@ export function useWRTC() {
 		}
 	}
 
-	async function joinRoom(room: string | null, name: string | null) {
+	async function joinRoom(room: string | null, name: string | null, id: string | null) {
 		await goto(`?room=${room}`);
 		document.title = `echos - ${room}`;
 
 		webrtc = newWRTC();
-		websocket = newWS(
-			`${PUBLIC_WEBSOCKET_URL}?room=${room}${name !== null ? `&id=${name}` : ''}`,
-			webrtc,
-			name
-		);
+		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${room}&id=${id}`, webrtc);
 
-		setupWebRTCCallbacks(webrtc, websocket, name);
+		setupWebRTCCallbacks(webrtc, websocket, id);
 		roomInfoStore.update((state) => ({ ...state, joined: true, room, name }));
 	}
 
 	function setupWebRTCCallbacks(
 		webrtc: ReturnType<typeof newWRTC>,
 		websocket: ReturnType<typeof newWS>,
-		name: string | null
+		id: string | null
 	) {
 		webrtc.setOnTrackCallback((event: RTCTrackEvent) => {
 			if (event.track.kind === 'audio') return;
@@ -94,7 +90,7 @@ export function useWRTC() {
 				.forEach((track: MediaStreamTrack) => webrtc.addTrack(track, localStream));
 
 		websocket.setChatMessageCallback((msg: App.WebsocketMessage) => {
-			if (msg.id === name) return;
+			if (msg.id === id) return;
 			messagesStore.update((messages) => [...messages, msg]);
 		});
 
@@ -105,19 +101,31 @@ export function useWRTC() {
 		document.title = 'echos';
 		await goto('?');
 
-		const { name } = get(roomInfoStore);
-		websocket.sendMessage({ id: name || 'Anonymous', event: 'message', data: 'Left the room 🤷‍♂️' });
+		const { id, name } = get(roomInfoStore);
+		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
 		webrtc.reset();
 		initializeMedia();
 		resetRoomState();
 	}
 
 	function sendChatMessage(message: string) {
-		const { name } = get(roomInfoStore);
+		const { id, name } = get(roomInfoStore);
+
+		messagesStore.update((state) => [
+			...state,
+			{
+				event: 'message',
+				data: message,
+				name,
+				id
+			}
+		]);
+
 		websocket.sendMessage({
 			event: 'message',
 			data: message,
-			id: name
+			name,
+			id: id
 		});
 	}
 

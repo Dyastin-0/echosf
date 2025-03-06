@@ -35,7 +35,7 @@
 						<div class="relative flex max-w-full items-center justify-center">
 							<video
 								use:setVideoStream={video.stream}
-								class="aspect-video max-h-[75vh] w-auto rounded-lg object-cover"
+								class="max-h-[75vh] w-auto rounded-lg object-cover"
 								autoplay
 								data-id={video.id}
 							>
@@ -82,7 +82,7 @@
 				<div class="group relative flex h-fit items-center justify-center transition-all">
 					<video
 						use:setVideoStream={video.stream}
-						class="aspect-video max-h-[150px] w-auto rounded-lg object-cover"
+						class="max-h-[150px] w-auto rounded-lg object-cover"
 						autoplay
 						data-id={video.id}
 					>

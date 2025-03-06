@@ -1,18 +1,22 @@
+import { roomInfoStore } from '$lib/stores/roomStore';
+import { get } from 'svelte/store';
+
 export class WS {
 	private ws: WebSocket;
 	private webrtcService: App.IWRTCService;
 	private chatMessageCallback: ((msg: App.WebsocketMessage) => void) | null;
-	private id: string | null;
 
-	constructor(url: string | URL, webrtcService: App.IWRTCService, id: string | null) {
+	constructor(url: string | URL, webrtcService: App.IWRTCService) {
 		this.ws = new WebSocket(url);
-		this.id = id;
 		this.webrtcService = webrtcService;
 		this.chatMessageCallback = (msg: App.WebsocketMessage) => {};
 
+		const { id, name } = get(roomInfoStore);
+
 		this.ws.onopen = () => {
 			this.sendMessage({
-				id: this.id,
+				id,
+				name,
 				event: 'message',
 				data: 'Joined the room 👋'
 			});
@@ -104,10 +108,6 @@ export class WS {
 	}
 }
 
-export const newWS = (
-	url: string | URL,
-	webrtcService: App.IWRTCService,
-	id: string | null
-): WS => {
-	return new WS(url, webrtcService, id);
+export const newWS = (url: string | URL, webrtcService: App.IWRTCService): WS => {
+	return new WS(url, webrtcService);
 };

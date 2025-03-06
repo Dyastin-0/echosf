@@ -3,10 +3,12 @@ import { get, writable } from 'svelte/store';
 export const roomInfoStore = writable<{
 	room: string | null;
 	name: string | null;
+	id: string | null;
 	joined: boolean;
 }>({
 	room: null,
 	name: null,
+	id: crypto.randomUUID(),
 	joined: false
 });
 
@@ -38,7 +40,8 @@ export function resetRoomState() {
 	roomInfoStore.set({
 		room: null,
 		name: null,
-		joined: false
+		joined: false,
+		id: crypto.randomUUID()
 	});
 
 	uiStore.set({

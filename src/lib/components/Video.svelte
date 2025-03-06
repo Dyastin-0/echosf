@@ -15,7 +15,7 @@
 
 <video
 	bind:this={videoRef}
-	class="{position} {height} z-50 aspect-video rounded-lg border border-[var(--accent)] object-cover"
+	class="{position} {height} z-50 rounded-lg border border-[var(--accent)] object-cover"
 	muted
 	autoplay
 ></video>
