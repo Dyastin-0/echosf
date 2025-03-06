@@ -33,7 +33,7 @@
 	<form on:submit={sendMessage}>
 		<input
 			name="chatInput"
-			class="w-full rounded-md bg-[var(--bg-primary)] p-2 outline-none"
+			class="w-full rounded-md bg-[var(--bg-primary)] p-4 outline-none"
 			placeholder="Send a message"
 		/>
 	</form>
