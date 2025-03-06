@@ -13,7 +13,9 @@ export function useWRTC() {
 	let webrtc: ReturnType<typeof newWRTC>;
 	let websocket: ReturnType<typeof newWS>;
 
-	async function initializeMedia() {
+	async function init() {
+		webrtc = newWRTC();
+
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 			mediaStore.update((state) => ({
@@ -28,6 +30,8 @@ export function useWRTC() {
 					}
 				]
 			}));
+
+			webrtc.setLocalTracks(stream);
 			return stream;
 		} catch (error) {
 			console.error('Error accessing media devices:', error);
@@ -39,7 +43,6 @@ export function useWRTC() {
 		await goto(`?room=${room}`);
 		document.title = `echos - ${room}`;
 
-		webrtc = newWRTC();
 		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${room}&id=${id}`, webrtc);
 
 		setupWebRTCCallbacks(webrtc, websocket, id);
@@ -81,7 +84,7 @@ export function useWRTC() {
 		});
 
 		const localStream = get(mediaStore).localStream;
-		webrtc.setLocalTracks(localStream);
+
 		if (localStream)
 			localStream
 				.getTracks()
@@ -102,7 +105,7 @@ export function useWRTC() {
 		const { id, name } = get(roomInfoStore);
 		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
 		webrtc.reset();
-		initializeMedia();
+		init();
 		resetRoomState();
 	}
 
@@ -128,9 +131,6 @@ export function useWRTC() {
 	}
 
 	function toggleMute() {
-		const state = get(roomInfoStore);
-		if (!state.joined) return;
-
 		webrtc.toggleAudio();
 
 		mediaStore.update((store) => {
@@ -152,9 +152,6 @@ export function useWRTC() {
 	}
 
 	function toggleCamera() {
-		const state = get(roomInfoStore);
-		if (!state.joined) return;
-
 		webrtc.toggleVideo();
 
 		mediaStore.update((store) => {
@@ -215,7 +212,7 @@ export function useWRTC() {
 	}
 
 	return {
-		initializeMedia,
+		init,
 		joinRoom,
 		leaveRoom,
 		sendChatMessage,

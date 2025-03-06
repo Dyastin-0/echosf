@@ -6,15 +6,25 @@
 	export let position: string;
 	export let height: string;
 
-	let videoRef: HTMLVideoElement;
-
-	$: if (videoRef && localStream) {
-		videoRef.srcObject = localStream;
+	function setVideoStream(node: HTMLVideoElement, stream: MediaStream | null) {
+		if (stream) {
+			node.srcObject = stream;
+		}
+		return {
+			update(newStream: MediaStream) {
+				if (newStream !== node.srcObject) {
+					node.srcObject = newStream;
+				}
+			},
+			destroy() {
+				node.srcObject = null;
+			}
+		};
 	}
 </script>
 
 <video
-	bind:this={videoRef}
+	use:setVideoStream={localStream}
 	class="{position} {height} z-50 rounded-lg border border-[var(--accent)] object-cover"
 	muted
 	autoplay

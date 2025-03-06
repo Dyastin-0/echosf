@@ -1,15 +1,17 @@
+<!-- App.svelte -->
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { roomInfoStore } from '$lib/stores/roomStore';
+	import { flowStep } from '$lib/stores/flowStore';
 	import { useWRTC } from '$lib/hooks/useWRTC';
-	import Controls from '$lib/components/Controls.svelte';
-	import ChatPanel from '$lib/components/ChatPanel.svelte';
-	import RemoteVideos from '$lib/components/Videos.svelte';
-	import Video from '$lib/components/Video.svelte';
+	import CreateRoom from '$lib/components/CreateRoom.svelte';
 	import JoinRoom from '$lib/components/JoinRoom.svelte';
+	import RemoteVideos from '$lib/components/Videos.svelte';
+	import ChatPanel from '$lib/components/ChatPanel.svelte';
+	import Controls from '$lib/components/Controls.svelte';
+	import { onMount } from 'svelte';
 
 	const {
-		initializeMedia,
+		init,
 		joinRoom,
 		leaveRoom,
 		sendChatMessage,
@@ -19,24 +21,23 @@
 		toggleScreenShare
 	} = useWRTC();
 
-	onMount(initializeMedia);
+	onMount(init);
+
+	const handleJoinRoom = (e: { preventDefault: () => void }) => {
+		e.preventDefault();
+		joinRoom($roomInfoStore.room, $roomInfoStore.name, $roomInfoStore.id);
+	};
 </script>
 
 {#if !$roomInfoStore.joined}
 	<main
 		class="flex h-screen w-full flex-wrap items-center justify-center gap-4 bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
 	>
-		<div class="flex flex-wrap justify-center gap-4">
-			<JoinRoom
-				joinRoom={(e) => {
-					e.preventDefault();
-					joinRoom($roomInfoStore.room, $roomInfoStore.name, $roomInfoStore.id);
-				}}
-				bind:room={$roomInfoStore.room}
-				bind:name={$roomInfoStore.name}
-			/>
-			<Video height="h-[250px]" position="static" />
-		</div>
+		{#if $flowStep === 'create'}
+			<CreateRoom />
+		{:else if $flowStep === 'join'}
+			<JoinRoom {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
+		{/if}
 	</main>
 {:else}
 	<main

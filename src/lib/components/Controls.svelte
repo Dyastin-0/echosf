@@ -2,6 +2,8 @@
 	import { mediaStore } from '$lib/stores/mediaStore';
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { uiStore } from '$lib/stores/uiStore';
+	import AudioToggle from './AudioToggle.svelte';
+	import Cameratoggle from './Cameratoggle.svelte';
 
 	export let leaveRoom: () => void;
 	export let toggleMute: () => void;
@@ -15,28 +17,8 @@
 </script>
 
 <div class="bottom-4 flex w-full justify-center gap-4">
-	<button
-		on:click={toggleMute}
-		class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-		aria-label="toggle audio"
-	>
-		<i
-			class="fa-solid text-lg"
-			class:fa-microphone={!mediaState?.isMuted}
-			class:fa-microphone-slash={mediaState?.isMuted}
-		></i>
-	</button>
-	<button
-		on:click={toggleCamera}
-		class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-		aria-label="toggle camera"
-	>
-		<i
-			class="fa-solid text-lg"
-			class:fa-video={mediaState?.isCameraOn}
-			class:fa-video-slash={!mediaState?.isCameraOn}
-		></i>
-	</button>
+	<AudioToggle {toggleMute} />
+	<Cameratoggle {toggleCamera} />
 	<button
 		on:click={toggleChat}
 		class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
