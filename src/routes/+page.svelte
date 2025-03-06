@@ -8,10 +8,9 @@
 	import RemoteVideos from '$lib/components/Videos.svelte';
 	import ChatPanel from '$lib/components/ChatPanel.svelte';
 	import Controls from '$lib/components/Controls.svelte';
-	import { onMount } from 'svelte';
 
 	const {
-		init,
+		initMedia,
 		joinRoom,
 		leaveRoom,
 		sendChatMessage,
@@ -20,8 +19,6 @@
 		toggleMute,
 		toggleScreenShare
 	} = useWRTC();
-
-	onMount(init);
 
 	const handleJoinRoom = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
@@ -36,7 +33,7 @@
 		{#if $flowStep === 'create'}
 			<CreateRoom />
 		{:else if $flowStep === 'join'}
-			<JoinRoom {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
+			<JoinRoom {initMedia} {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
 		{/if}
 	</main>
 {:else}

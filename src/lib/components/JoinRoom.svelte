@@ -1,14 +1,17 @@
 <script lang="ts">
-	export let toggleCamera: () => void;
-	export let toggleMute: () => void;
-
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { flowStep } from '$lib/stores/flowStore';
 	import Video from './Video.svelte';
 	import Cameratoggle from './Cameratoggle.svelte';
 	import AudioToggle from './AudioToggle.svelte';
+	import { onMount } from 'svelte';
 
+	export let toggleCamera: () => void;
+	export let toggleMute: () => void;
 	export let onJoinRoom;
+	export let initMedia: () => void;
+
+	onMount(initMedia);
 
 	const goBack = () => {
 		$flowStep = 'create';

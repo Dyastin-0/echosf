@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { flowStep } from '$lib/stores/flowStore';
+	import { generatecode } from '$lib/helpers/code';
 
 	const createNewRoom = () => {
-		$roomInfoStore.room = 'room-' + Math.random().toString(36).substring(2, 9);
+		$roomInfoStore.room = generatecode(3, 4, 3);
 		$flowStep = 'join';
 	};
 

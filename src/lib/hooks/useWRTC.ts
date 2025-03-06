@@ -13,7 +13,7 @@ export function useWRTC() {
 	let webrtc: ReturnType<typeof newWRTC>;
 	let websocket: ReturnType<typeof newWS>;
 
-	async function init() {
+	async function initMedia() {
 		webrtc = newWRTC();
 
 		try {
@@ -105,7 +105,7 @@ export function useWRTC() {
 		const { id, name } = get(roomInfoStore);
 		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
 		webrtc.reset();
-		init();
+		initMedia();
 		resetRoomState();
 	}
 
@@ -212,7 +212,7 @@ export function useWRTC() {
 	}
 
 	return {
-		init,
+		initMedia,
 		joinRoom,
 		leaveRoom,
 		sendChatMessage,
