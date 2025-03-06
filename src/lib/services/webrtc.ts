@@ -4,7 +4,6 @@ export class WRTC {
 	private videoTrack: MediaStreamTrack | null;
 	private screenStream: MediaStream | null;
 	private ws: App.IWebSocketService | null;
-	public mediaState: App.MediaState;
 
 	constructor() {
 		this.pc = new RTCPeerConnection();
@@ -12,11 +11,6 @@ export class WRTC {
 		this.videoTrack = null;
 		this.screenStream = null;
 		this.ws = null;
-		this.mediaState = {
-			isMuted: false,
-			isCameraOn: true,
-			isScreenSharing: false
-		};
 	}
 
 	public getPeerConnection(): RTCPeerConnection {
@@ -41,11 +35,6 @@ export class WRTC {
 			this.screenStream.getTracks().forEach((track) => track.stop());
 			this.screenStream = null;
 		}
-		this.mediaState = {
-			isMuted: false,
-			isCameraOn: true,
-			isScreenSharing: false
-		};
 
 		this.ws = null;
 

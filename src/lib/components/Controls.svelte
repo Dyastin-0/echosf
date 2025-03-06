@@ -1,14 +1,12 @@
 <script lang="ts">
 	import { roomInfoStore, uiStore, mediaStore } from '$lib/stores/roomStore';
 
-	// Function props from parent component
 	export let leaveRoom: () => void;
 	export let toggleMute: () => void;
 	export let toggleCamera: () => void;
 	export let toggleScreenShare: () => void;
 	export let toggleChat: () => void;
 
-	// We'll use the stores directly instead of props for these values
 	$: joined = $roomInfoStore.joined;
 	$: showChat = $uiStore.showChat;
 	$: mediaState = $mediaStore.mediaSate;

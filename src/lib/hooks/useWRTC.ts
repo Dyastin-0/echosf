@@ -103,13 +103,12 @@ export function useWRTC() {
 
 	async function leaveRoom() {
 		document.title = 'echos';
-		await goto('');
+		await goto('?');
 
 		const { name } = get(roomInfoStore);
 		websocket.sendMessage({ id: name || 'Anonymous', event: 'message', data: 'Left the room 🤷‍♂️' });
-		websocket.close();
-		webrtc.close();
-
+		webrtc.reset();
+		initializeMedia();
 		resetRoomState();
 	}
 

@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 export const roomInfoStore = writable<{
 	room: string | null;
@@ -33,6 +33,8 @@ export const mediaStore = writable<{
 export const messagesStore = writable<App.WebsocketMessage[]>([]);
 
 export function resetRoomState() {
+	const media = get(mediaStore);
+
 	roomInfoStore.set({
 		room: null,
 		name: null,
@@ -44,8 +46,12 @@ export function resetRoomState() {
 	});
 
 	mediaStore.set({
-		localStream: null,
-		mediaSate: null,
+		localStream: media?.localStream,
+		mediaSate: {
+			isCameraOn: true,
+			isMuted: false,
+			isScreenSharing: false
+		},
 		videos: []
 	});
 
