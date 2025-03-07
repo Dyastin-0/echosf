@@ -70,7 +70,7 @@ export function useWRTC() {
 							{
 								id: stream.id,
 								stream: stream,
-								isMuted: false
+								isMuted: stream.getAudioTracks()[0].enabled
 							}
 						];
 
