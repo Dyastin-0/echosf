@@ -119,7 +119,7 @@ export function useWRTC() {
 									return stream;
 								})
 							}));
-						}, 1000);
+						}, 5000);
 
 						break;
 
