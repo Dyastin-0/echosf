@@ -1,5 +1,4 @@
 import { mediaStore } from '$lib/stores/mediaStore';
-import { roomInfoStore } from '$lib/stores/roomStore';
 import { get } from 'svelte/store';
 
 export class WRTC {
@@ -79,13 +78,11 @@ export class WRTC {
 				})
 			}));
 
-			if (this.ws && get(mediaStore)?.localStream?.id) {
+			if (this.ws) {
 				this.ws.sendMessage({
 					event: 'message',
 					data: get(mediaStore)?.localStream?.id,
-					type: 'audioToggle',
-					id: get(roomInfoStore).id,
-					name: get(roomInfoStore).name
+					type: 'audioToggle'
 				});
 			}
 		}

@@ -121,7 +121,7 @@ export function useWRTC() {
 		document.title = 'echos';
 
 		const { id, name } = get(roomInfoStore);
-		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name, type: null });
+		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
 		webrtc.reset();
 		resetRoomState();
 		flowStep.set('create');

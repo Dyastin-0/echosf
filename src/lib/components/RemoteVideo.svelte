@@ -18,7 +18,6 @@
 		<track kind="captions" />
 	</video>
 
-	<!-- Audio State Indicator -->
 	<div
 		class="absolute bottom-2 left-2 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1 text-white"
 	>
@@ -29,7 +28,6 @@
 		{/if}
 	</div>
 
-	<!-- Expand/Collapse Button -->
 	<button
 		class="absolute top-2 right-2 min-h-8 min-w-8 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 		on:click={() => onExpand(id)}
