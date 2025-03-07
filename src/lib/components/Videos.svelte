@@ -1,21 +1,6 @@
 <script lang="ts">
 	import { mediaStore } from '$lib/stores/mediaStore';
-
-	function setVideoStream(node: HTMLVideoElement, stream: MediaStream) {
-		if (stream) {
-			node.srcObject = stream;
-		}
-		return {
-			update(newStream: MediaStream) {
-				if (newStream !== node.srcObject) {
-					node.srcObject = newStream;
-				}
-			},
-			destroy() {
-				node.srcObject = null;
-			}
-		};
-	}
+	import VideoPlayer from '$lib/components/RemoteVideo.svelte';
 
 	let expandedId: string | null = null;
 
@@ -28,80 +13,43 @@
 	{#if expandedId}
 		<div class="flex h-full w-full gap-4">
 			<div class="flex flex-grow items-center justify-center">
-				{#each $mediaStore.videos as video}
+				{#each $mediaStore.remoteStreams as video}
 					{#if video.id === expandedId}
-						<div class="relative flex max-w-full items-center justify-center">
-							<video
-								use:setVideoStream={video.stream}
-								class="max-h-[75vh] w-auto rounded-lg object-cover"
-								autoplay
-							>
-								<track kind="captions" />
-							</video>
-							<button
-								class="absolute min-h-11 min-w-11 rounded-full bg-black/50 opacity-0 transition-opacity hover:cursor-pointer hover:opacity-100"
-								on:click={() => toggleExpand(video.id)}
-								aria-label="toggle expand"
-							>
-								<i class="fa-solid fa-compress"></i>
-							</button>
-						</div>
+						<VideoPlayer
+							stream={video.stream}
+							isExpanded={true}
+							onExpand={toggleExpand}
+							id={video.id}
+							isMuted={video.isMuted}
+						/>
 					{/if}
 				{/each}
 			</div>
 			<div class="flex flex-col items-center justify-center gap-2 overflow-x-auto">
-				{#each $mediaStore.videos as video}
+				{#each $mediaStore.remoteStreams as video}
 					{#if video.id !== expandedId}
-						<div class="relative flex items-center justify-center">
-							<video
-								use:setVideoStream={video.stream}
-								class="max-h-[150px] w-auto rounded-lg object-cover"
-								autoplay
-							>
-								<track kind="captions" />
-							</video>
-							<button
-								class="absolute min-h-8 min-w-8 rounded-full bg-black/50 opacity-0 transition-opacity hover:cursor-pointer hover:opacity-100"
-								on:click={() => toggleExpand(video.id)}
-								aria-label="toggle expand"
-							>
-								<i class="fa-solid fa-expand"></i>
-							</button>
-						</div>
+						<VideoPlayer
+							stream={video.stream}
+							isExpanded={false}
+							onExpand={toggleExpand}
+							id={video.id}
+							isMuted={video.isMuted}
+						/>
 					{/if}
 				{/each}
 			</div>
 		</div>
 	{:else}
 		<div class="flex w-full flex-wrap gap-4">
-			{#each $mediaStore.videos as video}
-				<div class="group relative flex h-fit items-center justify-center transition-all">
-					{#if video.id === 'local'}
-						<video
-							use:setVideoStream={video.stream}
-							class="max-h-[150px] w-auto rounded-lg object-cover"
-							autoplay
-							muted
-						>
-							<track kind="captions" />
-						</video>
-					{:else}
-						<video
-							use:setVideoStream={video.stream}
-							class="max-h-[150px] w-auto rounded-lg object-cover"
-							autoplay
-						>
-							<track kind="captions" />
-						</video>
-					{/if}
-					<button
-						class="absolute min-h-11 min-w-11 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
-						on:click={() => toggleExpand(video.id)}
-						aria-label="toggle expand"
-					>
-						<i class="fa-solid fa-expand"></i>
-					</button>
-				</div>
+			{#each $mediaStore.remoteStreams as video}
+				<VideoPlayer
+					stream={video.stream}
+					isLocal={video.id === $mediaStore.localStream?.id}
+					isExpanded={false}
+					onExpand={toggleExpand}
+					id={video.id}
+					isMuted={video.isMuted}
+				/>
 			{/each}
 		</div>
 	{/if}

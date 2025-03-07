@@ -1,3 +1,7 @@
+import { mediaStore } from '$lib/stores/mediaStore';
+import { roomInfoStore } from '$lib/stores/roomStore';
+import { get } from 'svelte/store';
+
 export class WRTC {
 	private pc: RTCPeerConnection;
 	private audioTrack: MediaStreamTrack | null;
@@ -61,6 +65,29 @@ export class WRTC {
 	public toggleAudio(): void {
 		if (this.audioTrack) {
 			this.audioTrack.enabled = !this.audioTrack.enabled;
+
+			mediaStore.update((state) => ({
+				...state,
+				remoteStreams: state.remoteStreams.map((stream) => {
+					if (stream.id === get(mediaStore).localStream?.id && this.audioTrack) {
+						return {
+							...stream,
+							isMuted: !this.audioTrack.enabled
+						};
+					}
+					return stream;
+				})
+			}));
+
+			if (this.ws && get(mediaStore)?.localStream?.id) {
+				this.ws.sendMessage({
+					event: 'message',
+					data: get(mediaStore)?.localStream?.id,
+					type: 'audioToggle',
+					id: get(roomInfoStore).id,
+					name: get(roomInfoStore).name
+				});
+			}
 		}
 	}
 

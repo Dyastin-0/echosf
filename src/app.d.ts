@@ -10,7 +10,7 @@ declare global {
 			setOnIceCandidateCallback(callback: (e: { candidate: any }) => void): void;
 		}
 		export interface IWebSocketService {
-			sendMessage(message: { event: string; data: string }): void;
+			sendMessage(message): void;
 		}
 		export interface MediaState {
 			isMuted: boolean;
@@ -25,6 +25,7 @@ declare global {
 		export interface WebsocketMessage {
 			id: string | null;
 			name: string | null;
+			type: string | null | undefined;
 			event: string;
 			data: string;
 		}

@@ -18,7 +18,8 @@ export class WS {
 				id,
 				name,
 				event: 'message',
-				data: 'Joined the room 👋'
+				data: 'Joined the room 👋',
+				type: null
 			});
 		};
 
@@ -100,11 +101,11 @@ export class WS {
 		this.chatMessageCallback = null;
 	}
 
-	public sendMessage(message: App.WebsocketMessage): void {
+	public sendMessage(message: any): void {
 		this.ws.send(JSON.stringify(message));
 	}
 
-	public setChatMessageCallback(callback: (msg: App.WebsocketMessage) => void): void {
+	public setChatMessageCallback(callback: (msg: any) => void): void {
 		this.chatMessageCallback = callback;
 	}
 }

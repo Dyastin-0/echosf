@@ -1,0 +1,44 @@
+<script lang="ts">
+	import { setVideoStream } from '$lib/helpers/video';
+	export let stream: MediaStream;
+	export let isLocal: boolean = false;
+	export let isExpanded: boolean = false;
+	export let onExpand: (id: string) => void;
+	export let id: string;
+	export let isMuted: boolean = false;
+</script>
+
+<div class="group relative flex h-fit items-center justify-center transition-all">
+	<video
+		use:setVideoStream={stream}
+		class="w-auto rounded-lg object-cover {isExpanded ? 'max-h-[75vh]' : 'max-h-[150px]'}"
+		autoplay
+		muted={isLocal}
+	>
+		<track kind="captions" />
+	</video>
+
+	<!-- Audio State Indicator -->
+	<div
+		class="absolute bottom-2 left-2 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1 text-white"
+	>
+		{#if !isMuted}
+			<i class="fa-solid fa-microphone"></i>
+		{:else}
+			<i class="fa-solid fa-microphone-slash"></i>
+		{/if}
+	</div>
+
+	<!-- Expand/Collapse Button -->
+	<button
+		class="absolute top-2 right-2 min-h-8 min-w-8 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		on:click={() => onExpand(id)}
+		aria-label="toggle expand"
+	>
+		{#if isExpanded}
+			<i class="fa-solid fa-compress"></i>
+		{:else}
+			<i class="fa-solid fa-expand"></i>
+		{/if}
+	</button>
+</div>

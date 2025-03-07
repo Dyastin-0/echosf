@@ -23,12 +23,12 @@ export function useWRTC() {
 			mediaStore.update((state) => ({
 				...state,
 				localStream: stream,
-				videos: [
-					...state.videos,
+				remoteStreams: [
+					...state.remoteStreams,
 					{
-						id: 'local',
+						id: stream.id,
 						stream: stream,
-						kind: 'video'
+						isMuted: !stream.getAudioTracks()[0].enabled
 					}
 				]
 			}));
@@ -59,27 +59,31 @@ export function useWRTC() {
 
 			mediaStore.update((state) => {
 				const trackId = event.track.id;
-				const newVideos = state.videos.some((video) => video.id === trackId)
-					? state.videos
+				const stream = event.streams[0];
+
+				const streamExists = state.remoteStreams.some((s) => s.id === trackId);
+
+				const newStreams = streamExists
+					? state.remoteStreams
 					: [
-							...state.videos,
+							...state.remoteStreams,
 							{
-								id: trackId,
-								stream: event.streams[0],
-								kind: event.track.kind
+								id: stream.id,
+								stream: stream,
+								isMuted: false
 							}
 						];
 
-				event.streams[0].onremovetrack = (removeEvent) => {
+				stream.onremovetrack = (removeEvent) => {
 					if (removeEvent.track.id === event.track.id) {
 						mediaStore.update((state) => ({
 							...state,
-							videos: state.videos.filter((video) => video.id !== trackId)
+							remoteStreams: state.remoteStreams.filter((s) => s.id !== trackId)
 						}));
 					}
 				};
 
-				return { ...state, videos: newVideos };
+				return { ...state, remoteStreams: newStreams };
 			});
 		});
 
@@ -92,6 +96,21 @@ export function useWRTC() {
 
 		websocket.setChatMessageCallback((msg: App.WebsocketMessage) => {
 			if (msg.id === id) return;
+			if (msg.type === 'audioToggle') {
+				mediaStore.update((state) => ({
+					...state,
+					remoteStreams: state.remoteStreams.map((stream) => {
+						if (stream.id === msg.data) {
+							return {
+								...stream,
+								isMuted: !stream.isMuted
+							};
+						}
+						return stream;
+					})
+				}));
+				return;
+			}
 			messagesStore.update((messages) => [...messages, msg]);
 		});
 
@@ -102,7 +121,7 @@ export function useWRTC() {
 		document.title = 'echos';
 
 		const { id, name } = get(roomInfoStore);
-		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
+		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name, type: null });
 		webrtc.reset();
 		resetRoomState();
 		flowStep.set('create');
@@ -117,7 +136,8 @@ export function useWRTC() {
 				event: 'message',
 				data: message,
 				name,
-				id
+				id,
+				type: null
 			}
 		]);
 
