@@ -22,14 +22,17 @@
 		e.preventDefault();
 
 		try {
-			await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
+			const response = await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
 				method: 'POST'
 			});
 
-			onJoinRoom(e);
+			if (!response.ok) {
+				throw new Error('Failed to join room.');
+			}
+
 			$flowStep = 'join';
+			onJoinRoom(e);
 		} catch (error) {
-			console.log(error);
 			alert('Failed to join, room does not exist anymore.');
 		}
 	};

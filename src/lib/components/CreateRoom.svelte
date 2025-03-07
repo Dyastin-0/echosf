@@ -21,9 +21,13 @@
 		if (!$roomInfoStore.room) return;
 
 		try {
-			await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
+			const response = await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
 				method: 'POST'
 			});
+
+			if (!response.ok) {
+				throw new Error(`API error: ${response.status} ${response.statusText}`);
+			}
 
 			$flowStep = 'join';
 		} catch (error) {
