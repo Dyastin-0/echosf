@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { mediaStore } from '$lib/stores/mediaStore';
 
-	$: remoteVideos = $mediaStore.videos;
-
 	function setVideoStream(node: HTMLVideoElement, stream: MediaStream) {
 		if (stream) {
 			node.srcObject = stream;
@@ -30,14 +28,13 @@
 	{#if expandedId}
 		<div class="flex h-full w-full gap-4">
 			<div class="flex flex-grow items-center justify-center">
-				{#each remoteVideos as video (video.id)}
+				{#each $mediaStore.videos as video}
 					{#if video.id === expandedId}
 						<div class="relative flex max-w-full items-center justify-center">
 							<video
 								use:setVideoStream={video.stream}
 								class="max-h-[75vh] w-auto rounded-lg object-cover"
 								autoplay
-								data-id={video.id}
 							>
 								<track kind="captions" />
 							</video>
@@ -53,14 +50,13 @@
 				{/each}
 			</div>
 			<div class="flex flex-col items-center justify-center gap-2 overflow-x-auto">
-				{#each remoteVideos as video (video.id)}
+				{#each $mediaStore.videos as video}
 					{#if video.id !== expandedId}
 						<div class="relative flex items-center justify-center">
 							<video
 								use:setVideoStream={video.stream}
 								class="max-h-[150px] w-auto rounded-lg object-cover"
 								autoplay
-								data-id={video.id}
 							>
 								<track kind="captions" />
 							</video>
@@ -78,7 +74,7 @@
 		</div>
 	{:else}
 		<div class="flex w-full flex-wrap gap-4">
-			{#each remoteVideos as video (video.id)}
+			{#each $mediaStore.videos as video}
 				<div class="group relative flex h-fit items-center justify-center transition-all">
 					{#if video.id === 'local'}
 						<video
@@ -86,7 +82,6 @@
 							class="max-h-[150px] w-auto rounded-lg object-cover"
 							autoplay
 							muted
-							data-id={video.id}
 						>
 							<track kind="captions" />
 						</video>
@@ -95,7 +90,6 @@
 							use:setVideoStream={video.stream}
 							class="max-h-[150px] w-auto rounded-lg object-cover"
 							autoplay
-							data-id={video.id}
 						>
 							<track kind="captions" />
 						</video>

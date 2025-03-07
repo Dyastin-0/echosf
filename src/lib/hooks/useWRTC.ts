@@ -19,6 +19,7 @@ export function useWRTC() {
 
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
 			mediaStore.update((state) => ({
 				...state,
 				localStream: stream,
@@ -33,10 +34,8 @@ export function useWRTC() {
 			}));
 
 			webrtc.setLocalTracks(stream);
-			return stream;
 		} catch (error) {
 			console.error('Error accessing media devices:', error);
-			return null;
 		}
 	}
 
@@ -101,12 +100,10 @@ export function useWRTC() {
 
 	async function leaveRoom() {
 		document.title = 'echos';
-		await goto('?');
 
 		const { id, name } = get(roomInfoStore);
 		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
 		webrtc.reset();
-		initMedia();
 		resetRoomState();
 		flowStep.set('create');
 	}

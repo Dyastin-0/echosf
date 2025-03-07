@@ -3,6 +3,8 @@
 	import { flowStep } from '$lib/stores/flowStore';
 	import { generatecode } from '$lib/helpers/code';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { get } from 'svelte/store';
+	import { mediaStore } from '$lib/stores/mediaStore';
 
 	const createNewRoom = async () => {
 		try {
@@ -59,7 +61,6 @@
 					>Enter Room Code</label
 				>
 				<input
-					id="room"
 					type="text"
 					bind:value={$roomInfoStore.room}
 					required

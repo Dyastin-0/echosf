@@ -35,7 +35,8 @@ export class WS {
 				return;
 			}
 			if (!msg) {
-				return console.log('Failed to parse msg');
+				console.log('Failed to parse msg');
+				return;
 			}
 
 			switch (msg.event) {
