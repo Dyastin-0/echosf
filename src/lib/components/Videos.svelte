@@ -80,14 +80,26 @@
 		<div class="flex w-full flex-wrap gap-4">
 			{#each remoteVideos as video (video.id)}
 				<div class="group relative flex h-fit items-center justify-center transition-all">
-					<video
-						use:setVideoStream={video.stream}
-						class="max-h-[150px] w-auto rounded-lg object-cover"
-						autoplay
-						data-id={video.id}
-					>
-						<track kind="captions" />
-					</video>
+					{#if video.id === 'local'}
+						<video
+							use:setVideoStream={video.stream}
+							class="max-h-[150px] w-auto rounded-lg object-cover"
+							autoplay
+							muted
+							data-id={video.id}
+						>
+							<track kind="captions" />
+						</video>
+					{:else}
+						<video
+							use:setVideoStream={video.stream}
+							class="max-h-[150px] w-auto rounded-lg object-cover"
+							autoplay
+							data-id={video.id}
+						>
+							<track kind="captions" />
+						</video>
+					{/if}
 					<button
 						class="absolute min-h-11 min-w-11 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 						on:click={() => toggleExpand(video.id)}
