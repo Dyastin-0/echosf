@@ -2,15 +2,33 @@
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { flowStep } from '$lib/stores/flowStore';
 	import { generatecode } from '$lib/helpers/code';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	const createNewRoom = () => {
-		$roomInfoStore.room = generatecode(3, 4, 3);
-		$flowStep = 'join';
+	const createNewRoom = async () => {
+		try {
+			$roomInfoStore.room = generatecode(3, 4, 3);
+			await fetch(`${PUBLIC_API_URL}/create?room=${$roomInfoStore.room}`, {
+				method: 'POST'
+			});
+
+			$flowStep = 'join';
+		} catch (error) {
+			alert('Failed to create, room already exists. Join instead.');
+		}
 	};
 
-	const handleContinue = () => {
+	const handleContinue = async () => {
 		if (!$roomInfoStore.room) return;
-		$flowStep = 'join';
+
+		try {
+			await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
+				method: 'POST'
+			});
+
+			$flowStep = 'join';
+		} catch (error) {
+			alert(`Failed to join, room not found.`);
+		}
 	};
 </script>
 

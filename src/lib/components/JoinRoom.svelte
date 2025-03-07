@@ -5,6 +5,7 @@
 	import Cameratoggle from './Cameratoggle.svelte';
 	import AudioToggle from './AudioToggle.svelte';
 	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	export let toggleCamera: () => void;
 	export let toggleMute: () => void;
@@ -15,6 +16,22 @@
 
 	const goBack = () => {
 		$flowStep = 'create';
+	};
+
+	const join = async (e: { preventDefault: () => void }) => {
+		e.preventDefault();
+
+		try {
+			await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
+				method: 'POST'
+			});
+
+			onJoinRoom(e);
+			$flowStep = 'join';
+		} catch (error) {
+			console.log(error);
+			alert('Failed to join, room does not exist anymore.');
+		}
 	};
 </script>
 
@@ -32,7 +49,7 @@
 		<AudioToggle {toggleMute} />
 	</div>
 
-	<form on:submit|preventDefault={onJoinRoom} class="flex flex-col gap-4">
+	<form on:submit|preventDefault={join} class="flex flex-col gap-4">
 		<div class="flex gap-2">
 			<p class="text-sm">Meeting code</p>
 			<p class="font-medium text-[var(--text-secondary)]">{$roomInfoStore.room}</p>
