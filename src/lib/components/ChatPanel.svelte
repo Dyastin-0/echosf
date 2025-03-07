@@ -24,7 +24,7 @@
 	class:flex={showChat}
 	class:hidden={!showChat}
 >
-	<h1 class="text-center">Chat</h1>
+	<h1 class="text-center font-semibold">Chat</h1>
 	<div class="custom-scrollbar flex h-full flex-col gap-2 overflow-y-auto">
 		{#each messages as message}
 			<ChatMessage {message} />
@@ -33,7 +33,7 @@
 	<form on:submit={sendMessage}>
 		<input
 			name="chatInput"
-			class="w-full rounded-md bg-[var(--bg-primary)] p-4 outline-none"
+			class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"
 			placeholder="Send a message"
 		/>
 	</form>

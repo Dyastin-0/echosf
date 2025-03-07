@@ -8,6 +8,7 @@ import { resetRoomState } from '$lib/stores/reset';
 import { mediaStore } from '$lib/stores/mediaStore';
 import { messagesStore } from '$lib/stores/messagesStore';
 import { uiStore } from '$lib/stores/uiStore';
+import { flowStep } from '$lib/stores/flowStore';
 
 export function useWRTC() {
 	let webrtc: ReturnType<typeof newWRTC>;
@@ -107,6 +108,7 @@ export function useWRTC() {
 		webrtc.reset();
 		initMedia();
 		resetRoomState();
+		flowStep.set('create');
 	}
 
 	function sendChatMessage(message: string) {

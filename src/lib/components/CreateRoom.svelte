@@ -42,7 +42,7 @@
 					bind:value={$roomInfoStore.room}
 					required
 					placeholder="Code"
-					class="w-full rounded-md bg-[var(--bg-primary)] p-4 outline-none"
+					class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"
 				/>
 			</div>
 
