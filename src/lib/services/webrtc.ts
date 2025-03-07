@@ -82,7 +82,8 @@ export class WRTC {
 				this.ws.sendMessage({
 					event: 'message',
 					data: get(mediaStore)?.localStream?.id,
-					type: 'audioToggle'
+					type: 'audioToggle',
+					state: this.audioTrack.enabled
 				});
 			}
 		}

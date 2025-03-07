@@ -1,3 +1,4 @@
+import { mediaStore } from '$lib/stores/mediaStore';
 import { roomInfoStore } from '$lib/stores/roomStore';
 import { get } from 'svelte/store';
 
@@ -20,6 +21,22 @@ export class WS {
 				event: 'message',
 				data: 'Joined the room 👋',
 				type: null
+			});
+
+			const localStream = get(mediaStore).localStream;
+
+			this.sendMessage({
+				event: 'message',
+				data: get(mediaStore)?.localStream?.id,
+				type: 'initialAudioState',
+				state: localStream?.getAudioTracks()[0].enabled
+			});
+
+			this.sendMessage({
+				event: 'message',
+				data: get(mediaStore)?.localStream?.id,
+				type: 'audioStateRequest',
+				target: get(roomInfoStore).id
 			});
 		};
 

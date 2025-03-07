@@ -28,6 +28,8 @@ declare global {
 			type: string | null | undefined;
 			event: string;
 			data: string;
+			state: boolean;
+			target: string | null;
 		}
 	}
 }

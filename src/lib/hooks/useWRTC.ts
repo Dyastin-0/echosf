@@ -58,10 +58,8 @@ export function useWRTC() {
 			if (event.track.kind === 'audio') return;
 
 			mediaStore.update((state) => {
-				const trackId = event.track.id;
 				const stream = event.streams[0];
-
-				const streamExists = state.remoteStreams.some((s) => s.id === trackId);
+				const streamExists = state.remoteStreams.some((s) => s.id === stream.id);
 
 				const newStreams = streamExists
 					? state.remoteStreams
@@ -70,7 +68,7 @@ export function useWRTC() {
 							{
 								id: stream.id,
 								stream: stream,
-								isMuted: stream.getAudioTracks()[0].enabled
+								isMuted: !stream.getAudioTracks()[0]?.enabled
 							}
 						];
 
@@ -78,7 +76,7 @@ export function useWRTC() {
 					if (removeEvent.track.id === event.track.id) {
 						mediaStore.update((state) => ({
 							...state,
-							remoteStreams: state.remoteStreams.filter((s) => s.id !== trackId)
+							remoteStreams: state.remoteStreams.filter((s) => s.id !== stream.id)
 						}));
 					}
 				};
@@ -87,34 +85,69 @@ export function useWRTC() {
 			});
 		});
 
-		const localStream = get(mediaStore).localStream;
-
-		if (localStream)
-			localStream
-				.getTracks()
-				.forEach((track: MediaStreamTrack) => webrtc.addTrack(track, localStream));
-
 		websocket.setChatMessageCallback((msg: App.WebsocketMessage) => {
 			if (msg.id === id) return;
-			if (msg.type === 'audioToggle') {
-				mediaStore.update((state) => ({
-					...state,
-					remoteStreams: state.remoteStreams.map((stream) => {
-						if (stream.id === msg.data) {
-							return {
-								...stream,
-								isMuted: !stream.isMuted
-							};
-						}
-						return stream;
-					})
-				}));
+			if (msg?.type) {
+				switch (msg.type) {
+					case 'audioToggle':
+						// if (msg?.target && msg.target !== get(roomInfoStore).id) return;
+						mediaStore.update((state) => ({
+							...state,
+							remoteStreams: state.remoteStreams.map((stream) => {
+								if (stream.id === msg.data) {
+									return {
+										...stream,
+										isMuted: !msg.state
+									};
+								}
+								return stream;
+							})
+						}));
+						break;
+
+					case 'initialAudioState':
+						setTimeout(() => {
+							mediaStore.update((state) => ({
+								...state,
+								remoteStreams: state.remoteStreams.map((stream) => {
+									if (stream.id === msg.data) {
+										return {
+											...stream,
+											isMuted: !msg.state
+										};
+									}
+									return stream;
+								})
+							}));
+						}, 1000);
+
+						break;
+
+					case 'audioStateRequest':
+						websocket.sendMessage({
+							event: 'message',
+							type: 'audioToggle',
+							data: get(mediaStore).localStream?.id,
+							target: msg.target,
+							state: get(mediaStore).localStream?.getAudioTracks()[0].enabled
+						});
+
+					default:
+						break;
+				}
 				return;
 			}
 			messagesStore.update((messages) => [...messages, msg]);
 		});
 
 		webrtc.setWebsocketService(websocket);
+
+		const localStream = get(mediaStore).localStream;
+
+		if (localStream)
+			localStream.getTracks().forEach((track: MediaStreamTrack) => {
+				webrtc.addTrack(track, localStream);
+			});
 	}
 
 	async function leaveRoom() {
@@ -137,7 +170,9 @@ export function useWRTC() {
 				data: message,
 				name,
 				id,
-				type: null
+				type: null,
+				state: false,
+				target: null
 			}
 		]);
 
