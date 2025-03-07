@@ -3,17 +3,21 @@
 	import { flowStep } from '$lib/stores/flowStore';
 	import { generatecode } from '$lib/helpers/code';
 	import { PUBLIC_API_URL } from '$env/static/public';
-	import { get } from 'svelte/store';
-	import { mediaStore } from '$lib/stores/mediaStore';
+	import { updateParams } from '$lib/helpers/url';
+	import { page } from '$app/state';
+
+	$roomInfoStore.room = page.url.searchParams.get('room');
 
 	const createNewRoom = async () => {
 		try {
-			$roomInfoStore.room = generatecode(3, 4, 3);
+			const newRoom = generatecode(3, 4, 3);
+			$roomInfoStore.room = newRoom;
 			await fetch(`${PUBLIC_API_URL}/create?room=${$roomInfoStore.room}`, {
 				method: 'POST'
 			});
 
 			$flowStep = 'join';
+			updateParams({ room: newRoom });
 		} catch (error) {
 			alert('Failed to create, room already exists. Join instead.');
 		}
@@ -34,8 +38,13 @@
 			$flowStep = 'join';
 		} catch (error) {
 			alert(`Failed to join, room not found.`);
+			$roomInfoStore.room = '';
 		}
 	};
+
+	if ($roomInfoStore.room) {
+		handleContinue();
+	}
 </script>
 
 <div class="flex w-full max-w-md flex-col gap-6 rounded-lg bg-[var(--bg-secondary)] p-6 shadow-lg">
