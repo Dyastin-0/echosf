@@ -90,7 +90,6 @@ export function useWRTC() {
 			if (msg?.type) {
 				switch (msg.type) {
 					case 'audioToggle':
-						// if (msg?.target && msg.target !== get(roomInfoStore).id) return;
 						mediaStore.update((state) => ({
 							...state,
 							remoteStreams: state.remoteStreams.map((stream) => {
@@ -119,18 +118,35 @@ export function useWRTC() {
 									return stream;
 								})
 							}));
-						}, 5000);
+						}, 4000);
 
 						break;
 
 					case 'audioStateRequest':
 						websocket.sendMessage({
 							event: 'message',
-							type: 'audioToggle',
+							type: 'audioStateAnswer',
 							data: get(mediaStore).localStream?.id,
 							target: msg.target,
 							state: get(mediaStore).localStream?.getAudioTracks()[0].enabled
 						});
+						break;
+
+					case 'audioStateAnswer':
+						if (msg?.target !== get(roomInfoStore).id) return;
+						mediaStore.update((state) => ({
+							...state,
+							remoteStreams: state.remoteStreams.map((stream) => {
+								if (stream.id === msg.data) {
+									return {
+										...stream,
+										isMuted: !msg.state
+									};
+								}
+								return stream;
+							})
+						}));
+						break;
 
 					default:
 						break;
