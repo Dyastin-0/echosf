@@ -90,36 +90,39 @@ export function useWRTC() {
 			if (msg?.type) {
 				switch (msg.type) {
 					case 'audioToggle':
-						mediaStore.update((state) => ({
-							...state,
-							remoteStreams: state.remoteStreams.map((stream) => {
-								if (stream.id === msg.data) {
-									return {
-										...stream,
-										isMuted: !msg.state
-									};
-								}
-								return stream;
-							})
-						}));
+						mediaStore.update((state) => {
+							const streamId = msg.data;
+							const updatedStates = { ...state.remoteStreamStates };
+
+							if (!updatedStates[streamId]) {
+								updatedStates[streamId] = { audio: 'unknown', video: 'unknown' };
+							}
+
+							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
+
+							return {
+								...state,
+								remoteStreamStates: updatedStates
+							};
+						});
 						break;
 
 					case 'initialAudioState':
-						setTimeout(() => {
-							mediaStore.update((state) => ({
-								...state,
-								remoteStreams: state.remoteStreams.map((stream) => {
-									if (stream.id === msg.data) {
-										return {
-											...stream,
-											isMuted: !msg.state
-										};
-									}
-									return stream;
-								})
-							}));
-						}, 4000);
+						mediaStore.update((state) => {
+							const streamId = msg.data;
+							const updatedStates = { ...state.remoteStreamStates };
 
+							if (!updatedStates[streamId]) {
+								updatedStates[streamId] = { audio: 'unknown', video: 'unknown' };
+							}
+
+							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
+
+							return {
+								...state,
+								remoteStreamStates: updatedStates
+							};
+						});
 						break;
 
 					case 'audioStateRequest':
@@ -128,24 +131,28 @@ export function useWRTC() {
 							type: 'audioStateAnswer',
 							data: get(mediaStore).localStream?.id,
 							target: msg.target,
-							state: get(mediaStore).localStream?.getAudioTracks()[0].enabled
+							state: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled || false
 						});
 						break;
 
 					case 'audioStateAnswer':
 						if (msg?.target !== get(roomInfoStore).id) return;
-						mediaStore.update((state) => ({
-							...state,
-							remoteStreams: state.remoteStreams.map((stream) => {
-								if (stream.id === msg.data) {
-									return {
-										...stream,
-										isMuted: !msg.state
-									};
-								}
-								return stream;
-							})
-						}));
+
+						mediaStore.update((state) => {
+							const streamId = msg.data;
+							const updatedStates = { ...state.remoteStreamStates };
+
+							if (!updatedStates[streamId]) {
+								updatedStates[streamId] = { audio: 'unknown', video: 'unknown' };
+							}
+
+							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
+
+							return {
+								...state,
+								remoteStreamStates: updatedStates
+							};
+						});
 						break;
 
 					default:

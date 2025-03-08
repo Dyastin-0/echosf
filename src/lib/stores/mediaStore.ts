@@ -3,7 +3,8 @@ import { writable } from 'svelte/store';
 export const mediaStore = writable<{
 	localStream: MediaStream | null;
 	mediaSate: App.MediaState | null;
-	remoteStreams: Array<{ id: string; stream: MediaStream; isMuted: boolean }>;
+	remoteStreams: Array<{ id: string; stream: MediaStream }>;
+	remoteStreamStates: Record<string, Record<string, string>>;
 }>({
 	localStream: null,
 	mediaSate: {
@@ -11,5 +12,6 @@ export const mediaStore = writable<{
 		isMuted: false,
 		isScreenSharing: false
 	},
-	remoteStreams: []
+	remoteStreams: [],
+	remoteStreamStates: {}
 });

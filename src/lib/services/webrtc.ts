@@ -65,25 +65,31 @@ export class WRTC {
 		if (this.audioTrack) {
 			this.audioTrack.enabled = !this.audioTrack.enabled;
 
-			mediaStore.update((state) => ({
-				...state,
-				remoteStreams: state.remoteStreams.map((stream) => {
-					if (stream.id === get(mediaStore).localStream?.id && this.audioTrack) {
-						return {
-							...stream,
-							isMuted: !this.audioTrack.enabled
-						};
+			const localStream = get(mediaStore).localStream;
+
+			if (localStream) {
+				mediaStore.update((state) => {
+					const updatedStates = { ...state.remoteStreamStates };
+
+					if (!updatedStates[localStream.id]) {
+						updatedStates[localStream.id] = { audio: 'unknown', video: 'unknown' };
 					}
-					return stream;
-				})
-			}));
+
+					updatedStates[localStream.id].audio = this.audioTrack?.enabled ? 'enabled' : 'disabled';
+
+					return {
+						...state,
+						remoteStreamStates: updatedStates
+					};
+				});
+			}
 
 			if (this.ws) {
 				this.ws.sendMessage({
 					event: 'message',
-					data: get(mediaStore)?.localStream?.id,
 					type: 'audioToggle',
-					state: this.audioTrack.enabled
+					data: get(mediaStore).localStream?.id,
+					state: localStream?.getAudioTracks()[0].enabled
 				});
 			}
 		}

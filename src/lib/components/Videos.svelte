@@ -20,7 +20,7 @@
 							isExpanded={true}
 							onExpand={toggleExpand}
 							id={video.id}
-							isMuted={video.isMuted}
+							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
 						/>
 					{/if}
 				{/each}
@@ -33,7 +33,7 @@
 							isExpanded={false}
 							onExpand={toggleExpand}
 							id={video.id}
-							isMuted={video.isMuted}
+							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
 						/>
 					{/if}
 				{/each}
@@ -48,7 +48,7 @@
 					isExpanded={false}
 					onExpand={toggleExpand}
 					id={video.id}
-					isMuted={video.isMuted}
+					isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
 				/>
 			{/each}
 		</div>
