@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { mediaStore } from '$lib/stores/mediaStore';
 	import { roomInfoStore } from '$lib/stores/roomStore';
+	import { showToast } from '$lib/stores/toastStore';
 	import { uiStore } from '$lib/stores/uiStore';
 	import AudioToggle from './AudioToggle.svelte';
 	import Cameratoggle from './Cameratoggle.svelte';
@@ -17,12 +18,25 @@
 </script>
 
 <div class="bottom-4 flex w-full justify-between gap-4">
-	<div></div>
+	<div class="flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] p-4">
+		<span>{$roomInfoStore.room}</span>
+		<button
+			aria-label="copy code"
+			onclick={() => {
+				if ($roomInfoStore.room) {
+					navigator.clipboard.writeText($roomInfoStore.room);
+					showToast('Copied', 'info');
+				}
+			}}
+		>
+			<i class="fa-solid fa-copy"></i>
+		</button>
+	</div>
 	<div class="flex gap-4">
 		<AudioToggle {toggleMute} />
 		<Cameratoggle {toggleCamera} />
 		<button
-			on:click={toggleScreenShare}
+			onclick={toggleScreenShare}
 			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
 			aria-label="toggle screen share"
 		>
@@ -36,7 +50,7 @@
 		</button>
 		{#if joined && leaveRoom}
 			<button
-				on:click={leaveRoom}
+				onclick={leaveRoom}
 				class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
 				aria-label="leave room"
 			>
@@ -46,7 +60,7 @@
 	</div>
 	<div>
 		<button
-			on:click={toggleChat}
+			onclick={toggleChat}
 			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
 			class:text-[var(--highlight)]={showChat}
 			class:text-[var(--text-primary)]={!showChat}

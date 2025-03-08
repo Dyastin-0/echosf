@@ -41,7 +41,7 @@
 			$flowStep = 'join';
 			updateParams({ room: $roomInfoStore.room });
 		} catch (error) {
-			showAlert('Automatic join failed, room does not exist.', 'info');
+			showAlert('Failed to join, room does not exist.', 'info');
 			goto('?').then(() => ($roomInfoStore.room = null));
 		}
 	};

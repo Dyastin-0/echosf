@@ -9,6 +9,7 @@ import { mediaStore } from '$lib/stores/mediaStore';
 import { messagesStore } from '$lib/stores/messagesStore';
 import { uiStore } from '$lib/stores/uiStore';
 import { flowStep } from '$lib/stores/flowStore';
+import { showToast } from '$lib/stores/toastStore';
 
 export function useWRTC() {
 	let webrtc: ReturnType<typeof newWRTC>;
@@ -89,6 +90,11 @@ export function useWRTC() {
 			if (msg.id === id) return;
 			if (msg?.type) {
 				switch (msg.type) {
+					case 'join':
+						showToast(`${msg.name} ${msg.data}`, 'info');
+						messagesStore.update((messages) => [...messages, msg]);
+						break;
+
 					case 'audioToggle':
 						mediaStore.update((state) => {
 							const streamId = msg.data;

@@ -1,4 +1,3 @@
-<!-- App.svelte -->
 <script lang="ts">
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { flowStep } from '$lib/stores/flowStore';
@@ -11,6 +10,7 @@
 	import { fade, slide, fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import Alert from '$lib/components/Alert.svelte';
+	import Toast from '$lib/components/Toast.svelte';
 
 	const {
 		initMedia,
@@ -63,5 +63,6 @@
 			<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} {toggleChat} />
 		</div>
 		<Alert />
+		<Toast />
 	</main>
 {/if}

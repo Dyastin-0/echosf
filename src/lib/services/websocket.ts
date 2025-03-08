@@ -20,7 +20,7 @@ export class WS {
 				name,
 				event: 'message',
 				data: 'Joined the room 👋',
-				type: null
+				type: 'join'
 			});
 
 			const localStream = get(mediaStore).localStream;
