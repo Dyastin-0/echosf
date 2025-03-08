@@ -20,6 +20,9 @@
 							isExpanded={true}
 							onExpand={toggleExpand}
 							id={video.id}
+							audioLevel={Number(
+								$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
+							)}
 							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
 						/>
 					{/if}
@@ -33,6 +36,9 @@
 							isExpanded={false}
 							onExpand={toggleExpand}
 							id={video.id}
+							audioLevel={Number(
+								$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
+							)}
 							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
 						/>
 					{/if}
@@ -48,6 +54,9 @@
 					isExpanded={false}
 					onExpand={toggleExpand}
 					id={video.id}
+					audioLevel={Number(
+						$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
+					)}
 					isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
 				/>
 			{/each}

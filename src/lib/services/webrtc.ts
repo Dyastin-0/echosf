@@ -14,6 +14,10 @@ export class WRTC {
 		this.videoTrack = null;
 		this.screenStream = null;
 		this.ws = null;
+
+		setInterval(() => {
+			this.audioStats();
+		}, 500);
 	}
 
 	public getPeerConnection(): RTCPeerConnection {
@@ -59,6 +63,46 @@ export class WRTC {
 	public addTrack(track: MediaStreamTrack, stream: MediaStream | null): void {
 		if (!stream) return;
 		this.pc.addTrack(track, stream);
+	}
+
+	public async audioStats(): Promise<void> {
+		const report = await this.pc.getStats();
+
+		report.forEach((stats, id) => {
+			if (stats.type === 'media-source' && stats.kind === 'audio') {
+				mediaStore.update((state) => {
+					const updatedStates = { ...state.remoteStreamStates };
+
+					if (!updatedStates[stats.trackIdentifier]) {
+						updatedStates[stats.trackIdentifier] = { audioLevel: 0 };
+					}
+
+					updatedStates[stats.trackIdentifier].audioLevel = stats.audioLevel;
+
+					return {
+						...state,
+						remoteStreamStates: updatedStates
+					};
+				});
+			}
+
+			if (stats.type === 'inbound-rtp' && stats.kind === 'audio') {
+				mediaStore.update((state) => {
+					const updatedStates = { ...state.remoteStreamStates };
+
+					if (!updatedStates[stats.trackIdentifier]) {
+						updatedStates[stats.trackIdentifier] = { audioLevel: 0 };
+					}
+
+					updatedStates[stats.trackIdentifier].audioLevel = stats.audioLevel;
+
+					return {
+						...state,
+						remoteStreamStates: updatedStates
+					};
+				});
+			}
+		});
 	}
 
 	public toggleAudio(): void {

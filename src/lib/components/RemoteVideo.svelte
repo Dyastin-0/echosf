@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { setVideoStream } from '$lib/helpers/video';
-	import { quintOut } from 'svelte/easing';
 	import { fly } from 'svelte/transition';
 	export let stream: MediaStream;
 	export let isLocal: boolean = false;
@@ -8,16 +7,22 @@
 	export let onExpand: (id: string) => void;
 	export let id: string;
 	export let isMuted: boolean = false;
+	export let audioLevel: number = 0;
 </script>
 
 <div
-	class="group relative flex h-fit items-center justify-center transition-all"
+	class="group relative flex h-fit items-center justify-center p-1 transition-all duration-200"
 	in:fly={{ y: 100, duration: 200, opacity: 1 }}
 	out:fly={{ duration: 200, opacity: 1 }}
 >
+	<div
+		class="absolute inset-0 rounded-lg bg-[var(--accent)] opacity-0 transition-opacity duration-200"
+		style="opacity: {audioLevel};"
+	></div>
+
 	<video
 		use:setVideoStream={stream}
-		class="w-auto rounded-lg {isExpanded ? 'max-h-[75vh]' : 'max-h-[150px]'}"
+		class="relative w-auto rounded-lg {isExpanded ? 'max-h-[75vh]' : 'max-h-[150px]'}"
 		autoplay
 		muted={isLocal}
 	>
@@ -25,7 +30,7 @@
 	</video>
 
 	<div
-		class="bg-black/ absolute top-2 right-2 flex h-6 w-6 items-center justify-center gap-2 rounded-full text-white"
+		class="absolute top-2 right-2 flex h-6 w-6 items-center justify-center gap-2 rounded-full bg-black/50 text-white"
 	>
 		{#if !isMuted}
 			<i class="fa-solid fa-microphone"></i>

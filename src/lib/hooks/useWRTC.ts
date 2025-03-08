@@ -107,7 +107,7 @@ export function useWRTC() {
 							const updatedStates = { ...state.remoteStreamStates };
 
 							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown', video: 'unknown' };
+								updatedStates[streamId] = { audio: 'unknown', video: 'unknown', audioLevel: 0 };
 							}
 
 							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
