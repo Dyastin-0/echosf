@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { copyCode } from '$lib/helpers/clip';
 	import { mediaStore } from '$lib/stores/mediaStore';
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { showToast } from '$lib/stores/toastStore';
@@ -20,15 +21,7 @@
 <div class="bottom-4 flex w-full justify-between gap-4">
 	<div class="flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] p-4">
 		<span>{$roomInfoStore.room}</span>
-		<button
-			aria-label="copy code"
-			onclick={() => {
-				if ($roomInfoStore.room) {
-					navigator.clipboard.writeText($roomInfoStore.room);
-					showToast('Copied', 'info');
-				}
-			}}
-		>
+		<button aria-label="copy code" onclick={copyCode}>
 			<i class="fa-solid fa-copy"></i>
 		</button>
 	</div>

@@ -31,20 +31,21 @@
 
 {#if !$roomInfoStore.joined}
 	<main
-		class="flex h-screen w-full flex-wrap items-center justify-center gap-4 bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
+		class="flex h-screen w-full flex-wrap items-center justify-center gap-4 overflow-hidden bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
 		in:fade={{ duration: 300 }}
 		out:fade={{ duration: 200 }}
 	>
 		{#if $flowStep === 'create'}
-			<div in:slide={{ duration: 300, delay: 150 }}>
+			<div in:fly={{ duration: 300, x: 100 }}>
 				<CreateRoom />
 			</div>
 		{:else if $flowStep === 'join'}
-			<div in:slide={{ duration: 300, delay: 150 }}>
+			<div in:fly={{ duration: 300, x: 100 }}>
 				<JoinRoom {initMedia} {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
 			</div>
 		{/if}
 		<Alert />
+		<Toast />
 	</main>
 {:else}
 	<main
@@ -56,13 +57,13 @@
 			class="relative flex h-full gap-4"
 			in:slide={{ duration: 400, delay: 100, easing: quintOut }}
 		>
-			<div class="flex-grow" in:fade={{ duration: 400, delay: 200 }}>
+			<div class="flex-grow" in:fade={{ duration: 400, delay: 300 }}>
 				<RemoteVideos />
 			</div>
 			<ChatPanel onSendMessage={sendChatMessage} />
 		</div>
 
-		<div in:fly={{ y: 20, duration: 300, delay: 400 }}>
+		<div in:fly={{ y: 20, duration: 300, delay: 500 }}>
 			<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} {toggleChat} />
 		</div>
 		<Alert />
