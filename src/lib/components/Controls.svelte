@@ -20,7 +20,7 @@
 
 <div class="bottom-4 flex w-full justify-between gap-4">
 	<div class="flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] p-4">
-		<span>{$roomInfoStore.room}</span>
+		<span>{$roomInfoStore.id}</span>
 		<button aria-label="copy code" onclick={copyCode}>
 			<i class="fa-solid fa-copy"></i>
 		</button>

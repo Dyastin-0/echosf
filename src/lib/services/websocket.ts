@@ -12,31 +12,27 @@ export class WS {
 		this.webrtcService = webrtcService;
 		this.chatMessageCallback = (msg: App.WebsocketMessage) => {};
 
-		const { id, name } = get(roomInfoStore);
-
 		this.ws.onopen = () => {
 			this.sendMessage({
-				id,
-				name,
+				id: get(roomInfoStore).userId,
+				name: get(roomInfoStore).userName,
 				event: 'message',
 				data: 'Joined the room 👋',
 				type: 'join'
 			});
 
-			const localStream = get(mediaStore).localStream;
-
 			this.sendMessage({
 				event: 'message',
-				data: get(mediaStore)?.localStream?.id,
+				data: get(mediaStore).localStream?.id,
 				type: 'initialAudioState',
-				state: localStream?.getAudioTracks()[0].enabled
+				state: get(mediaStore).localStream?.getAudioTracks()[0].enabled
 			});
 
 			this.sendMessage({
 				event: 'message',
-				data: get(mediaStore)?.localStream?.id,
+				data: get(mediaStore).localStream?.id,
 				type: 'audioStateRequest',
-				target: get(roomInfoStore).id
+				target: get(roomInfoStore).userId
 			});
 		};
 

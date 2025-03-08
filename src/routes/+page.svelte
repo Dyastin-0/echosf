@@ -24,7 +24,7 @@
 
 	const handleJoinRoom = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
-		joinRoom($roomInfoStore.room, $roomInfoStore.name, $roomInfoStore.id);
+		joinRoom($roomInfoStore.id, $roomInfoStore.userName, $roomInfoStore.userId);
 	};
 </script>
 

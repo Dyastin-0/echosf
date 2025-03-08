@@ -20,7 +20,7 @@
 	const goBack = () => {
 		goto('?').then(() => {
 			$flowStep = 'create';
-			$roomInfoStore.room = null;
+			$roomInfoStore.id = null;
 		});
 	};
 
@@ -28,7 +28,7 @@
 		e.preventDefault();
 
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
+			const response = await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.id}`, {
 				method: 'POST'
 			});
 
@@ -69,7 +69,7 @@
 					<input
 						id="name"
 						type="text"
-						bind:value={$roomInfoStore.name}
+						bind:value={$roomInfoStore.userName}
 						required
 						placeholder="Enter your name"
 						class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"
@@ -106,7 +106,7 @@
 				<input
 					type="text"
 					readonly
-					value={$roomInfoStore.room}
+					value={$roomInfoStore.id}
 					class="flex-grow rounded-lg bg-[var(--bg-secondary)] p-2 outline-none"
 				/>
 				<button

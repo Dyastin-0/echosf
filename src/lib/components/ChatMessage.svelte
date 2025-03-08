@@ -4,12 +4,12 @@
 
 	export let message: App.WebsocketMessage;
 
-	const { id } = get(roomInfoStore);
+	const { userId } = get(roomInfoStore);
 </script>
 
 <div class="rounded-full bg-[var(--bg-primary)] pt-3 pr-6 pb-3 pl-6">
 	<p class="text-xs text-[var(--text-secondary)]">
-		{id === message.id ? 'You' : message.name}
+		{userId === message.id ? 'You' : message.name}
 	</p>
 	<p>{message.data}</p>
 </div>

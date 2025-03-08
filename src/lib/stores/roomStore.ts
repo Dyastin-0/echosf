@@ -1,13 +1,13 @@
 import { writable } from 'svelte/store';
 
 export const roomInfoStore = writable<{
-	room: string | null;
-	name: string | null;
 	id: string | null;
+	userName: string | null;
+	userId: string | null;
 	joined: boolean;
 }>({
-	room: null,
-	name: null,
-	id: crypto.randomUUID(),
+	id: null,
+	userName: null,
+	userId: crypto.randomUUID(),
 	joined: false
 });

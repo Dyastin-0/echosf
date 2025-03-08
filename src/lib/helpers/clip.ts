@@ -4,9 +4,8 @@ import { get } from 'svelte/store';
 
 export function copyCode() {
 	const info = get(roomInfoStore);
-	if (info.room) {
-		console.log('WAW');
-		navigator.clipboard.writeText(info.room);
+	if (info.id) {
+		navigator.clipboard.writeText(info.id);
 		showToast('Room code copied.', 'info');
 	}
 }

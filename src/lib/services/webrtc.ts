@@ -88,7 +88,7 @@ export class WRTC {
 				this.ws.sendMessage({
 					event: 'message',
 					type: 'audioToggle',
-					data: get(mediaStore).localStream?.id,
+					data: localStream?.id,
 					state: localStream?.getAudioTracks()[0].enabled
 				});
 			}

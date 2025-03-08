@@ -9,13 +9,13 @@
 	import { showAlert } from '$lib/stores/alertStore';
 	import { goto } from '$app/navigation';
 
-	$roomInfoStore.room = page.url.searchParams.get('room');
+	$roomInfoStore.id = page.url.searchParams.get('room');
 
 	const createNewRoom = async () => {
 		try {
 			const newRoom = generatecode(3, 4, 3);
-			$roomInfoStore.room = newRoom;
-			await fetch(`${PUBLIC_API_URL}/create?room=${$roomInfoStore.room}`, {
+			$roomInfoStore.id = newRoom;
+			await fetch(`${PUBLIC_API_URL}/create?room=${$roomInfoStore.id}`, {
 				method: 'POST'
 			});
 
@@ -27,10 +27,10 @@
 	};
 
 	const handleContinue = async () => {
-		if (!$roomInfoStore.room || $roomInfoStore.room.trim() === '') return;
+		if (!$roomInfoStore.id) return;
 
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.room}`, {
+			const response = await fetch(`${PUBLIC_API_URL}/check?room=${$roomInfoStore.id}`, {
 				method: 'POST'
 			});
 
@@ -39,15 +39,15 @@
 			}
 
 			$flowStep = 'join';
-			updateParams({ room: $roomInfoStore.room });
+			updateParams({ room: $roomInfoStore.id });
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');
-			goto('?').then(() => ($roomInfoStore.room = null));
+			goto('?').then(() => ($roomInfoStore.id = null));
 		}
 	};
 
 	onMount(() => {
-		if ($roomInfoStore.room && $roomInfoStore.room.trim() !== '') {
+		if ($roomInfoStore.id) {
 			handleContinue();
 		}
 	});
@@ -79,7 +79,7 @@
 				>
 				<input
 					type="text"
-					bind:value={$roomInfoStore.room}
+					bind:value={$roomInfoStore.id}
 					required
 					placeholder="Code"
 					class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"

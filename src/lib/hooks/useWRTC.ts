@@ -40,14 +40,20 @@ export function useWRTC() {
 		}
 	}
 
-	async function joinRoom(room: string | null, name: string | null, id: string | null) {
-		await goto(`?room=${room}`);
-		document.title = `echos - ${room}`;
+	async function joinRoom(roomId: string | null, name: string | null, id: string | null) {
+		await goto(`?room=${roomId}`);
+		document.title = `echos - ${roomId}`;
 
-		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${room}&id=${id}`, webrtc);
+		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${roomId}&id=${id}`, webrtc);
 
 		setupWebRTCCallbacks(webrtc, websocket, id);
-		roomInfoStore.update((state) => ({ ...state, joined: true, room, name }));
+		roomInfoStore.update((state) => ({
+			...state,
+			joined: true,
+			id: roomId,
+			userName: name,
+			userId: id
+		}));
 	}
 
 	function setupWebRTCCallbacks(
@@ -137,12 +143,12 @@ export function useWRTC() {
 							type: 'audioStateAnswer',
 							data: get(mediaStore).localStream?.id,
 							target: msg.target,
-							state: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled || false
+							state: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled
 						});
 						break;
 
 					case 'audioStateAnswer':
-						if (msg?.target !== get(roomInfoStore).id) return;
+						if (msg?.target !== get(roomInfoStore).userId) return;
 
 						mediaStore.update((state) => {
 							const streamId = msg.data;
@@ -182,23 +188,25 @@ export function useWRTC() {
 	async function leaveRoom() {
 		document.title = 'echos';
 
-		const { id, name } = get(roomInfoStore);
-		websocket.sendMessage({ id, event: 'message', data: 'Left the room 🤷‍♂️', name });
+		websocket.sendMessage({
+			id: get(roomInfoStore).userId,
+			event: 'message',
+			data: 'Left the room 🤷‍♂️',
+			name: get(roomInfoStore).userName
+		});
 		webrtc.reset();
 		resetRoomState();
 		flowStep.set('create');
 	}
 
 	function sendChatMessage(message: string) {
-		const { id, name } = get(roomInfoStore);
-
 		messagesStore.update((state) => [
 			...state,
 			{
 				event: 'message',
 				data: message,
-				name,
-				id,
+				name: get(roomInfoStore).userName,
+				id: get(roomInfoStore).userId,
 				type: null,
 				state: false,
 				target: null
@@ -208,8 +216,11 @@ export function useWRTC() {
 		websocket.sendMessage({
 			event: 'message',
 			data: message,
-			name,
-			id: id
+			name: get(roomInfoStore).userName,
+			id: get(roomInfoStore).userId,
+			type: '',
+			target: '',
+			state: null
 		});
 	}
 
@@ -256,8 +267,7 @@ export function useWRTC() {
 	}
 
 	async function toggleScreenShare() {
-		const state = get(roomInfoStore);
-		if (!state.joined) return;
+		if (!get(roomInfoStore).joined) return;
 
 		const isCurrentlySharing = get(mediaStore).mediaSate?.isScreenSharing;
 

@@ -8,10 +8,10 @@ export function resetRoomState() {
 	const media = get(mediaStore);
 
 	roomInfoStore.set({
-		room: null,
-		name: null,
+		id: null,
+		userName: null,
 		joined: false,
-		id: crypto.randomUUID()
+		userId: crypto.randomUUID()
 	});
 
 	uiStore.set({
