@@ -24,6 +24,7 @@
 								$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
 							)}
 							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
+							owner={String($mediaStore.remoteStreamStates[video.id]?.owner)}
 						/>
 					{/if}
 				{/each}
@@ -40,6 +41,7 @@
 								$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
 							)}
 							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
+							owner={String($mediaStore.remoteStreamStates[video.id]?.owner)}
 						/>
 					{/if}
 				{/each}
@@ -58,6 +60,7 @@
 						$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
 					)}
 					isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
+					owner={String($mediaStore.remoteStreamStates[video.id]?.owner)}
 				/>
 			{/each}
 		</div>

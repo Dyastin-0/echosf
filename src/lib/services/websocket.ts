@@ -25,7 +25,8 @@ export class WS {
 				event: 'message',
 				data: get(mediaStore).localStream?.id,
 				type: 'initialAudioState',
-				state: get(mediaStore).localStream?.getAudioTracks()[0].enabled
+				state: get(mediaStore).localStream?.getAudioTracks()[0].enabled,
+				name: get(roomInfoStore).userName
 			});
 
 			this.sendMessage({

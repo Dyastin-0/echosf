@@ -6,6 +6,7 @@
 	export let isExpanded: boolean = false;
 	export let onExpand: (id: string) => void;
 	export let id: string;
+	export let owner: string;
 	export let isMuted: boolean = false;
 	export let audioLevel: number = 0;
 </script>
@@ -30,7 +31,7 @@
 	</video>
 
 	<div
-		class="absolute top-2 right-2 flex h-6 w-6 items-center justify-center gap-2 rounded-full bg-black/50 text-white"
+		class="absolute top-3 right-3 flex h-6 w-6 items-center justify-center gap-2 rounded-full bg-black/50 text-white"
 	>
 		{#if !isMuted}
 			<i class="fa-solid fa-microphone"></i>
@@ -39,8 +40,16 @@
 		{/if}
 	</div>
 
+	<div class="absolute bottom-3 min-h-6 min-w-6 font-bold">
+		{#if owner !== 'undefined'}
+			<span>{owner}</span>
+		{:else}
+			<span>You</span>
+		{/if}
+	</div>
+
 	<button
-		class="absolute right-2 bottom-2 min-h-6 min-w-6 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		class="absolute right-3 bottom-3 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 		on:click={() => onExpand(id)}
 		aria-label="toggle expand"
 	>

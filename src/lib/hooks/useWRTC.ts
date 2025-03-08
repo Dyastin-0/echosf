@@ -125,10 +125,11 @@ export function useWRTC() {
 							const updatedStates = { ...state.remoteStreamStates };
 
 							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown', video: 'unknown' };
+								updatedStates[streamId] = { audio: 'unknown', video: 'unknown', owner: '' };
 							}
 
 							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
+							updatedStates[streamId].owner = msg.name || '';
 
 							return {
 								...state,
@@ -143,6 +144,7 @@ export function useWRTC() {
 							type: 'audioStateAnswer',
 							data: get(mediaStore).localStream?.id,
 							target: msg.target,
+							name: get(roomInfoStore).userName,
 							state: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled
 						});
 						break;
@@ -155,10 +157,11 @@ export function useWRTC() {
 							const updatedStates = { ...state.remoteStreamStates };
 
 							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown', video: 'unknown' };
+								updatedStates[streamId] = { audio: 'unknown', video: 'unknown', owner: '' };
 							}
 
 							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
+							updatedStates[streamId].owner = String(msg.name);
 
 							return {
 								...state,
