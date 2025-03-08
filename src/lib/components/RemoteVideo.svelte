@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { setVideoStream } from '$lib/helpers/video';
+	import { quintOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 	export let stream: MediaStream;
 	export let isLocal: boolean = false;
 	export let isExpanded: boolean = false;
@@ -8,10 +10,14 @@
 	export let isMuted: boolean = false;
 </script>
 
-<div class="group relative flex h-fit items-center justify-center transition-all">
+<div
+	class="group relative flex h-fit items-center justify-center transition-all"
+	in:fly={{ y: 100, duration: 200, opacity: 1 }}
+	out:fly={{ duration: 200, opacity: 1 }}
+>
 	<video
 		use:setVideoStream={stream}
-		class="w-auto rounded-lg object-cover {isExpanded ? 'max-h-[75vh]' : 'max-h-[150px]'}"
+		class="w-auto rounded-lg {isExpanded ? 'max-h-[75vh]' : 'max-h-[150px]'}"
 		autoplay
 		muted={isLocal}
 	>

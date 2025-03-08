@@ -8,6 +8,8 @@
 	import RemoteVideos from '$lib/components/Videos.svelte';
 	import ChatPanel from '$lib/components/ChatPanel.svelte';
 	import Controls from '$lib/components/Controls.svelte';
+	import { fade, slide, fly } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	const {
 		initMedia,
@@ -29,22 +31,34 @@
 {#if !$roomInfoStore.joined}
 	<main
 		class="flex h-screen w-full flex-wrap items-center justify-center gap-4 bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
+		in:fade={{ duration: 300 }}
+		out:fade={{ duration: 200 }}
 	>
 		{#if $flowStep === 'create'}
-			<CreateRoom />
+			<div in:slide={{ duration: 300, delay: 150 }}>
+				<CreateRoom />
+			</div>
 		{:else if $flowStep === 'join'}
-			<JoinRoom {initMedia} {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
+			<div in:slide={{ duration: 300, delay: 150 }}>
+				<JoinRoom {initMedia} {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
+			</div>
 		{/if}
 	</main>
 {:else}
 	<main
-		class="relative flex h-screen w-full flex-col justify-center gap-4 bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
+		class="relative flex h-screen w-full flex-col justify-center gap-4 overflow-hidden bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
+		in:fade={{ duration: 300 }}
+		out:fade={{ duration: 200 }}
 	>
-		<div class="relative flex h-full gap-4">
-			<RemoteVideos />
+		<div class="relative flex h-full" in:slide={{ duration: 400, delay: 100, easing: quintOut }}>
+			<div class="flex-grow" in:fade={{ duration: 400, delay: 200 }}>
+				<RemoteVideos />
+			</div>
 			<ChatPanel onSendMessage={sendChatMessage} />
 		</div>
 
-		<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} {toggleChat} />
+		<div in:fly={{ y: 20, duration: 300, delay: 400 }}>
+			<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} {toggleChat} />
+		</div>
 	</main>
 {/if}
