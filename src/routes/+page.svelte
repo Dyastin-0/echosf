@@ -10,6 +10,7 @@
 	import Controls from '$lib/components/Controls.svelte';
 	import { fade, slide, fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import Alert from '$lib/components/Alert.svelte';
 
 	const {
 		initMedia,
@@ -43,6 +44,7 @@
 				<JoinRoom {initMedia} {toggleCamera} {toggleMute} onJoinRoom={handleJoinRoom} />
 			</div>
 		{/if}
+		<Alert />
 	</main>
 {:else}
 	<main
@@ -60,5 +62,6 @@
 		<div in:fly={{ y: 20, duration: 300, delay: 400 }}>
 			<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} {toggleChat} />
 		</div>
+		<Alert />
 	</main>
 {/if}

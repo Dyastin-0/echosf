@@ -6,6 +6,8 @@
 	import AudioToggle from './AudioToggle.svelte';
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { goto } from '$app/navigation';
+	import { showAlert } from '$lib/stores/alertStore';
 
 	export let toggleCamera: () => void;
 	export let toggleMute: () => void;
@@ -15,7 +17,10 @@
 	onMount(initMedia);
 
 	const goBack = () => {
-		$flowStep = 'create';
+		goto('?').then(() => {
+			$flowStep = 'create';
+			$roomInfoStore.room = null;
+		});
 	};
 
 	const join = async (e: { preventDefault: () => void }) => {
@@ -33,12 +38,14 @@
 			$flowStep = 'join';
 			onJoinRoom(e);
 		} catch (error) {
-			alert('Failed to join, room does not exist anymore.');
+			showAlert('Failed to join, room does not exist.', 'info');
 		}
 	};
 </script>
 
-<div class="flex w-full max-w-md flex-col gap-4 rounded-lg bg-[var(--bg-secondary)] p-4 shadow-lg">
+<div
+	class="flex w-[400px] max-w-md flex-col gap-4 rounded-lg bg-[var(--bg-secondary)] p-4 shadow-lg"
+>
 	<div class="flex items-center justify-center gap-2">
 		<h1 class="text-center text-2xl font-bold text-[var(--text-primary)]">Echos</h1>
 		<img src="icon.ico" alt="logo" class="h-11 w-11" />
