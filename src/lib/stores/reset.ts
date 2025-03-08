@@ -25,7 +25,8 @@ export function resetRoomState() {
 			isMuted: false,
 			isScreenSharing: false
 		},
-		remoteStreams: []
+		remoteStreams: [],
+		remoteStreamStates: {}
 	});
 
 	messagesStore.set([]);
