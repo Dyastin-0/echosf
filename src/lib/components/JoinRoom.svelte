@@ -39,6 +39,7 @@
 			onJoinRoom(e);
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');
+			goBack();
 		}
 	};
 </script>
