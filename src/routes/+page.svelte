@@ -52,7 +52,10 @@
 		in:fade={{ duration: 300 }}
 		out:fade={{ duration: 200 }}
 	>
-		<div class="relative flex h-full" in:slide={{ duration: 400, delay: 100, easing: quintOut }}>
+		<div
+			class="relative flex h-full gap-4"
+			in:slide={{ duration: 400, delay: 100, easing: quintOut }}
+		>
 			<div class="flex-grow" in:fade={{ duration: 400, delay: 200 }}>
 				<RemoteVideos />
 			</div>
