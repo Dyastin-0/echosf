@@ -119,7 +119,7 @@ export function useWRTC() {
 						});
 						break;
 
-					case 'initialAudioState':
+					case 'initialStates':
 						mediaStore.update((state) => {
 							const streamId = msg.data;
 							const updatedStates = { ...state.remoteStreamStates };
@@ -138,10 +138,10 @@ export function useWRTC() {
 						});
 						break;
 
-					case 'audioStateRequest':
+					case 'stateRequest':
 						websocket.sendMessage({
 							event: 'message',
-							type: 'audioStateAnswer',
+							type: 'stateAnswer',
 							data: get(mediaStore).localStream?.id,
 							target: msg.target,
 							name: get(roomInfoStore).userName,
@@ -149,7 +149,7 @@ export function useWRTC() {
 						});
 						break;
 
-					case 'audioStateAnswer':
+					case 'stateAnswer':
 						if (msg?.target !== get(roomInfoStore).userId) return;
 
 						mediaStore.update((state) => {

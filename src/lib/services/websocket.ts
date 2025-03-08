@@ -24,7 +24,7 @@ export class WS {
 			this.sendMessage({
 				event: 'message',
 				data: get(mediaStore).localStream?.id,
-				type: 'initialAudioState',
+				type: 'initialStates',
 				state: get(mediaStore).localStream?.getAudioTracks()[0].enabled,
 				name: get(roomInfoStore).userName
 			});
@@ -32,7 +32,7 @@ export class WS {
 			this.sendMessage({
 				event: 'message',
 				data: get(mediaStore).localStream?.id,
-				type: 'audioStateRequest',
+				type: 'stateRequest',
 				target: get(roomInfoStore).userId
 			});
 		};
