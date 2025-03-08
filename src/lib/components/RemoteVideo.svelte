@@ -19,7 +19,7 @@
 	</video>
 
 	<div
-		class="absolute bottom-2 left-2 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1 text-white"
+		class="bg-black/ absolute top-2 right-2 flex h-6 w-6 items-center justify-center gap-2 rounded-full text-white"
 	>
 		{#if !isMuted}
 			<i class="fa-solid fa-microphone"></i>
@@ -29,7 +29,7 @@
 	</div>
 
 	<button
-		class="absolute top-2 right-2 min-h-8 min-w-8 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		class="absolute right-2 bottom-2 min-h-6 min-w-6 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 		on:click={() => onExpand(id)}
 		aria-label="toggle expand"
 	>

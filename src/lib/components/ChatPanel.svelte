@@ -20,7 +20,7 @@
 </script>
 
 <section
-	class="h-full w-[400px] flex-col gap-4 rounded-md bg-[var(--bg-secondary)] p-4"
+	class="h-[500px] w-[400px] flex-col gap-4 rounded-md bg-[var(--bg-secondary)] p-4"
 	class:flex={showChat}
 	class:hidden={!showChat}
 >
@@ -30,11 +30,14 @@
 			<ChatMessage {message} />
 		{/each}
 	</div>
-	<form on:submit={sendMessage}>
-		<input
-			name="chatInput"
-			class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"
-			placeholder="Send a message"
-		/>
+	<form class="flex rounded-full bg-[var(--bg-primary)]" on:submit={sendMessage}>
+		<input name="chatInput" class="w-full p-4 outline-none" placeholder="Send a message" />
+		<button
+			class="flex min-h-14 min-w-14 items-center justify-center rounded-full p-4 hover:bg-[var(--accent)]"
+			type="submit"
+			aria-label="send message button"
+		>
+			<i class="fa-solid fa-paper-plane"></i>
+		</button>
 	</form>
 </section>

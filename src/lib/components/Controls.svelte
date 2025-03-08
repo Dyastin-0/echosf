@@ -16,38 +16,43 @@
 	$: mediaState = $mediaStore.mediaSate;
 </script>
 
-<div class="bottom-4 flex w-full justify-center gap-4">
-	<AudioToggle {toggleMute} />
-	<Cameratoggle {toggleCamera} />
-	<button
-		on:click={toggleChat}
-		class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-		class:text-[var(--highlight)]={showChat}
-		class:text-[var(--text-primary)]={!showChat}
-		aria-label="toggle chat"
-	>
-		<i class="fa-solid fa-message text-lg"></i>
-	</button>
-	<button
-		on:click={toggleScreenShare}
-		class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-		aria-label="toggle screen share"
-	>
-		<i
-			class="fa-solid text-lg"
-			class:text-[var(--red)]={mediaState?.isScreenSharing}
-			class:text-[var(--text-primary)]={!mediaState?.isScreenSharing}
-			class:fa-desktop={!mediaState?.isScreenSharing}
-			class:fa-stop={mediaState?.isScreenSharing}
-		></i>
-	</button>
-	{#if joined && leaveRoom}
+<div class="bottom-4 flex w-full justify-between gap-4">
+	<div></div>
+	<div class="flex gap-4">
+		<AudioToggle {toggleMute} />
+		<Cameratoggle {toggleCamera} />
 		<button
-			on:click={leaveRoom}
+			on:click={toggleScreenShare}
 			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-			aria-label="leave room"
+			aria-label="toggle screen share"
 		>
-			<i class="fa-solid fa-phone rotate-[135deg] text-lg text-[var(--red)]"></i>
+			<i
+				class="fa-solid text-lg"
+				class:text-[var(--red)]={mediaState?.isScreenSharing}
+				class:text-[var(--text-primary)]={!mediaState?.isScreenSharing}
+				class:fa-desktop={!mediaState?.isScreenSharing}
+				class:fa-stop={mediaState?.isScreenSharing}
+			></i>
 		</button>
-	{/if}
+		{#if joined && leaveRoom}
+			<button
+				on:click={leaveRoom}
+				class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+				aria-label="leave room"
+			>
+				<i class="fa-solid fa-phone rotate-[135deg] text-lg text-[var(--red)]"></i>
+			</button>
+		{/if}
+	</div>
+	<div>
+		<button
+			on:click={toggleChat}
+			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+			class:text-[var(--highlight)]={showChat}
+			class:text-[var(--text-primary)]={!showChat}
+			aria-label="toggle chat"
+		>
+			<i class="fa-solid fa-message text-lg"></i>
+		</button>
+	</div>
 </div>
