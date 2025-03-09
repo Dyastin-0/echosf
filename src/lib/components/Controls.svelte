@@ -13,6 +13,7 @@
 
 	$: joined = $roomInfoStore.joined;
 	$: showChat = $uiStore.showChat;
+	$: showParticipants = $uiStore.showParticipants;
 	$: mediaState = $mediaStore.mediaSate;
 </script>
 
@@ -53,8 +54,8 @@
 		<button
 			onclick={toggleParticipants}
 			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-			class:text-[var(--highlight)]={showChat}
-			class:text-[var(--text-primary)]={!showChat}
+			class:text-[var(--highlight)]={showParticipants}
+			class:text-[var(--text-primary)]={!showParticipants}
 			aria-label="toggle participants"
 		>
 			<i class="fa-solid fa-users"></i>
