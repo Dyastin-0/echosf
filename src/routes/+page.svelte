@@ -10,6 +10,8 @@
 	import { fly } from 'svelte/transition';
 	import Alert from '$lib/components/Alert.svelte';
 	import Toast from '$lib/components/Toast.svelte';
+	import { toggleChat } from '$lib/stores/uiStore';
+	import Participants from '$lib/components/Participants.svelte';
 
 	const {
 		initMedia,
@@ -17,7 +19,6 @@
 		leaveRoom,
 		sendChatMessage,
 		toggleCamera,
-		toggleChat,
 		toggleMute,
 		toggleScreenShare
 	} = useWRTC();
@@ -57,10 +58,11 @@
 				<RemoteVideos />
 			</div>
 			<ChatPanel onSendMessage={sendChatMessage} />
+			<Participants />
 		</div>
 
 		<div in:fly={{ y: 20, duration: 300 }} out:fly={{ y: -20, duration: 300 }}>
-			<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} {toggleChat} />
+			<Controls {leaveRoom} {toggleMute} {toggleCamera} {toggleScreenShare} />
 		</div>
 		<Alert />
 		<Toast />

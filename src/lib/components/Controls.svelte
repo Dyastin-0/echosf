@@ -2,8 +2,7 @@
 	import { copyCode } from '$lib/helpers/clip';
 	import { mediaStore } from '$lib/stores/mediaStore';
 	import { roomInfoStore } from '$lib/stores/roomStore';
-	import { showToast } from '$lib/stores/toastStore';
-	import { uiStore } from '$lib/stores/uiStore';
+	import { toggleChat, toggleParticipants, uiStore } from '$lib/stores/uiStore';
 	import AudioToggle from './AudioToggle.svelte';
 	import Cameratoggle from './Cameratoggle.svelte';
 
@@ -11,7 +10,6 @@
 	export let toggleMute: () => void;
 	export let toggleCamera: () => void;
 	export let toggleScreenShare: () => void;
-	export let toggleChat: () => void;
 
 	$: joined = $roomInfoStore.joined;
 	$: showChat = $uiStore.showChat;
@@ -51,7 +49,16 @@
 			</button>
 		{/if}
 	</div>
-	<div>
+	<div class="flex gap-2">
+		<button
+			onclick={toggleParticipants}
+			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+			class:text-[var(--highlight)]={showChat}
+			class:text-[var(--text-primary)]={!showChat}
+			aria-label="toggle participants"
+		>
+			<i class="fa-solid fa-users"></i>
+		</button>
 		<button
 			onclick={toggleChat}
 			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"

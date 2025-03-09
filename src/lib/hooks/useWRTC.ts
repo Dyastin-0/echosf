@@ -7,7 +7,6 @@ import { roomInfoStore } from '$lib/stores/roomStore';
 import { resetRoomState } from '$lib/stores/reset';
 import { mediaStore } from '$lib/stores/mediaStore';
 import { messagesStore } from '$lib/stores/messagesStore';
-import { uiStore } from '$lib/stores/uiStore';
 import { flowStep } from '$lib/stores/flowStore';
 import { showToast } from '$lib/stores/toastStore';
 
@@ -81,10 +80,17 @@ export function useWRTC() {
 
 				stream.onremovetrack = (removeEvent) => {
 					if (removeEvent.track.id === event.track.id) {
-						mediaStore.update((state) => ({
-							...state,
-							remoteStreams: state.remoteStreams.filter((s) => s.id !== stream.id)
-						}));
+						mediaStore.update((state) => {
+							const updatedRemoteStreamStates = { ...state.remoteStreamStates };
+
+							delete updatedRemoteStreamStates[stream.id];
+
+							return {
+								...state,
+								remoteStreamStates: updatedRemoteStreamStates,
+								remoteStreams: state.remoteStreams.filter((s) => s.id !== stream.id)
+							};
+						});
 					}
 				};
 
@@ -107,7 +113,7 @@ export function useWRTC() {
 							const updatedStates = { ...state.remoteStreamStates };
 
 							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown', video: 'unknown', audioLevel: 0 };
+								updatedStates[streamId] = { audio: 'unknown' };
 							}
 
 							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
@@ -120,20 +126,22 @@ export function useWRTC() {
 						break;
 
 					case 'initialStates':
-						mediaStore.update((state) => {
-							const streamId = msg.data;
-							const updatedStates = { ...state.remoteStreamStates };
+						const { data, target, state, name } = msg;
 
-							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown', video: 'unknown', owner: '' };
+						mediaStore.update((prevState) => {
+							const updatedRemoteStreamStates = { ...prevState.remoteStreamStates };
+
+							if (!updatedRemoteStreamStates[data]) {
+								updatedRemoteStreamStates[data] = { audio: 'unknown', ownerId: '', owner: '' };
 							}
 
-							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
-							updatedStates[streamId].owner = msg.name || '';
+							updatedRemoteStreamStates[data].audio = state ? 'enabled' : 'disabled';
+							updatedRemoteStreamStates[data].owner = name || '';
+							updatedRemoteStreamStates[data].ownerId = target || '';
 
 							return {
-								...state,
-								remoteStreamStates: updatedStates
+								...prevState,
+								remoteStreamStates: updatedRemoteStreamStates
 							};
 						});
 						break;
@@ -197,6 +205,7 @@ export function useWRTC() {
 			data: 'Left the room 🤷‍♂️',
 			name: get(roomInfoStore).userName
 		});
+
 		webrtc.reset();
 		resetRoomState();
 		flowStep.set('create');
@@ -300,20 +309,12 @@ export function useWRTC() {
 		});
 	}
 
-	function toggleChat() {
-		uiStore.update((store) => ({
-			...store,
-			showChat: !store.showChat
-		}));
-	}
-
 	return {
 		initMedia,
 		joinRoom,
 		leaveRoom,
 		sendChatMessage,
 		toggleCamera,
-		toggleChat,
 		toggleMute,
 		toggleScreenShare,
 		getWebRTC: () => webrtc,

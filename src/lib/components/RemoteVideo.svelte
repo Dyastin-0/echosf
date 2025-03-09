@@ -31,25 +31,16 @@
 	</video>
 
 	<div
-		class="absolute top-3 right-3 flex h-6 w-6 items-center justify-center gap-2 rounded-full bg-black/50 text-white"
+		class="absolute bottom-3 left-4 flex items-center justify-center gap-1 rounded-full bg-black/50 text-white"
 	>
-		{#if !isMuted}
-			<i class="fa-solid fa-microphone"></i>
-		{:else}
-			<i class="fa-solid fa-microphone-slash"></i>
-		{/if}
-	</div>
-
-	<div class="absolute bottom-3 min-h-6 min-w-6 font-bold">
-		{#if owner !== 'undefined'}
-			<span>{owner}</span>
-		{:else}
-			<span>You</span>
-		{/if}
+		<div class="flex h-4 w-4 items-center justify-center">
+			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
+		</div>
+		<span>{owner !== 'undefined' ? owner : 'You'}</span>
 	</div>
 
 	<button
-		class="absolute right-3 bottom-3 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		class="absolute right-4 bottom-3 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 		on:click={() => onExpand(id)}
 		aria-label="toggle expand"
 	>
