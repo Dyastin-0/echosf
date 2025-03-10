@@ -22,7 +22,7 @@
 							onExpand={toggleExpand}
 							id={stream.id}
 							audioLevel={Number(
-								$mediaStore.remoteStreamStates[stream.getAudioTracks()[0].id]?.audioLevel
+								$mediaStore.remoteStreamStates[stream.getAudioTracks()[0]?.id]?.audioLevel
 							)}
 							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
@@ -41,7 +41,7 @@
 							onExpand={toggleExpand}
 							id={stream.id}
 							audioLevel={Number(
-								$mediaStore.remoteStreamStates[stream.getAudioTracks()[0].id]?.audioLevel
+								$mediaStore.remoteStreamStates[stream.getAudioTracks()[0]?.id]?.audioLevel
 							)}
 							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
@@ -61,7 +61,7 @@
 					onExpand={toggleExpand}
 					id={stream.id}
 					audioLevel={Number(
-						$mediaStore.remoteStreamStates[stream.getAudioTracks()[0].id]?.audioLevel
+						$mediaStore.remoteStreamStates[stream.getAudioTracks()[0]?.id]?.audioLevel
 					)}
 					isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 					owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
