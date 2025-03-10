@@ -116,7 +116,7 @@ export class WRTC {
 					const updatedStates = { ...state.remoteStreamStates };
 
 					if (!updatedStates[localStream.id]) {
-						updatedStates[localStream.id] = { audio: 'unknown', video: 'unknown' };
+						updatedStates[localStream.id] = { audio: 'unknown' };
 					}
 
 					updatedStates[localStream.id].audio = this.audioTrack?.enabled ? 'enabled' : 'disabled';
@@ -150,7 +150,7 @@ export class WRTC {
       const updatedStates = { ...state.remoteStreamStates };
 
 			if (!updatedStates[localStream.id]) {
-        updatedStates[localStream.id] = { video: 'unknown', video: 'unknown' };
+        updatedStates[localStream.id] = { video: 'unknown' };
 			}
 
 			updatedStates[localStream.id].video = this.videoTrack?.enabled ? 'enabled' : 'disabled';
