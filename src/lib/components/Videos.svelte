@@ -16,7 +16,8 @@
 				{#each $mediaStore.remoteStreams as stream}
 					{#if stream.id === expandedId}
 						<VideoPlayer
-							stream={stream}
+              stream={stream}
+              isLocal={stream.id === $mediaStore.localStream?.id}
 							isExpanded={true}
 							onExpand={toggleExpand}
 							id={stream.id}
@@ -34,7 +35,8 @@
 				{#each $mediaStore.remoteStreams as stream}
 					{#if stream.id !== expandedId}
 						<VideoPlayer
-							stream={stream}
+              stream={stream}
+              isLocal={stream.id === $mediaStore.localStream?.id}
 							isExpanded={false}
 							onExpand={toggleExpand}
 							id={stream.id}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { setVideoStream } from '$lib/helpers/video';
 	import { fly } from 'svelte/transition';
+	import Avatar from './Avatar.svelte';
 	export let stream: MediaStream;
 	export let isLocal: boolean = false;
 	export let isExpanded: boolean = false;
@@ -31,13 +32,7 @@
 		<track kind="captions" />
 	</video>
 
-  <div
-	  class="absolute min-h-11 min-w-11 items-center justify-center rounded-full bg-[var(--accent)]"
-    class:hidden={isCameraOpen}
-    class:flex={!isCameraOpen}
-  >
-		{owner ? owner.charAt(0).toUpperCase() : '?'}
-	</div>
+  <Avatar {owner} {audioLevel} {isCameraOpen} />  
 
 	<div
 		class="absolute bottom-3 left-4 flex items-center justify-center gap-1"

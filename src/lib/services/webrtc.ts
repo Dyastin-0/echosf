@@ -17,7 +17,7 @@ export class WRTC {
 
 		setInterval(() => {
 			this.audioStats();
-		}, 500);
+		}, 250);
 	}
 
 	public getPeerConnection(): RTCPeerConnection {
