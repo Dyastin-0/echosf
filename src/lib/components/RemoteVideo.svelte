@@ -9,8 +9,8 @@
 	export let id: string;
 	export let owner: string;
 	export let isMuted: boolean = false;
-  export let isCameraOpen: boolean = false;
-  export let audioLevel: number = 0;
+	export let isCameraOpen: boolean = false;
+	export let audioLevel: number = 0;
 </script>
 
 <div
@@ -32,11 +32,9 @@
 		<track kind="captions" />
 	</video>
 
-  <Avatar {owner} {audioLevel} {isCameraOpen} />  
+	<Avatar {owner} {audioLevel} {isCameraOpen} />
 
-	<div
-		class="absolute bottom-3 left-4 flex items-center justify-center gap-1"
-	>
+	<div class="absolute bottom-3 left-4 flex items-center justify-center gap-1">
 		<div class="flex h-4 w-4 items-center justify-center">
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		</div>

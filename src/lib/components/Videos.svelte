@@ -16,8 +16,8 @@
 				{#each $mediaStore.remoteStreams as stream}
 					{#if stream.id === expandedId}
 						<VideoPlayer
-              stream={stream}
-              isLocal={stream.id === $mediaStore.localStream?.id}
+							{stream}
+							isLocal={stream.id === $mediaStore.localStream?.id}
 							isExpanded={true}
 							onExpand={toggleExpand}
 							id={stream.id}
@@ -26,8 +26,8 @@
 							)}
 							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
-              isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}  
-            />
+							isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}
+						/>
 					{/if}
 				{/each}
 			</div>
@@ -35,8 +35,8 @@
 				{#each $mediaStore.remoteStreams as stream}
 					{#if stream.id !== expandedId}
 						<VideoPlayer
-              stream={stream}
-              isLocal={stream.id === $mediaStore.localStream?.id}
+							{stream}
+							isLocal={stream.id === $mediaStore.localStream?.id}
 							isExpanded={false}
 							onExpand={toggleExpand}
 							id={stream.id}
@@ -45,8 +45,8 @@
 							)}
 							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
-              isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}  
-            />
+							isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}
+						/>
 					{/if}
 				{/each}
 			</div>
@@ -55,7 +55,7 @@
 		<div class="flex w-full flex-wrap gap-4">
 			{#each $mediaStore.remoteStreams as stream}
 				<VideoPlayer
-          stream={stream}
+					{stream}
 					isLocal={stream.id === $mediaStore.localStream?.id}
 					isExpanded={false}
 					onExpand={toggleExpand}
@@ -65,8 +65,8 @@
 					)}
 					isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 					owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
-          isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}    
-        />
+					isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}
+				/>
 			{/each}
 		</div>
 	{/if}
