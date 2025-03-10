@@ -8,13 +8,14 @@
 	export let id: string;
 	export let owner: string;
 	export let isMuted: boolean = false;
-	export let audioLevel: number = 0;
+  export let isCameraOpen: boolean = false;
+  export let audioLevel: number = 0;
 </script>
 
 <div
 	class="group relative flex h-fit items-center justify-center p-1 transition-all duration-200"
-	in:fly={{ y: 100, duration: 200, opacity: 1 }}
-	out:fly={{ duration: 200, opacity: 1 }}
+	in:fly={{ y: 100, opacity: 1 }}
+	out:fly={{ opacity: 1 }}
 >
 	<div
 		class="absolute inset-0 rounded-lg bg-[var(--accent)] opacity-0 transition-opacity duration-200"
@@ -30,8 +31,16 @@
 		<track kind="captions" />
 	</video>
 
+  <div
+	  class="absolute min-h-11 min-w-11 items-center justify-center rounded-full bg-[var(--accent)]"
+    class:hidden={isCameraOpen}
+    class:flex={!isCameraOpen}
+  >
+		{owner ? owner.charAt(0).toUpperCase() : '?'}
+	</div>
+
 	<div
-		class="absolute bottom-3 left-4 flex items-center justify-center gap-1 rounded-full bg-black/50 text-white"
+		class="absolute bottom-3 left-4 flex items-center justify-center gap-1"
 	>
 		<div class="flex h-4 w-4 items-center justify-center">
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>

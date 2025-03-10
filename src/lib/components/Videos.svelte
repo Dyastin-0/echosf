@@ -13,55 +13,58 @@
 	{#if expandedId}
 		<div class="flex h-full w-full gap-4">
 			<div class="flex flex-grow items-center justify-center">
-				{#each $mediaStore.remoteStreams as video}
-					{#if video.id === expandedId}
+				{#each $mediaStore.remoteStreams as stream}
+					{#if stream.id === expandedId}
 						<VideoPlayer
-							stream={video.stream}
+							stream={stream}
 							isExpanded={true}
 							onExpand={toggleExpand}
-							id={video.id}
+							id={stream.id}
 							audioLevel={Number(
-								$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
+								$mediaStore.remoteStreamStates[stream.getAudioTracks()[0].id]?.audioLevel
 							)}
-							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
-							owner={String($mediaStore.remoteStreamStates[video.id]?.owner)}
-						/>
+							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
+							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
+              isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}  
+            />
 					{/if}
 				{/each}
 			</div>
 			<div class="flex flex-col items-center justify-center gap-2 overflow-x-auto">
-				{#each $mediaStore.remoteStreams as video}
-					{#if video.id !== expandedId}
+				{#each $mediaStore.remoteStreams as stream}
+					{#if stream.id !== expandedId}
 						<VideoPlayer
-							stream={video.stream}
+							stream={stream}
 							isExpanded={false}
 							onExpand={toggleExpand}
-							id={video.id}
+							id={stream.id}
 							audioLevel={Number(
-								$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
+								$mediaStore.remoteStreamStates[stream.getAudioTracks()[0].id]?.audioLevel
 							)}
-							isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
-							owner={String($mediaStore.remoteStreamStates[video.id]?.owner)}
-						/>
+							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
+							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
+              isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}  
+            />
 					{/if}
 				{/each}
 			</div>
 		</div>
 	{:else}
 		<div class="flex w-full flex-wrap gap-4">
-			{#each $mediaStore.remoteStreams as video}
+			{#each $mediaStore.remoteStreams as stream}
 				<VideoPlayer
-					stream={video.stream}
-					isLocal={video.id === $mediaStore.localStream?.id}
+          stream={stream}
+					isLocal={stream.id === $mediaStore.localStream?.id}
 					isExpanded={false}
 					onExpand={toggleExpand}
-					id={video.id}
+					id={stream.id}
 					audioLevel={Number(
-						$mediaStore.remoteStreamStates[video.stream.getAudioTracks()[0].id]?.audioLevel
+						$mediaStore.remoteStreamStates[stream.getAudioTracks()[0].id]?.audioLevel
 					)}
-					isMuted={$mediaStore.remoteStreamStates[video.id]?.audio === 'disabled'}
-					owner={String($mediaStore.remoteStreamStates[video.id]?.owner)}
-				/>
+					isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
+					owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
+          isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}    
+        />
 			{/each}
 		</div>
 	{/if}

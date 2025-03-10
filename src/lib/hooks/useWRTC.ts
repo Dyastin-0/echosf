@@ -23,14 +23,7 @@ export function useWRTC() {
 			mediaStore.update((state) => ({
 				...state,
 				localStream: stream,
-				remoteStreams: [
-					...state.remoteStreams,
-					{
-						id: stream.id,
-						stream: stream,
-						isMuted: !stream.getAudioTracks()[0].enabled
-					}
-				]
+				remoteStreams: [...state.remoteStreams, stream]
 			}));
 
 			webrtc.setLocalTracks(stream);
@@ -53,7 +46,25 @@ export function useWRTC() {
 			userName: name,
 			userId: id
 		}));
-	}
+
+      mediaStore.update((state) => {
+				const updatedRemoteStreamStates = { ...state.remoteStreamStates };
+        const localStream = get(mediaStore).localStream;
+        const roomInfo = get(roomInfoStore);
+
+      updatedRemoteStreamStates[localStream.id] = {
+        ownerId: roomInfo.userId,
+        owner: roomInfo.userName,
+        audio: localStream?.getAudioTracks()[0]?.enabled ? "enabled" : "disabled",
+        video: localStream?.getVideoTracks()[0]?.enabled ? "enabled" : "disabled",
+      }
+
+      return {
+        ...state,
+				remoteStreamStates: updatedRemoteStreamStates,
+      };
+		});
+  }
 
 	function setupWebRTCCallbacks(
 		webrtc: ReturnType<typeof newWRTC>,
@@ -69,14 +80,7 @@ export function useWRTC() {
 
 				const newStreams = streamExists
 					? state.remoteStreams
-					: [
-							...state.remoteStreams,
-							{
-								id: stream.id,
-								stream: stream,
-								isMuted: !stream.getAudioTracks()[0]?.enabled
-							}
-						];
+					: [...state.remoteStreams, stream];
 
 				stream.onremovetrack = (removeEvent) => {
 					if (removeEvent.track.id === event.track.id) {
@@ -124,19 +128,39 @@ export function useWRTC() {
 							};
 						});
 						break;
+          
+          case 'cameraToggle':
+            	mediaStore.update((state) => {
+							const streamId = msg.data;
+							const updatedStates = { ...state.remoteStreamStates };
+
+							if (!updatedStates[streamId]) {
+								updatedStates[streamId] = { video: 'unknown' };
+							}
+
+							updatedStates[streamId].video = msg.state ? 'enabled' : 'disabled';
+
+							return {
+								...state,
+								remoteStreamStates: updatedStates
+							};
+						});
+ 
+            break;
 
 					case 'initialStates':
-						const { data, target, state, name } = msg;
+						const { data, target, audioState, videoState, name } = msg;
 
 						mediaStore.update((prevState) => {
 							const updatedRemoteStreamStates = { ...prevState.remoteStreamStates };
 
 							if (!updatedRemoteStreamStates[data]) {
-								updatedRemoteStreamStates[data] = { audio: 'unknown', ownerId: '', owner: '' };
+								updatedRemoteStreamStates[data] = { audio: 'unknown', video: '', ownerId: '', owner: '' };
 							}
 
-							updatedRemoteStreamStates[data].audio = state ? 'enabled' : 'disabled';
-							updatedRemoteStreamStates[data].owner = name || '';
+							updatedRemoteStreamStates[data].audio = audioState ? 'enabled' : 'disabled';
+							updatedRemoteStreamStates[data].video = videoState ? 'enabled' : 'disabled';
+              updatedRemoteStreamStates[data].owner = name || '';
 							updatedRemoteStreamStates[data].ownerId = target || '';
 
 							return {
@@ -165,7 +189,7 @@ export function useWRTC() {
 							const updatedStates = { ...state.remoteStreamStates };
 
 							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown', video: 'unknown', owner: '' };
+								updatedStates[streamId] = { audio: 'unknown', owner: '' };
 							}
 
 							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
