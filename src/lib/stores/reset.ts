@@ -15,7 +15,8 @@ export function resetRoomState() {
 	});
 
 	uiStore.set({
-		showChat: false
+		showChat: false,
+		showParticipants: false
 	});
 
 	mediaStore.set({

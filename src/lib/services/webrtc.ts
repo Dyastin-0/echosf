@@ -143,34 +143,33 @@ export class WRTC {
 		if (this.videoTrack) {
 			this.videoTrack.enabled = !this.videoTrack.enabled;
 		}
-  
-    const localStream = get(mediaStore).localStream;
+
+		const localStream = get(mediaStore).localStream;
 
 		mediaStore.update((state) => {
-      const updatedStates = { ...state.remoteStreamStates };
+			const updatedStates = { ...state.remoteStreamStates };
 
 			if (!updatedStates[localStream.id]) {
-        updatedStates[localStream.id] = { video: 'unknown' };
+				updatedStates[localStream.id] = { video: 'unknown' };
 			}
 
 			updatedStates[localStream.id].video = this.videoTrack?.enabled ? 'enabled' : 'disabled';
 
-					return {
-						...state,
-						remoteStreamStates: updatedStates
-					};
-				});
+			return {
+				...state,
+				remoteStreamStates: updatedStates
+			};
+		});
 
-
-    if (this.ws) {
-		  this.ws.sendMessage({
+		if (this.ws) {
+			this.ws.sendMessage({
 				event: 'message',
 				type: 'cameraToggle',
 				data: localStream?.id,
 				state: this.videoTrack.enabled
 			});
 		}
-  }
+	}
 
 	public async startScreenSharing(stopScreenSharing: () => void): Promise<boolean> {
 		try {
