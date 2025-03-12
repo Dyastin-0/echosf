@@ -23,7 +23,7 @@ export function useWRTC() {
 			mediaStore.update((state) => ({
 				...state,
 				localStream: stream,
-				remoteStreams: [...state.remoteStreams, stream]
+				remoteStreams: [stream]
 			}));
 
 			webrtc.setLocalTracks(stream);
