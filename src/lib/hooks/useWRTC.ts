@@ -273,7 +273,9 @@ export function useWRTC() {
 			event: 'message',
 			data: message,
 			name: get(roomInfoStore).userName,
-			id: get(roomInfoStore).userId
+			id: get(roomInfoStore).userId,
+			type: '',
+			target: ''
 		});
 	}
 
