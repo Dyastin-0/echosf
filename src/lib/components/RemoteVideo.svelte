@@ -2,6 +2,7 @@
 	import { setVideoStream } from '$lib/helpers/video';
 	import { fly } from 'svelte/transition';
 	import Avatar from './Avatar.svelte';
+	import Wave from './Wave.svelte';
 	export let stream: MediaStream;
 	export let isLocal: boolean = false;
 	export let isExpanded: boolean = false;
@@ -11,6 +12,8 @@
 	export let isMuted: boolean = false;
 	export let isCameraOpen: boolean = false;
 	export let audioLevel: number = 0;
+
+	$: isAudioActive = audioLevel > 0.1;
 </script>
 
 <div
@@ -20,7 +23,7 @@
 >
 	<div
 		class="absolute inset-0 rounded-lg bg-[var(--accent)] opacity-0 transition-opacity duration-200"
-		style="opacity: {audioLevel};"
+		class:opacity-100={isAudioActive}
 	></div>
 
 	<video
@@ -32,9 +35,12 @@
 		<track kind="captions" />
 	</video>
 
-	<Avatar {owner} {audioLevel} {isCameraOpen} />
+	<Avatar {owner} {isAudioActive} {isCameraOpen} />
+	<Wave {isAudioActive} />
 
-	<div class="absolute bottom-3 left-4 flex items-center justify-center gap-1">
+	<div
+		class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-sm bg-black/50"
+	>
 		<div class="flex h-4 w-4 items-center justify-center">
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		</div>
@@ -42,7 +48,7 @@
 	</div>
 
 	<button
-		class="absolute right-4 bottom-3 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		class="absolute bottom-3 right-3 rounded-full bg-black/50 opacity-0 transition-opacity hover:cursor-pointer group-hover:opacity-100"
 		on:click={() => onExpand(id)}
 		aria-label="toggle expand"
 	>
