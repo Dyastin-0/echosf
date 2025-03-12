@@ -27,6 +27,7 @@
 							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
 							isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}
+							ownerId={String($mediaStore.remoteStreamStates[stream.id]?.ownerId)}
 						/>
 					{/if}
 				{/each}
@@ -46,6 +47,7 @@
 							isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 							owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
 							isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}
+							ownerId={String($mediaStore.remoteStreamStates[stream.id]?.ownerId)}
 						/>
 					{/if}
 				{/each}
@@ -66,6 +68,7 @@
 					isMuted={$mediaStore.remoteStreamStates[stream.id]?.audio === 'disabled'}
 					owner={String($mediaStore.remoteStreamStates[stream.id]?.owner)}
 					isCameraOpen={$mediaStore.remoteStreamStates[stream.id]?.video === 'enabled'}
+					ownerId={String($mediaStore.remoteStreamStates[stream.id]?.ownerId)}
 				/>
 			{/each}
 		</div>

@@ -109,6 +109,7 @@ export function useWRTC() {
 			if (msg.id === id) return;
 			if (msg?.type) {
 				switch (msg.type) {
+					case 'left':
 					case 'join': {
 						showToast(`${msg.name} ${msg.data}`, 'info');
 						messagesStore.update((messages) => [...messages, msg]);
@@ -249,6 +250,7 @@ export function useWRTC() {
 		websocket.sendMessage({
 			id: get(roomInfoStore).userId,
 			event: 'message',
+			type: 'left',
 			data: 'Left the room 🤷‍♂️',
 			name: get(roomInfoStore).userName
 		});

@@ -3,17 +3,19 @@
 	import { fly } from 'svelte/transition';
 	import Avatar from './Avatar.svelte';
 	import Wave from './Wave.svelte';
+	import { roomInfoStore } from '$lib/stores/roomStore';
 	export let stream: MediaStream;
 	export let isLocal: boolean = false;
 	export let isExpanded: boolean = false;
 	export let onExpand: (id: string) => void;
 	export let id: string;
 	export let owner: string;
+	export let ownerId: string;
 	export let isMuted: boolean = false;
 	export let isCameraOpen: boolean = false;
 	export let audioLevel: number = 0;
 
-	$: isAudioActive = audioLevel > 0.1;
+	$: isAudioActive = audioLevel > 0.05;
 </script>
 
 <div
@@ -35,7 +37,9 @@
 		<track kind="captions" />
 	</video>
 
-	<Avatar {owner} {isAudioActive} {isCameraOpen} />
+	{#if owner !== 'undefined'}
+		<Avatar {owner} {isAudioActive} {isCameraOpen} />
+	{/if}
 	<Wave {isAudioActive} />
 
 	<div
@@ -44,7 +48,7 @@
 		<div class="flex h-4 w-4 items-center justify-center">
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		</div>
-		<span>{owner !== 'undefined' ? owner : 'You'}</span>
+		<span>{ownerId === $roomInfoStore.userId ? 'You' : owner}</span>
 	</div>
 
 	<button

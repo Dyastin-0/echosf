@@ -43,6 +43,7 @@ export class WRTC {
 			this.screenStream = null;
 		}
 
+		this.ws?.close();
 		this.ws = null;
 
 		this.setOnTrackCallback(null);
@@ -148,6 +149,11 @@ export class WRTC {
 
 		mediaStore.update((state) => {
 			const updatedStates = { ...state.remoteStreamStates };
+
+			if (!localStream?.id)
+				return {
+					...state
+				};
 
 			if (!updatedStates[localStream.id]) {
 				updatedStates[localStream.id] = { video: 'unknown' };
