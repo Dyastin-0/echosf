@@ -25,8 +25,8 @@ export class WS {
 				event: 'message',
 				data: get(mediaStore).localStream?.id,
 				type: 'initialStates',
-				audioState: get(mediaStore).localStream?.getAudioTracks()[0].enabled,
-				videoState: get(mediaStore).localStream?.getVideoTracks()[0].enabled,
+				audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
+				videoState: get(mediaStore).localStream?.getVideoTracks()[0]?.enabled,
 				name: get(roomInfoStore).userName,
 				target: get(roomInfoStore).userId
 			});

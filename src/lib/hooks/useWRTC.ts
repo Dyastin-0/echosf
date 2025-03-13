@@ -14,22 +14,68 @@ export function useWRTC() {
 	let webrtc: ReturnType<typeof newWRTC>;
 	let websocket: ReturnType<typeof newWS>;
 
+	async function getAvailableMedia(): Promise<MediaStream | null> {
+		try {
+			const devices = await navigator.mediaDevices.enumerateDevices();
+
+			const hasVideo = devices.some((device) => device.kind === 'videoinput');
+			if (!hasVideo) {
+				showToast('Video device missing', 'warning', 3000);
+				mediaStore.update((state) => ({
+					...state,
+					mediaSate: {
+						isScreenSharing: state.mediaSate?.isScreenSharing,
+						isMuted: state.mediaSate?.isMuted,
+						isCameraOn: hasVideo
+					}
+				}));
+			}
+
+			const hasAudio = devices.some((device) => device.kind === 'audioinput');
+			if (!hasAudio) {
+				showToast('Audio device missing', 'warning', 3000);
+				mediaStore.update((state) => ({
+					...state,
+					mediaSate: {
+						isScreenSharing: state.mediaSate?.isScreenSharing,
+						isMuted: !hasAudio,
+						isCameraOn: state.mediaSate?.isCameraOn
+					}
+				}));
+			}
+
+			const constraints: {
+				video: boolean;
+				audio: boolean;
+			} = {
+				video: hasVideo,
+				audio: hasAudio
+			};
+
+			return await navigator.mediaDevices.getUserMedia(constraints);
+		} catch (error) {
+			console.error('failed to get media devices: ', error);
+			return null;
+		}
+	}
+
 	async function initMedia() {
 		webrtc = newWRTC();
 
-		try {
-			const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+		const stream = await getAvailableMedia();
 
-			mediaStore.update((state) => ({
-				...state,
-				localStream: stream,
-				remoteStreams: [stream]
-			}));
-
-			webrtc.setLocalTracks(stream);
-		} catch (error) {
-			console.error('Error accessing media devices:', error);
+		if (!stream) {
+			showToast('No media device available.', 'warning', 3000);
+			return;
 		}
+
+		mediaStore.update((state) => ({
+			...state,
+			localStream: stream,
+			remoteStreams: [stream]
+		}));
+
+		webrtc.setLocalTracks(stream);
 	}
 
 	async function joinRoom(roomId: string | null, name: string | null, id: string | null) {
@@ -283,44 +329,10 @@ export function useWRTC() {
 
 	function toggleMute() {
 		webrtc.toggleAudio();
-
-		mediaStore.update((store) => {
-			const currentMediaState = store.mediaSate || {
-				isMuted: false,
-				isCameraOn: true,
-				isScreenSharing: false
-			};
-
-			return {
-				...store,
-				mediaSate: {
-					isMuted: !currentMediaState.isMuted,
-					isCameraOn: currentMediaState.isCameraOn,
-					isScreenSharing: currentMediaState.isScreenSharing
-				}
-			};
-		});
 	}
 
 	function toggleCamera() {
 		webrtc.toggleVideo();
-
-		mediaStore.update((store) => {
-			const currentMediaState = store.mediaSate || {
-				isMuted: false,
-				isCameraOn: true,
-				isScreenSharing: false
-			};
-
-			return {
-				...store,
-				mediaSate: {
-					isMuted: currentMediaState.isMuted,
-					isCameraOn: !currentMediaState.isCameraOn,
-					isScreenSharing: currentMediaState.isScreenSharing
-				}
-			};
-		});
 	}
 
 	async function toggleScreenShare() {

@@ -1,4 +1,5 @@
 import { mediaStore } from '$lib/stores/mediaStore';
+import { showToast } from '$lib/stores/toastStore';
 import { get } from 'svelte/store';
 
 export class WRTC {
@@ -107,44 +108,54 @@ export class WRTC {
 	}
 
 	public toggleAudio(): void {
-		if (this.audioTrack) {
-			this.audioTrack.enabled = !this.audioTrack.enabled;
+		if (!this.audioTrack) {
+			showToast('Audio device missing.', 'info', 3000);
+			return;
+		}
 
-			const localStream = get(mediaStore).localStream;
+		this.audioTrack.enabled = !this.audioTrack.enabled;
+		const localStream = get(mediaStore).localStream;
 
-			if (localStream) {
-				mediaStore.update((state) => {
-					const updatedStates = { ...state.remoteStreamStates };
+		if (localStream) {
+			mediaStore.update((state) => {
+				const updatedStates = { ...state.remoteStreamStates };
 
-					if (!updatedStates[localStream.id]) {
-						updatedStates[localStream.id] = { audio: 'unknown' };
-					}
+				if (!updatedStates[localStream.id]) {
+					updatedStates[localStream.id] = { audio: 'unknown' };
+				}
 
-					updatedStates[localStream.id].audio = this.audioTrack?.enabled ? 'enabled' : 'disabled';
+				updatedStates[localStream.id].audio = this.audioTrack?.enabled ? 'enabled' : 'disabled';
 
-					return {
-						...state,
-						remoteStreamStates: updatedStates
-					};
-				});
-			}
+				return {
+					...state,
+					mediaSate: {
+						isMuted: !state.mediaSate.isMuted,
+						isCameraOn: state.mediaSate.isCameraOn,
+						isScreenSharing: state.mediaSate.isScreenSharing
+					},
 
-			if (this.ws) {
-				this.ws.sendMessage({
-					event: 'message',
-					type: 'audioToggle',
-					data: localStream?.id,
-					state: localStream?.getAudioTracks()[0].enabled
-				});
-			}
+					remoteStreamStates: updatedStates
+				};
+			});
+		}
+
+		if (this.ws) {
+			this.ws.sendMessage({
+				event: 'message',
+				type: 'audioToggle',
+				data: localStream?.id,
+				state: localStream?.getAudioTracks()[0].enabled
+			});
 		}
 	}
 
 	public toggleVideo(): void {
-		if (this.videoTrack) {
-			this.videoTrack.enabled = !this.videoTrack.enabled;
+		if (!this.videoTrack) {
+			showToast('Video device is missing.', 'info', 3000);
+			return;
 		}
 
+		this.videoTrack.enabled = !this.videoTrack.enabled;
 		const localStream = get(mediaStore).localStream;
 
 		mediaStore.update((state) => {
@@ -163,6 +174,11 @@ export class WRTC {
 
 			return {
 				...state,
+				mediaSate: {
+					isMuted: state.mediaSate.isMuted,
+					isCameraOn: !state.mediaSate.isCameraOn,
+					isScreenSharing: state.mediaSate.isScreenSharing
+				},
 				remoteStreamStates: updatedStates
 			};
 		});
