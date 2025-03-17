@@ -8,10 +8,12 @@ export function resetRoomState() {
 	const media = get(mediaStore);
 
 	roomInfoStore.set({
-		id: null,
-		userName: null,
+		id: '',
+		userName: '',
 		joined: false,
-		userId: crypto.randomUUID()
+		userId: crypto.randomUUID(),
+		streamIdMapper: {},
+		participants: {}
 	});
 
 	uiStore.set({
@@ -21,13 +23,8 @@ export function resetRoomState() {
 
 	mediaStore.set({
 		localStream: media?.localStream,
-		mediaSate: {
-			isCameraOn: true,
-			isMuted: false,
-			isScreenSharing: false
-		},
-		remoteStreams: [],
-		remoteStreamStates: {}
+		remoteStreams: {},
+		audioLevels: {}
 	});
 
 	messagesStore.set([]);

@@ -3,17 +3,11 @@
 	import { uiStore } from '$lib/stores/uiStore';
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import { get } from 'svelte/store';
+	import { roomInfoStore } from '$lib/stores/roomStore';
 
 	$: showParticipants = $uiStore.showParticipants;
-	$: participantsRecord = $mediaStore.remoteStreamStates;
-
-	$: participants = Object.entries(participantsRecord)
-		.filter(([_, data]) => data?.owner)
-		.map(([_, data]) => ({
-			id: data.ownerId,
-			name: data.owner as string,
-			isMuted: data.audio === 'disabled'
-		}));
+	$: participants = Object.entries($roomInfoStore.participants);
 </script>
 
 <div
@@ -29,7 +23,7 @@
 		>
 			<h1 class="text-center font-semibold">Participants</h1>
 			<div class="custom-scrollbar flex h-full flex-col gap-2 overflow-y-auto">
-				{#each participants as participant}
+				{#each participants as [id, info]}
 					<div in:fly|local={{ y: 20, duration: 200 }}>
 						<div
 							class="hover:bg-opacity-80 flex items-center gap-3 rounded-lg bg-[var(--bg-primary)] p-3"
@@ -37,15 +31,15 @@
 							<div
 								class="flex min-h-10 min-w-10 items-center justify-center rounded-full bg-[var(--accent)]"
 							>
-								{participant.name ? participant.name.charAt(0).toUpperCase() : '?'}
+								{info.name ? info.name.charAt(0).toUpperCase() : '?'}
 							</div>
 							<div class="flex w-full justify-between gap-2">
-								<span class="font-medium">{participant.name}</span>
+								<span class="font-medium">{info.name}</span>
 								<div class="flex items-center gap-2 text-sm">
 									<i
 										class="fa-solid"
-										class:fa-microphone={!participant.isMuted}
-										class:fa-microphone-slash={participant.isMuted}
+										class:fa-microphone={info.audio === 'enabled'}
+										class:fa-microphone-slash={info.audio! === 'enabled'}
 									></i>
 								</div>
 							</div>

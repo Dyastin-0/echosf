@@ -21,27 +21,11 @@ export function useWRTC() {
 			const hasVideo = devices.some((device) => device.kind === 'videoinput');
 			if (!hasVideo) {
 				showToast('Video device missing', 'warning', 3000);
-				mediaStore.update((state) => ({
-					...state,
-					mediaSate: {
-						isScreenSharing: state.mediaSate?.isScreenSharing,
-						isMuted: state.mediaSate?.isMuted,
-						isCameraOn: hasVideo
-					}
-				}));
 			}
 
 			const hasAudio = devices.some((device) => device.kind === 'audioinput');
 			if (!hasAudio) {
 				showToast('Audio device missing', 'warning', 3000);
-				mediaStore.update((state) => ({
-					...state,
-					mediaSate: {
-						isScreenSharing: state.mediaSate?.isScreenSharing,
-						isMuted: !hasAudio,
-						isCameraOn: state.mediaSate?.isCameraOn
-					}
-				}));
 			}
 
 			const constraints: {
@@ -72,13 +56,39 @@ export function useWRTC() {
 		mediaStore.update((state) => ({
 			...state,
 			localStream: stream,
-			remoteStreams: [stream]
+			remoteStreams: {
+				[`${stream.id}`]: stream
+			}
 		}));
+
+		roomInfoStore.update((state) => {
+			const updatedParticipants = state.participants;
+
+			if (!updatedParticipants) return { ...state };
+
+			const roomInfo = get(roomInfoStore);
+			const participant = updatedParticipants[roomInfo.userId];
+
+			updatedParticipants[roomInfo.userId] = {
+				...participant,
+				audio: stream.getAudioTracks()[0]?.enabled ? 'enabled' : 'disabled',
+				camera: stream.getVideoTracks()[0]?.enabled ? 'enabled' : 'disabled',
+				screen: 'disabled',
+				streams: {
+					[`${stream.id}`]: true
+				}
+			};
+
+			return {
+				...state,
+				participants: updatedParticipants
+			};
+		});
 
 		webrtc.setLocalTracks(stream);
 	}
 
-	async function joinRoom(roomId: string | null, name: string | null, id: string | null) {
+	async function joinRoom(roomId: string, name: string, id: string) {
 		await goto(`?room=${roomId}`);
 		document.title = `echos - ${roomId}`;
 
@@ -93,26 +103,22 @@ export function useWRTC() {
 			userId: id
 		}));
 
-		mediaStore.update((state) => {
-			const updatedRemoteStreamStates = { ...state.remoteStreamStates };
-			const localStream = get(mediaStore).localStream;
+		roomInfoStore.update((state) => {
+			const updatedParticipants = state.participants;
+
+			if (!updatedParticipants) return { ...state };
+
 			const roomInfo = get(roomInfoStore);
+			const participant = updatedParticipants[roomInfo.userId];
 
-			if (!localStream)
-				return {
-					...state
-				};
-
-			updatedRemoteStreamStates[localStream.id] = {
-				ownerId: String(roomInfo.userId),
-				owner: String(roomInfo.userName),
-				audio: localStream?.getAudioTracks()[0]?.enabled ? 'enabled' : 'disabled',
-				video: localStream?.getVideoTracks()[0]?.enabled ? 'enabled' : 'disabled'
+			updatedParticipants[roomInfo.userId] = {
+				...participant,
+				name: roomInfo.userName
 			};
 
 			return {
 				...state,
-				remoteStreamStates: updatedRemoteStreamStates
+				participants: updatedParticipants
 			};
 		});
 	}
@@ -127,27 +133,67 @@ export function useWRTC() {
 
 			mediaStore.update((state) => {
 				const stream = event.streams[0];
-				const streamExists = state.remoteStreams.some((s) => s.id === stream.id);
+				const updatedRemoteStreams = state.remoteStreams;
 
-				const newStreams = streamExists ? state.remoteStreams : [...state.remoteStreams, stream];
+				updatedRemoteStreams[`${stream.id}`] = stream;
 
 				stream.onremovetrack = (removeEvent) => {
 					if (removeEvent.track.id === event.track.id) {
 						mediaStore.update((state) => {
-							const updatedRemoteStreamStates = { ...state.remoteStreamStates };
+							const updatedRemoteStreams = state.remoteStreams;
 
-							delete updatedRemoteStreamStates[stream.id];
+							delete updatedRemoteStreams[`${stream.id}`];
 
 							return {
 								...state,
-								remoteStreamStates: updatedRemoteStreamStates,
-								remoteStreams: state.remoteStreams.filter((s) => s.id !== stream.id)
+								remoteStreams: updatedRemoteStreams
+							};
+						});
+
+						roomInfoStore.update((state) => {
+							const updatedMapper = state.streamIdMapper;
+							const updatedParticipants = state.participants;
+
+							delete updatedParticipants[updatedMapper[stream.id]];
+							delete updatedMapper[stream.id];
+
+							return {
+								...state,
+								streamIdMapper: updatedMapper,
+								participants: updatedParticipants
 							};
 						});
 					}
 				};
 
-				return { ...state, remoteStreams: newStreams };
+				return { ...state, remoteStreams: updatedRemoteStreams };
+			});
+		});
+
+		websocket.setOnOpenCallback(() => {
+			websocket.sendMessage({
+				id: get(roomInfoStore).userId,
+				name: get(roomInfoStore).userName,
+				event: 'message',
+				data: 'Joined the room 👋',
+				type: 'join'
+			});
+
+			websocket.sendMessage({
+				event: 'message',
+				type: 'initialStates',
+				audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
+				videoState: get(mediaStore).localStream?.getVideoTracks()[0]?.enabled,
+				name: get(roomInfoStore).userName,
+				target: get(roomInfoStore).userId,
+				data: get(mediaStore).localStream?.id
+			});
+
+			websocket.sendMessage({
+				event: 'message',
+				data: get(mediaStore).localStream?.id,
+				type: 'stateRequest',
+				target: get(roomInfoStore).userId
 			});
 		});
 
@@ -162,67 +208,108 @@ export function useWRTC() {
 						break;
 					}
 
-					case 'audioToggle': {
-						mediaStore.update((state) => {
-							const streamId = msg.data;
-							const updatedStates = { ...state.remoteStreamStates };
+					case 'stream': {
+						const { data: streamId, name, id } = msg;
 
-							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { audio: 'unknown' };
-							}
+						if (!id || !name) break;
+						roomInfoStore.update((state) => {
+							const updatedParticipants = state.participants;
 
-							updatedStates[streamId].audio = msg.state ? 'enabled' : 'disabled';
+							updatedParticipants[id] = {
+								...updatedParticipants[id],
+								screen: streamId,
+								streams: {
+									...updatedParticipants[id].streams,
+									[`${streamId}`]: true
+								}
+							};
+
+							const updatedMapper = state.streamIdMapper;
+
+							updatedMapper[streamId] = id;
 
 							return {
 								...state,
-								remoteStreamStates: updatedStates
+								participants: updatedParticipants,
+								streamIdMapper: updatedMapper
+							};
+						});
+						break;
+					}
+
+					case 'audioToggle': {
+						roomInfoStore.update((state) => {
+							const { audioState, id } = msg;
+							const updatedStates = state.participants;
+
+							if (!id) return { ...state };
+
+							updatedStates[id] = {
+								...updatedStates[id],
+								audio: audioState ? 'enabled' : 'disabled'
+							};
+
+							return {
+								...state,
+								participants: updatedStates
 							};
 						});
 						break;
 					}
 
 					case 'cameraToggle': {
-						mediaStore.update((state) => {
-							const streamId = msg.data;
-							const updatedStates = { ...state.remoteStreamStates };
+						roomInfoStore.update((state) => {
+							const { videoState, id } = msg;
+							const updatedStates = state.participants;
 
-							if (!updatedStates[streamId]) {
-								updatedStates[streamId] = { video: 'unknown' };
-							}
+							if (!id) return { ...state };
 
-							updatedStates[streamId].video = msg.state ? 'enabled' : 'disabled';
+							updatedStates[id] = {
+								...updatedStates[id],
+								camera: videoState ? 'enabled' : 'disabled'
+							};
 
 							return {
 								...state,
-								remoteStreamStates: updatedStates
+								participants: updatedStates
 							};
 						});
 						break;
 					}
 
 					case 'initialStates': {
-						const { data, audioState, videoState, name, target } = msg;
+						const {
+							data: streamId,
+							adData: screenStreamId,
+							audioState,
+							videoState,
+							name,
+							target
+						} = msg;
 
-						mediaStore.update((prevState) => {
-							const updatedRemoteStreamStates = { ...prevState.remoteStreamStates };
+						roomInfoStore.update((state) => {
+							const updatedParticipants = state.participants;
 
-							if (!updatedRemoteStreamStates[data]) {
-								updatedRemoteStreamStates[data] = {
-									audio: 'unknown',
-									video: 'unknown',
-									ownerId: '',
-									owner: ''
-								};
-							}
+							if (!target || !name) return { ...state };
 
-							updatedRemoteStreamStates[data].audio = audioState ? 'enabled' : 'disabled';
-							updatedRemoteStreamStates[data].video = videoState ? 'enabled' : 'disabled';
-							updatedRemoteStreamStates[data].owner = name || '';
-							updatedRemoteStreamStates[data].ownerId = target || '';
+							updatedParticipants[target] = {
+								camera: videoState ? 'enabled' : 'disabled',
+								audio: audioState ? 'enabled' : 'disabled',
+								screen: screenStreamId,
+								name,
+								streams: {
+									[`${streamId}`]: true
+								}
+							};
+
+							const updatedMapper = state.streamIdMapper;
+
+							updatedMapper[streamId] = target;
 
 							return {
-								...prevState,
-								remoteStreamStates: updatedRemoteStreamStates
+								...state,
+								streamIdMapper: updatedMapper,
+								participants: updatedParticipants
 							};
 						});
 						break;
@@ -233,6 +320,8 @@ export function useWRTC() {
 							event: 'message',
 							type: 'stateAnswer',
 							data: get(mediaStore).localStream?.id,
+							adData: webrtc.screenStream?.id,
+							screen: webrtc.screenStream?.id,
 							target: msg.target,
 							name: get(roomInfoStore).userName,
 							audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
@@ -244,28 +333,43 @@ export function useWRTC() {
 					case 'stateAnswer': {
 						if (msg?.target !== get(roomInfoStore).userId) return;
 
-						const { id, data, audioState, videoState, name } = msg;
+						const {
+							id,
+							data: streamId,
+							adData: screenStreamId,
+							audioState,
+							videoState,
+							name
+						} = msg;
 
-						mediaStore.update((state) => {
-							const updatedStates = { ...state.remoteStreamStates };
+						roomInfoStore.update((state) => {
+							const updatedStates = state.participants;
 
-							if (!updatedStates[data]) {
-								updatedStates[data] = {
-									audio: 'unknown',
-									video: 'unknown',
-									owner: '',
-									ownerId: ''
+							if (!id || !name) return { ...state };
+
+							updatedStates[id] = {
+								camera: videoState ? 'enabled' : 'disabled',
+								audio: audioState ? 'enabled' : 'disabled',
+								screen: screenStreamId,
+								name,
+								streams: {
+									[`${streamId}`]: true
+								}
+							};
+
+							if (screenStreamId) {
+								updatedStates[id] = {
+									...updatedStates[id],
+									streams: {
+										...updatedStates[id].streams,
+										[`${screenStreamId}`]: true
+									}
 								};
 							}
 
-							updatedStates[data].audio = audioState ? 'enabled' : 'disabled';
-							updatedStates[data].video = videoState ? 'enabled' : 'disabled';
-							updatedStates[data].owner = name || '';
-							updatedStates[data].ownerId = id || '';
-
 							return {
 								...state,
-								remoteStreamStates: updatedStates
+								participants: updatedStates
 							};
 						});
 						break;
@@ -336,9 +440,11 @@ export function useWRTC() {
 	}
 
 	async function toggleScreenShare() {
-		if (!get(roomInfoStore).joined) return;
+		const roomInfo = get(roomInfoStore);
 
-		const isCurrentlySharing = get(mediaStore).mediaSate?.isScreenSharing;
+		if (!roomInfo.joined) return;
+
+		const isCurrentlySharing = webrtc.screenStream;
 
 		if (!isCurrentlySharing) {
 			await webrtc.startScreenSharing(() => {
@@ -347,23 +453,6 @@ export function useWRTC() {
 		} else {
 			webrtc.stopScreenSharing();
 		}
-
-		mediaStore.update((store) => {
-			const currentMediaState = store.mediaSate || {
-				isMuted: false,
-				isCameraOn: true,
-				isScreenSharing: false
-			};
-
-			return {
-				...store,
-				mediaSate: {
-					isMuted: currentMediaState.isMuted,
-					isCameraOn: currentMediaState.isCameraOn,
-					isScreenSharing: !isCurrentlySharing
-				}
-			};
-		});
 	}
 
 	return {

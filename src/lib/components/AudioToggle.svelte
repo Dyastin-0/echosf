@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { mediaStore } from '$lib/stores/mediaStore';
+	import { roomInfoStore } from '$lib/stores/roomStore';
 
 	export let toggleMute: () => void;
 
-	$: mediaState = $mediaStore.mediaSate;
+	$: mediaState = $roomInfoStore.participants[$roomInfoStore.userId];
 </script>
 
 <button
@@ -13,7 +13,7 @@
 >
 	<i
 		class="fa-solid text-lg"
-		class:fa-microphone={!mediaState?.isMuted}
-		class:fa-microphone-slash={mediaState?.isMuted}
+		class:fa-microphone={mediaState?.audio === 'enabled'}
+		class:fa-microphone-slash={mediaState?.audio === 'disabled'}
 	></i>
 </button>

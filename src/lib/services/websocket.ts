@@ -1,42 +1,19 @@
-import { mediaStore } from '$lib/stores/mediaStore';
-import { roomInfoStore } from '$lib/stores/roomStore';
-import { get } from 'svelte/store';
-
 export class WS {
 	private ws: WebSocket;
 	private webrtcService: App.IWRTCService;
 	private chatMessageCallback: ((msg: App.WebsocketMessage) => void) | null;
+	private onOpenCallback: (() => void) | null;
 
 	constructor(url: string | URL, webrtcService: App.IWRTCService) {
 		this.ws = new WebSocket(url);
 		this.webrtcService = webrtcService;
 		this.chatMessageCallback = (msg: App.WebsocketMessage) => {};
+		this.onOpenCallback = () => {};
 
 		this.ws.onopen = () => {
-			this.sendMessage({
-				id: get(roomInfoStore).userId,
-				name: get(roomInfoStore).userName,
-				event: 'message',
-				data: 'Joined the room 👋',
-				type: 'join'
-			});
-
-			this.sendMessage({
-				event: 'message',
-				data: get(mediaStore).localStream?.id,
-				type: 'initialStates',
-				audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
-				videoState: get(mediaStore).localStream?.getVideoTracks()[0]?.enabled,
-				name: get(roomInfoStore).userName,
-				target: get(roomInfoStore).userId
-			});
-
-			this.sendMessage({
-				event: 'message',
-				data: get(mediaStore).localStream?.id,
-				type: 'stateRequest',
-				target: get(roomInfoStore).userId
-			});
+			if (this.onOpenCallback) {
+				this.onOpenCallback();
+			}
 		};
 
 		this.ws.onerror = (e: Event) => {
@@ -123,6 +100,10 @@ export class WS {
 
 	public setChatMessageCallback(callback: (msg: any) => void): void {
 		this.chatMessageCallback = callback;
+	}
+
+	public setOnOpenCallback(callback: () => void): void {
+		this.onOpenCallback = callback;
 	}
 }
 

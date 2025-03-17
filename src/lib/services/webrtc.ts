@@ -1,4 +1,5 @@
 import { mediaStore } from '$lib/stores/mediaStore';
+import { roomInfoStore } from '$lib/stores/roomStore';
 import { showToast } from '$lib/stores/toastStore';
 import { get } from 'svelte/store';
 
@@ -6,7 +7,7 @@ export class WRTC {
 	private pc: RTCPeerConnection;
 	public audioTrack: MediaStreamTrack | null;
 	public videoTrack: MediaStreamTrack | null;
-	private screenStream: MediaStream | null;
+	public screenStream: MediaStream | null;
 	private ws: App.IWebSocketService | null;
 
 	constructor() {
@@ -70,37 +71,29 @@ export class WRTC {
 	public async audioStats(): Promise<void> {
 		const report = await this.pc.getStats();
 
-		report.forEach((stats, id) => {
+		report.forEach((stats) => {
 			if (stats.type === 'media-source' && stats.kind === 'audio') {
 				mediaStore.update((state) => {
-					const updatedStates = { ...state.remoteStreamStates };
+					const updatedStates = state.audioLevels;
 
-					if (!updatedStates[stats.trackIdentifier]) {
-						updatedStates[stats.trackIdentifier] = { audioLevel: 0 };
-					}
-
-					updatedStates[stats.trackIdentifier].audioLevel = stats.audioLevel;
+					updatedStates[stats.trackIdentifier] = stats.audioLevel;
 
 					return {
 						...state,
-						remoteStreamStates: updatedStates
+						audioLevels: updatedStates
 					};
 				});
 			}
 
 			if (stats.type === 'inbound-rtp' && stats.kind === 'audio') {
 				mediaStore.update((state) => {
-					const updatedStates = { ...state.remoteStreamStates };
+					const updatedStates = state.audioLevels;
 
-					if (!updatedStates[stats.trackIdentifier]) {
-						updatedStates[stats.trackIdentifier] = { audioLevel: 0 };
-					}
-
-					updatedStates[stats.trackIdentifier].audioLevel = stats.audioLevel;
+					updatedStates[stats.trackIdentifier] = stats.audioLevel;
 
 					return {
 						...state,
-						remoteStreamStates: updatedStates
+						audioLevels: updatedStates
 					};
 				});
 			}
@@ -117,24 +110,18 @@ export class WRTC {
 		const localStream = get(mediaStore).localStream;
 
 		if (localStream) {
-			mediaStore.update((state) => {
-				const updatedStates = { ...state.remoteStreamStates };
+			roomInfoStore.update((state) => {
+				const updatedStates = state.participants;
 
-				if (!updatedStates[localStream.id]) {
-					updatedStates[localStream.id] = { audio: 'unknown' };
-				}
+				if (!updatedStates) return { ...state };
 
-				updatedStates[localStream.id].audio = this.audioTrack?.enabled ? 'enabled' : 'disabled';
+				updatedStates[get(roomInfoStore)?.userId].audio = this.audioTrack?.enabled
+					? 'enabled'
+					: 'disabled';
 
 				return {
 					...state,
-					mediaSate: {
-						isMuted: !state.mediaSate.isMuted,
-						isCameraOn: state.mediaSate.isCameraOn,
-						isScreenSharing: state.mediaSate.isScreenSharing
-					},
-
-					remoteStreamStates: updatedStates
+					participants: updatedStates
 				};
 			});
 		}
@@ -143,8 +130,7 @@ export class WRTC {
 			this.ws.sendMessage({
 				event: 'message',
 				type: 'audioToggle',
-				data: localStream?.id,
-				state: localStream?.getAudioTracks()[0].enabled
+				audioState: localStream?.getAudioTracks()[0].enabled
 			});
 		}
 	}
@@ -156,30 +142,19 @@ export class WRTC {
 		}
 
 		this.videoTrack.enabled = !this.videoTrack.enabled;
-		const localStream = get(mediaStore).localStream;
 
-		mediaStore.update((state) => {
-			const updatedStates = { ...state.remoteStreamStates };
+		roomInfoStore.update((state) => {
+			const updatedStates = state.participants;
 
-			if (!localStream?.id)
-				return {
-					...state
-				};
+			if (!updatedStates) return { ...state };
 
-			if (!updatedStates[localStream.id]) {
-				updatedStates[localStream.id] = { video: 'unknown' };
-			}
-
-			updatedStates[localStream.id].video = this.videoTrack?.enabled ? 'enabled' : 'disabled';
+			updatedStates[get(roomInfoStore)?.userId].camera = this.videoTrack?.enabled
+				? 'enabled'
+				: 'disabled';
 
 			return {
 				...state,
-				mediaSate: {
-					isMuted: state.mediaSate.isMuted,
-					isCameraOn: !state.mediaSate.isCameraOn,
-					isScreenSharing: state.mediaSate.isScreenSharing
-				},
-				remoteStreamStates: updatedStates
+				participants: updatedStates
 			};
 		});
 
@@ -187,8 +162,7 @@ export class WRTC {
 			this.ws.sendMessage({
 				event: 'message',
 				type: 'cameraToggle',
-				data: localStream?.id,
-				state: this.videoTrack.enabled
+				videoState: this.videoTrack.enabled
 			});
 		}
 	}
@@ -203,7 +177,48 @@ export class WRTC {
 				track.onended = () => stopScreenSharing();
 				this.pc.addTrack(track, this.screenStream as MediaStream);
 			});
+
 			await this.renegotiate();
+
+			mediaStore.update((state) => {
+				const updatedRemoteStreams = state.remoteStreams;
+
+				if (!this.screenStream) return { ...state };
+
+				updatedRemoteStreams[this.screenStream?.id] = this.screenStream;
+
+				return {
+					...state,
+					remoteStreams: updatedRemoteStreams
+				};
+			});
+
+			roomInfoStore.update((state) => {
+				const updatedParticipants = state.participants;
+
+				const participant = updatedParticipants[get(roomInfoStore).userId];
+				updatedParticipants[get(roomInfoStore).userId] = {
+					...participant,
+					screen: this?.screenStream?.id || '',
+					streams: {
+						...participant.streams,
+						[`${this.screenStream?.id}`]: true
+					}
+				};
+
+				return {
+					...state,
+					participants: updatedParticipants
+				};
+			});
+
+			this.ws?.sendMessage({
+				event: 'message',
+				type: 'stream',
+				name: get(roomInfoStore).userName,
+				data: this.screenStream.id
+			});
+
 			return true;
 		} catch (error) {
 			console.error('Error starting screen share:', error);

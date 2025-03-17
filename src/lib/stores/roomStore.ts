@@ -1,13 +1,17 @@
 import { writable } from 'svelte/store';
 
 export const roomInfoStore = writable<{
-	id: string | null;
-	userName: string | null;
-	userId: string | null;
+	id: string;
+	userName: string;
+	userId: string;
 	joined: boolean;
+	streamIdMapper: Record<string, string>;
+	participants: Record<string, App.Participant>;
 }>({
-	id: null,
-	userName: null,
+	id: '',
+	userName: '',
 	userId: crypto.randomUUID(),
-	joined: false
+	joined: false,
+	streamIdMapper: {},
+	participants: {}
 });

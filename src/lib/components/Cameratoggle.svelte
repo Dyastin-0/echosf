@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { mediaStore } from '$lib/stores/mediaStore';
+	import { roomInfoStore } from '$lib/stores/roomStore';
 
 	export let toggleCamera: () => void;
 
-	$: mediaState = $mediaStore.mediaSate;
+	$: mediaState = $roomInfoStore.participants[$roomInfoStore.userId];
 </script>
 
 <button
@@ -13,7 +13,7 @@
 >
 	<i
 		class="fa-solid text-lg"
-		class:fa-video={mediaState?.isCameraOn}
-		class:fa-video-slash={!mediaState?.isCameraOn}
+		class:fa-video={mediaState?.camera === 'enabled'}
+		class:fa-video-slash={mediaState?.camera === 'disabled'}
 	></i>
 </button>

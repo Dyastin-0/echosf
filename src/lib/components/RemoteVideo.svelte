@@ -8,12 +8,13 @@
 	export let isLocal: boolean = false;
 	export let isExpanded: boolean = false;
 	export let onExpand: (id: string) => void;
-	export let id: string;
+	export let streamId: string;
 	export let owner: string;
 	export let ownerId: string;
 	export let isMuted: boolean = false;
 	export let isCameraOpen: boolean = false;
 	export let audioLevel: number = 0;
+	export let isScreen: boolean = false;
 
 	$: isAudioActive = audioLevel > 0.05;
 </script>
@@ -37,7 +38,7 @@
 		<track kind="captions" />
 	</video>
 
-	{#if owner !== 'undefined'}
+	{#if owner !== 'undefined' && !isScreen}
 		<Avatar {owner} {isAudioActive} {isCameraOpen} />
 	{/if}
 	<Wave {isAudioActive} />
@@ -48,12 +49,14 @@
 		<div class="flex h-4 w-4 items-center justify-center">
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		</div>
-		<span>{ownerId === $roomInfoStore.userId ? 'You' : owner}</span>
+		<span
+			>{`${ownerId === $roomInfoStore.userId ? 'You' : owner}${isScreen ? ' (Presenting)' : ''}`}</span
+		>
 	</div>
 
 	<button
-		class="absolute bottom-3 right-3 rounded-full bg-black/50 opacity-0 transition-opacity hover:cursor-pointer group-hover:opacity-100"
-		on:click={() => onExpand(id)}
+		class="absolute right-3 bottom-3 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		on:click={() => onExpand(streamId)}
 		aria-label="toggle expand"
 	>
 		{#if isExpanded}

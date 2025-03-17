@@ -30,10 +30,18 @@ declare global {
 			type: string | null | undefined;
 			event: string;
 			data: string;
+			adData: string;
 			state: boolean;
 			audioState: boolean;
 			videoState: boolean;
 			target: string | null;
+		}
+		export interface Participant {
+			streams: Record<string, boolean>;
+			camera: 'enabled' | 'disabled';
+			audio: 'enabled' | 'disabled';
+			screen: string;
+			name: string;
 		}
 	}
 }
