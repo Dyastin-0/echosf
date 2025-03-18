@@ -13,7 +13,7 @@ export async function getAvailableMedia(): Promise<MediaStream | null> {
 		if (!hasVideo) showToast('Video device missing', 'warning', 3000);
 		if (!hasAudio) showToast('Audio device missing', 'warning', 3000);
 
-		if (!hasAudio && !hasAudio) return null;
+		if (!hasAudio && !hasVideo) return null;
 
 		return await navigator.mediaDevices.getUserMedia({
 			video: hasVideo,

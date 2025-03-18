@@ -33,10 +33,10 @@
 		>
 			<i
 				class="fa-solid text-lg"
-				class:text-[var(--red)]={mediaState?.screen}
-				class:text-[var(--text-primary)]={!mediaState?.screen}
-				class:fa-desktop={!mediaState?.screen}
-				class:fa-stop={mediaState?.screen}
+				class:text-[var(--red)]={mediaState?.screen !== 'disabled'}
+				class:text-[var(--text-primary)]={mediaState?.screen === 'disabled'}
+				class:fa-desktop={mediaState?.screen === 'disabled'}
+				class:fa-stop={mediaState?.screen !== 'disabled'}
 			></i>
 		</button>
 		{#if joined && leaveRoom}

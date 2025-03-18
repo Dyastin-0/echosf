@@ -245,7 +245,7 @@ export class WRTC {
 			roomInfoStore.update((state) => {
 				const updatedParticipants = state.participants;
 
-				updatedParticipants[state.userId].screen = '';
+				updatedParticipants[state.userId].screen = 'disabled';
 
 				return {
 					...state,
