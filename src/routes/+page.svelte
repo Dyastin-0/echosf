@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { flowStep } from '$lib/stores/flowStore';
-	import { useWRTC } from '$lib/hooks/useWRTC';
+	import { useWRTC } from '$lib/hooks/useEchos';
 	import CreateRoom from '$lib/components/CreateRoom.svelte';
 	import JoinRoom from '$lib/components/JoinRoom.svelte';
 	import RemoteVideos from '$lib/components/Videos.svelte';
@@ -10,7 +10,6 @@
 	import { fly } from 'svelte/transition';
 	import Alert from '$lib/components/Alert.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-	import { toggleChat } from '$lib/stores/uiStore';
 	import Participants from '$lib/components/Participants.svelte';
 
 	const {
