@@ -28,7 +28,7 @@
 							audioLevel={$mediaStore.audioLevels[
 								$mediaStore.remoteStreams[expandedId]?.getAudioTracks()[0]?.id
 							]}
-							isMuted={info.audio === 'disabled'}
+							isMuted={info.audio === 'disabled' || info.audio === 'missing'}
 							owner={info.name}
 							isScreen={info.screen === expandedId}
 							isCameraOpen={info.camera === 'enabled'}
@@ -53,7 +53,7 @@
 											$mediaStore.remoteStreams[streamId]?.getAudioTracks()[0]?.id
 										]
 									)}
-									isMuted={info.audio === 'disabled'}
+									isMuted={info.audio === 'disabled' || info.audio === 'missing'}
 									owner={info.name}
 									isScreen={info.screen === streamId}
 									isCameraOpen={info.camera === 'enabled'}
@@ -85,7 +85,7 @@
 									$mediaStore.remoteStreams[streamId]?.getAudioTracks()[0]?.id
 								]
 							)}
-							isMuted={info.audio === 'disabled'}
+							isMuted={info.audio === 'disabled' || info.audio === 'missing'}
 							owner={info.name}
 							isScreen={info.screen === streamId}
 							isCameraOpen={info.camera === 'enabled'}
