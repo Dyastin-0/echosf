@@ -118,7 +118,8 @@ export function handleStreamRemoval(stream: MediaStream) {
 		const updatedMapper = state.streamIdMapper;
 		const updatedParticipants = state.participants;
 
-		delete updatedParticipants[updatedMapper[stream.id]].streams[stream.id];
+		if (updatedParticipants[updatedMapper[stream.id]])
+			delete updatedParticipants[updatedMapper[stream.id]].streams[stream.id];
 		delete updatedMapper[stream.id];
 
 		return {
