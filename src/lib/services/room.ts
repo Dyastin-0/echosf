@@ -38,19 +38,8 @@ export function updateRoomInfo(roomId: string, name: string, id: string) {
 	});
 }
 
-export function leaveRoom(websocket: WS, webrtcReset: () => void) {
+export function leaveRoom(webrtcReset: () => void) {
 	document.title = 'echos';
-
-	const roomInfo = get(roomInfoStore);
-
-	websocket.sendMessage({
-		id: roomInfo.userId,
-		event: 'message',
-		type: 'left',
-		data: 'Left the room 🤷‍♂️',
-		name: roomInfo.userName
-	});
-
 	webrtcReset();
 	resetRoomState();
 	flowStep.set('create');

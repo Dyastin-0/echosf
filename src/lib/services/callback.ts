@@ -10,7 +10,8 @@ import {
 	handleCameraToggleMessage,
 	handleInitialStatesMessage,
 	handleStateRequestMessage,
-	handleStateAnswerMessage
+	handleStateAnswerMessage,
+	handleParticipantDisconnect
 } from './message';
 import type { WRTC } from './webrtc';
 import type { WS } from './websocket';
@@ -68,7 +69,6 @@ export function handleWebSocketOpen(websocket: WS) {
 
 	websocket.sendMessage({
 		event: 'message',
-		data: localStream?.id,
 		type: 'stateRequest',
 		target: roomInfo.userId
 	});
@@ -84,9 +84,12 @@ export function handleWebSocketMessage(
 
 	if (msg?.type) {
 		switch (msg.type) {
-			case 'left':
 			case 'join':
 				handleParticipantStatusMessage(msg);
+				break;
+
+			case 'disconnect':
+				handleParticipantDisconnect(msg);
 				break;
 
 			case 'stream':

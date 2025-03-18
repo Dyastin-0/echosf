@@ -23,9 +23,15 @@
 	}
 </script>
 
-<video
-	use:setVideoStream={localStream}
-	class="{position} {height} z-50 rounded-lg border border-[var(--accent)] object-cover"
-	muted
-	autoplay
-></video>
+{#if !localStream}
+	<div class="flex h-[200px] w-[350px] items-center justify-center bg-[var(--bg-primary)]">
+		<span>No media device found</span>
+	</div>
+{:else}
+	<video
+		use:setVideoStream={localStream}
+		class="{position} {height} z-50 rounded-lg border border-[var(--accent)] object-cover"
+		muted
+		autoplay
+	></video>
+{/if}

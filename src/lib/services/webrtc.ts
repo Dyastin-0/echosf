@@ -195,6 +195,7 @@ export class WRTC {
 
 			roomInfoStore.update((state) => {
 				const updatedParticipants = state.participants;
+				const updatedMapper = state.streamIdMapper;
 
 				const participant = updatedParticipants[get(roomInfoStore).userId];
 				updatedParticipants[get(roomInfoStore).userId] = {
@@ -206,9 +207,12 @@ export class WRTC {
 					}
 				};
 
+				if (this.screenStream) updatedMapper[this.screenStream?.id] = get(roomInfoStore).userId;
+
 				return {
 					...state,
-					participants: updatedParticipants
+					participants: updatedParticipants,
+					streamIdMapper: updatedMapper
 				};
 			});
 
@@ -237,6 +241,17 @@ export class WRTC {
 			});
 			this.renegotiate();
 			this.screenStream = null;
+
+			roomInfoStore.update((state) => {
+				const updatedParticipants = state.participants;
+
+				updatedParticipants[state.userId].screen = '';
+
+				return {
+					...state,
+					updatedParticipants
+				};
+			});
 		}
 	}
 

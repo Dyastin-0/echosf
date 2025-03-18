@@ -56,8 +56,10 @@
 			<div class="flex-grow" in:fly={{ duration: 400, y: 100 }}>
 				<RemoteVideos />
 			</div>
-			<ChatPanel onSendMessage={sendChatMessage} />
-			<Participants />
+			<div class="flex">
+				<ChatPanel onSendMessage={sendChatMessage} />
+				<Participants />
+			</div>
 		</div>
 
 		<div in:fly={{ y: 20, duration: 300 }} out:fly={{ y: -20, duration: 300 }}>

@@ -6,6 +6,22 @@ import { mediaStore } from '$lib/stores/mediaStore';
 import type { WS } from './websocket';
 import type { WRTC } from './webrtc';
 
+export function handleParticipantDisconnect(msg: App.WebsocketMessage) {
+	roomInfoStore.update((state) => {
+		const updatedParticipants = state.participants;
+
+		if (msg?.target) {
+			showToast(`${updatedParticipants[msg.target].name} left the room 🤷‍♀️`, 'info', 3000);
+			delete updatedParticipants[msg.target];
+		}
+
+		return {
+			...state,
+			updatedParticipants
+		};
+	});
+}
+
 export function handleParticipantStatusMessage(msg: App.WebsocketMessage) {
 	showToast(`${msg.name} ${msg.data}`, 'info');
 	messagesStore.update((messages) => [...messages, msg]);
@@ -76,25 +92,34 @@ export function handleCameraToggleMessage(msg: App.WebsocketMessage) {
 }
 
 export function handleInitialStatesMessage(msg: App.WebsocketMessage) {
-	const { data: streamId, adData: screenStreamId, audioState, videoState, name, target } = msg;
+	const { data: streamId, audioState, videoState, name, target } = msg;
 
 	roomInfoStore.update((state) => {
 		const updatedParticipants = state.participants;
+		const updatedMapper = state.streamIdMapper;
 
 		if (!target || !name) return { ...state };
 
-		updatedParticipants[target] = {
-			camera: videoState ? 'enabled' : 'disabled',
-			audio: audioState ? 'enabled' : 'disabled',
-			screen: screenStreamId,
-			name,
-			streams: {
-				[`${streamId}`]: true
-			}
-		};
+		if (streamId) {
+			updatedParticipants[target] = {
+				...updatedParticipants[target],
+				camera: videoState ? 'enabled' : 'disabled',
+				audio: audioState ? 'enabled' : 'disabled',
+				name,
+				streams: {
+					[`${streamId}`]: true
+				}
+			};
 
-		const updatedMapper = state.streamIdMapper;
-		updatedMapper[streamId] = target;
+			updatedMapper[streamId] = target;
+		} else {
+			updatedParticipants[target] = {
+				...updatedParticipants[target],
+				camera: videoState ? 'enabled' : 'disabled',
+				audio: audioState ? 'enabled' : 'disabled',
+				name
+			};
+		}
 
 		return {
 			...state,
@@ -110,7 +135,6 @@ export function handleStateRequestMessage(msg: App.WebsocketMessage, websocket: 
 		type: 'stateAnswer',
 		data: get(mediaStore).localStream?.id,
 		adData: webrtc.screenStream?.id,
-		screen: webrtc.screenStream?.id,
 		target: msg.target,
 		name: get(roomInfoStore).userName,
 		audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
@@ -128,15 +152,25 @@ export function handleStateAnswerMessage(msg: App.WebsocketMessage) {
 
 		if (!id || !name) return { ...state };
 
-		updatedStates[id] = {
-			camera: videoState ? 'enabled' : 'disabled',
-			audio: audioState ? 'enabled' : 'disabled',
-			screen: screenStreamId,
-			name,
-			streams: {
-				[`${streamId}`]: true
-			}
-		};
+		if (streamId) {
+			updatedStates[id] = {
+				camera: videoState ? 'enabled' : 'disabled',
+				audio: audioState ? 'enabled' : 'disabled',
+				screen: screenStreamId,
+				name,
+				streams: {
+					[`${streamId}`]: true
+				}
+			};
+		} else {
+			updatedStates[id] = {
+				...updatedStates[id],
+				camera: videoState ? 'enabled' : 'disabled',
+				audio: audioState ? 'enabled' : 'disabled',
+				screen: screenStreamId,
+				name
+			};
+		}
 
 		if (screenStreamId) {
 			updatedStates[id] = {

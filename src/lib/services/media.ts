@@ -13,6 +13,8 @@ export async function getAvailableMedia(): Promise<MediaStream | null> {
 		if (!hasVideo) showToast('Video device missing', 'warning', 3000);
 		if (!hasAudio) showToast('Audio device missing', 'warning', 3000);
 
+		if (!hasAudio && !hasAudio) return null;
+
 		return await navigator.mediaDevices.getUserMedia({
 			video: hasVideo,
 			audio: hasAudio
@@ -60,6 +62,8 @@ export function updateMediaStoreWithLocalStream(stream: MediaStream) {
 export function updateParticipantMediaState(stream: MediaStream) {
 	roomInfoStore.update((state) => {
 		const updatedParticipants = state.participants;
+		const updatedMapper = state.streamIdMapper;
+
 		if (!updatedParticipants) return { ...state };
 
 		const roomInfo = get(roomInfoStore);
@@ -75,8 +79,10 @@ export function updateParticipantMediaState(stream: MediaStream) {
 			}
 		};
 
+		updatedMapper[stream.id] = get(roomInfoStore).userId;
 		return {
 			...state,
+			streamIdMapper: updatedMapper,
 			participants: updatedParticipants
 		};
 	});
@@ -112,7 +118,7 @@ export function handleStreamRemoval(stream: MediaStream) {
 		const updatedMapper = state.streamIdMapper;
 		const updatedParticipants = state.participants;
 
-		delete updatedParticipants[updatedMapper[stream.id]];
+		delete updatedParticipants[updatedMapper[stream.id]].streams[stream.id];
 		delete updatedMapper[stream.id];
 
 		return {

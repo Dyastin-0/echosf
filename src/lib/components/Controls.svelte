@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { copyCode } from '$lib/helpers/clip';
-	import { mediaStore } from '$lib/stores/mediaStore';
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { toggleChat, toggleParticipants, uiStore } from '$lib/stores/uiStore';
 	import AudioToggle from './AudioToggle.svelte';
@@ -14,7 +13,7 @@
 	$: joined = $roomInfoStore.joined;
 	$: showChat = $uiStore.showChat;
 	$: showParticipants = $uiStore.showParticipants;
-	$: mediaState = $mediaStore.mediaSate;
+	$: mediaState = $roomInfoStore.participants[$roomInfoStore.userId];
 </script>
 
 <div class="bottom-4 flex w-full justify-between gap-4">
@@ -34,10 +33,10 @@
 		>
 			<i
 				class="fa-solid text-lg"
-				class:text-[var(--red)]={mediaState?.isScreenSharing}
-				class:text-[var(--text-primary)]={!mediaState?.isScreenSharing}
-				class:fa-desktop={!mediaState?.isScreenSharing}
-				class:fa-stop={mediaState?.isScreenSharing}
+				class:text-[var(--red)]={mediaState?.screen}
+				class:text-[var(--text-primary)]={!mediaState?.screen}
+				class:fa-desktop={!mediaState?.screen}
+				class:fa-stop={mediaState?.screen}
 			></i>
 		</button>
 		{#if joined && leaveRoom}

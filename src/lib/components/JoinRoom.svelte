@@ -20,7 +20,7 @@
 	const goBack = () => {
 		goto('?').then(() => {
 			$flowStep = 'create';
-			$roomInfoStore.id = null;
+			$roomInfoStore.id = '';
 		});
 	};
 

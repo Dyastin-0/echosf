@@ -46,7 +46,7 @@ export function useWRTC() {
 	}
 
 	function exitRoom() {
-		leaveRoom(websocket, () => webrtc.reset());
+		leaveRoom(() => webrtc.reset());
 	}
 
 	function sendChatMessage(message: string) {
