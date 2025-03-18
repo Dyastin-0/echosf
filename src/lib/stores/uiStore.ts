@@ -10,14 +10,14 @@ export const uiStore = writable<{
 
 export function toggleChat() {
 	uiStore.update((store) => ({
-		...store,
+		showParticipants: !store.showChat ? false : store.showParticipants,
 		showChat: !store.showChat
 	}));
 }
 
 export function toggleParticipants() {
 	uiStore.update((store) => ({
-		...store,
+		showChat: !store.showParticipants ? false : store.showChat,
 		showParticipants: !store.showParticipants
 	}));
 }

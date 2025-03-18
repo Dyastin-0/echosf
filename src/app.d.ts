@@ -38,8 +38,8 @@ declare global {
 		}
 		export interface Participant {
 			streams: Record<string, boolean>;
-			camera: 'enabled' | 'disabled';
-			audio: 'enabled' | 'disabled';
+			camera: 'enabled' | 'disabled' | 'missing';
+			audio: 'enabled' | 'disabled' | 'missing';
 			screen: string;
 			name: string;
 		}

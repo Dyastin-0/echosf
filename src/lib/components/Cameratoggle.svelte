@@ -14,6 +14,7 @@
 	<i
 		class="fa-solid text-lg"
 		class:fa-video={mediaState?.camera === 'enabled'}
-		class:fa-video-slash={mediaState?.camera === 'disabled'}
+		class:fa-video-slash={mediaState?.camera === 'disabled' || mediaState?.camera === 'missing'}
+		class:text-[var(--red)]={mediaState?.camera === 'missing'}
 	></i>
 </button>

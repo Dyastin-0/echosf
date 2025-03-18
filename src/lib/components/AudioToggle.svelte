@@ -14,6 +14,7 @@
 	<i
 		class="fa-solid text-lg"
 		class:fa-microphone={mediaState?.audio === 'enabled'}
-		class:fa-microphone-slash={mediaState?.audio === 'disabled'}
+		class:fa-microphone-slash={mediaState?.audio === 'disabled' || mediaState?.audio === 'missing'}
+		class:text-[var(--red)]={mediaState?.audio === 'missing'}
 	></i>
 </button>

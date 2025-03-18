@@ -50,6 +50,27 @@ export function useWRTC() {
 
 		if (!stream) {
 			showToast('No media device available.', 'warning', 3000);
+
+			roomInfoStore.update((state) => {
+				const updatedParticipants = state.participants;
+
+				if (!updatedParticipants) return { ...state };
+
+				const roomInfo = get(roomInfoStore);
+				const participant = updatedParticipants[roomInfo.userId];
+
+				updatedParticipants[roomInfo.userId] = {
+					...participant,
+					audio: 'missing',
+					camera: 'missing',
+					screen: ''
+				};
+
+				return {
+					...state,
+					participants: updatedParticipants
+				};
+			});
 			return;
 		}
 
@@ -71,8 +92,16 @@ export function useWRTC() {
 
 			updatedParticipants[roomInfo.userId] = {
 				...participant,
-				audio: stream.getAudioTracks()[0]?.enabled ? 'enabled' : 'disabled',
-				camera: stream.getVideoTracks()[0]?.enabled ? 'enabled' : 'disabled',
+				audio: stream.getAudioTracks()[0]?.enabled
+					? 'enabled'
+					: stream.getAudioTracks()[0]
+						? 'disabled'
+						: 'missing',
+				camera: stream.getVideoTracks()[0]?.enabled
+					? 'enabled'
+					: stream?.getVideoTracks()[0]
+						? 'disabled'
+						: 'missing',
 				screen: 'disabled',
 				streams: {
 					[`${stream.id}`]: true

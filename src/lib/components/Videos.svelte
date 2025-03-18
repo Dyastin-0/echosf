@@ -17,7 +17,7 @@
 		<div class="flex h-full w-full gap-4">
 			<div class="flex flex-grow items-center justify-center">
 				{#each participants as [id, info]}
-					{#each Object.entries(info.streams) as [streamId, _]}
+					{#each Object.entries(info.streams || {}) as [streamId, _]}
 						{#if streamId === expandedId}
 							<VideoPlayer
 								stream={$mediaStore.remoteStreams[streamId]}
@@ -40,7 +40,7 @@
 			</div>
 			<div class="flex flex-col items-center justify-center gap-2 overflow-x-auto">
 				{#each participants as [id, info]}
-					{#each Object.entries(info.streams) as [streamId, _]}
+					{#each Object.entries(info.streams || {}) as [streamId, _]}
 						{#if streamId !== expandedId}
 							<VideoPlayer
 								stream={$mediaStore.remoteStreams[streamId]}
@@ -67,7 +67,7 @@
 	{:else}
 		<div class="flex w-full flex-wrap gap-4">
 			{#each participants as [id, info]}
-				{#each Object.entries(info.streams) as [streamId, _]}
+				{#each Object.entries(info.streams || {}) as [streamId, _]}
 					<VideoPlayer
 						stream={$mediaStore.remoteStreams[streamId]}
 						isLocal={streamId === $mediaStore.localStream?.id}
