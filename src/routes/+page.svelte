@@ -4,7 +4,7 @@
 	import { useWRTC } from '$lib/hooks/useEchos';
 	import CreateRoom from '$lib/components/CreateRoom.svelte';
 	import JoinRoom from '$lib/components/JoinRoom.svelte';
-	import RemoteVideos from '$lib/components/Videos.svelte';
+	import Streams from '$lib/components/Streams.svelte';
 	import ChatPanel from '$lib/components/ChatPanel.svelte';
 	import Controls from '$lib/components/Controls.svelte';
 	import { fly } from 'svelte/transition';
@@ -54,7 +54,7 @@
 	>
 		<div class="relative flex h-full gap-4 overflow-hidden" in:fly={{ duration: 400 }}>
 			<div class="flex-grow" in:fly={{ duration: 400, y: 100 }}>
-				<RemoteVideos />
+				<Streams />
 			</div>
 			<div class="flex">
 				<ChatPanel onSendMessage={sendChatMessage} />

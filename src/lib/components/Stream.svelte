@@ -31,7 +31,9 @@
 
 	<video
 		use:setVideoStream={stream}
-		class="relative w-auto rounded-lg {isExpanded ? 'max-h-[75vh]' : 'max-h-[150px]'}"
+		class="relative min-w-64 rounded-lg bg-[var(--bg-secondary)] {isExpanded
+			? 'max-h-[75vh]'
+			: 'max-h-[150px]'}"
 		autoplay
 		muted={isLocal}
 	>
@@ -43,12 +45,10 @@
 	{/if}
 	<Wave {isAudioActive} />
 
-	<div
-		class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-sm bg-black/50"
-	>
-		<div class="flex h-4 w-4 items-center justify-center">
+	<div class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black">
+		{#if !isScreen}
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
-		</div>
+		{/if}
 		<span
 			>{`${ownerId === $roomInfoStore.userId ? 'You' : owner}${isScreen ? ' (Presenting)' : ''}`}</span
 		>

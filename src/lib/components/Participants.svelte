@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { mediaStore } from '$lib/stores/mediaStore';
 	import { uiStore } from '$lib/stores/uiStore';
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-	import { get } from 'svelte/store';
 	import { roomInfoStore } from '$lib/stores/roomStore';
 
 	$: showParticipants = $uiStore.showParticipants;
@@ -31,15 +29,17 @@
 							<div
 								class="flex min-h-10 min-w-10 items-center justify-center rounded-full bg-[var(--accent)]"
 							>
-								{info.name ? info.name.charAt(0).toUpperCase() : '?'}
+								<span>{info.name ? info.name.charAt(0).toUpperCase() : '?'}</span>
 							</div>
 							<div class="flex w-full justify-between gap-2">
-								<span class="font-medium">{info.name}</span>
+								<span class="font-medium"
+									>{`${info.name} ${id === $roomInfoStore.userId ? '(You)' : ''}`}</span
+								>
 								<div class="flex items-center gap-2 text-sm">
 									<i
 										class="fa-solid"
 										class:fa-microphone={info.audio === 'enabled'}
-										class:fa-microphone-slash={info.audio! === 'enabled'}
+										class:fa-microphone-slash={info.audio !== 'enabled'}
 									></i>
 								</div>
 							</div>

@@ -9,7 +9,7 @@
 	import { showAlert } from '$lib/stores/alertStore';
 	import { goto } from '$app/navigation';
 
-	$roomInfoStore.id = page.url.searchParams.get('room');
+	$roomInfoStore.id = page.url.searchParams.get('room') || '';
 
 	const createNewRoom = async () => {
 		try {
@@ -42,7 +42,7 @@
 			updateParams({ room: $roomInfoStore.id });
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');
-			goto('?').then(() => ($roomInfoStore.id = null));
+			goto('?').then(() => ($roomInfoStore.id = ''));
 		}
 	};
 
