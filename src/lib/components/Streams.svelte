@@ -61,7 +61,7 @@
 						{/each}
 					{:else}
 						<div
-							class="relative flex h-32 w-32 items-center justify-center rounded-lg bg-[var(--bg-secondary)]"
+							class="relative flex h-[150px] w-64 items-center justify-center rounded-lg bg-[var(--bg-secondary)]"
 						>
 							<Avatar owner={info.name} isCameraOpen={false} isAudioActive={false} />
 							<span class="absolute bottom-3 left-3">{info.name}</span>
