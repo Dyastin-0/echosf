@@ -39,7 +39,7 @@ export function handleNoMediaAvailable() {
 			...participant,
 			audio: 'missing',
 			camera: 'missing',
-			screen: ''
+			screen: 'disabled'
 		};
 
 		return {
