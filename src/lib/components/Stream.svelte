@@ -5,7 +5,6 @@
 	import Wave from './Wave.svelte';
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	export let stream: MediaStream;
-	export let isLocal: boolean = false;
 	export let isExpanded: boolean = false;
 	export let onExpand: (id: string) => void;
 	export let streamId: string;
@@ -17,6 +16,7 @@
 	export let isScreen: boolean = false;
 
 	$: isAudioActive = audioLevel > 0.05;
+	$: isLocalStream = ownerId === $roomInfoStore.userId;
 </script>
 
 <div
@@ -35,7 +35,7 @@
 			? 'max-h-[75vh]'
 			: 'max-h-[150px]'}"
 		autoplay
-		muted={isLocal}
+		muted={isLocalStream}
 	>
 		<track kind="captions" />
 	</video>
@@ -43,7 +43,7 @@
 	{#if owner !== 'undefined' && !isScreen}
 		<Avatar {owner} {isAudioActive} {isCameraOpen} />
 	{/if}
-	<Wave {isAudioActive} />
+	<Wave isAudioActive={isAudioActive && !isLocalStream} />
 
 	<div class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black">
 		{#if !isScreen}

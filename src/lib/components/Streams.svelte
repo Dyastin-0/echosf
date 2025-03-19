@@ -21,7 +21,6 @@
 					{#if Object.keys(info.streams || {}).includes(expandedId)}
 						<Stream
 							stream={$mediaStore.remoteStreams[expandedId]}
-							isLocal={id === $roomInfoStore.userId}
 							isExpanded={true}
 							onExpand={toggleExpand}
 							streamId={expandedId}
@@ -44,7 +43,6 @@
 							{#if streamId !== expandedId}
 								<Stream
 									stream={$mediaStore.remoteStreams[streamId]}
-									isLocal={id === $roomInfoStore.userId}
 									isExpanded={false}
 									onExpand={toggleExpand}
 									{streamId}
@@ -77,7 +75,6 @@
 					{#each Object.entries(info.streams) as [streamId, _]}
 						<Stream
 							stream={$mediaStore.remoteStreams[streamId]}
-							isLocal={streamId === $roomInfoStore.userId}
 							isExpanded={false}
 							onExpand={toggleExpand}
 							{streamId}
