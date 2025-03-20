@@ -26,7 +26,7 @@
 >
 	<div
 		class="absolute inset-0 rounded-lg bg-[var(--accent)] opacity-0 transition-opacity duration-200"
-		class:opacity-100={isAudioActive}
+		class:opacity-100={isAudioActive && !isLocalStream}
 	></div>
 
 	<video
