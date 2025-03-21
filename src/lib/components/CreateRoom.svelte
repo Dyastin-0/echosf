@@ -33,7 +33,7 @@
 				throw new Error(`API error: ${response.status} ${response.statusText}`);
 			}
 
-			updateParams({ room: $roomInfoStore.id });
+			goto(`/${$roomInfoStore.id}`);
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');
 			goto('/').then(() => ($roomInfoStore.id = ''));
