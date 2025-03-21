@@ -21,7 +21,9 @@
 </script>
 
 <div
-	class="group relative flex h-fit items-center justify-center transition-all duration-200"
+	class="group relative flex h-fit items-center justify-center rounded-lg border-2 transition-all duration-200"
+	class:border-[var(--accent)]={isAudioActive}
+	class:border-transparent={!isAudioActive}
 	in:fly={{ y: 100, opacity: 1 }}
 	out:fly={{ opacity: 1 }}
 >
@@ -43,7 +45,9 @@
 	{/if}
 	<Wave isAudioActive={isAudioActive && !isLocalStream} />
 
-	<div class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black">
+	<div
+		class="absolute bottom-2 left-2 flex items-center justify-center gap-1 rounded-md bg-black/50 p-1"
+	>
 		{#if !isScreen}
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		{/if}
@@ -51,14 +55,10 @@
 	</div>
 
 	<button
-		class="absolute right-3 bottom-3 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		class="absolute right-2 bottom-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 		on:click={() => onExpand(streamId)}
 		aria-label="toggle expand"
 	>
-		{#if isExpanded}
-			<i class="fa-solid fa-compress"></i>
-		{:else}
-			<i class="fa-solid fa-expand"></i>
-		{/if}
+		<i class="fa-solid" class:fa-expand={!isExpanded} class:fa-compress={isExpanded}></i>
 	</button>
 </div>

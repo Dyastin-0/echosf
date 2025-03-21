@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { roomInfoStore } from '$lib/stores/roomStore';
-	import { flowStep } from '$lib/stores/flowStore';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { updateParams } from '$lib/helpers/url';
 	import { onMount } from 'svelte';
@@ -15,7 +14,6 @@
 
 			const { room } = await response.json();
 
-			$flowStep = 'join';
 			$roomInfoStore.id = room;
 			goto(`/${room}`);
 		} catch (error) {
@@ -35,7 +33,6 @@
 				throw new Error(`API error: ${response.status} ${response.statusText}`);
 			}
 
-			$flowStep = 'join';
 			updateParams({ room: $roomInfoStore.id });
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');

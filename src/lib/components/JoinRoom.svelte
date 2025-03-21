@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { roomInfoStore } from '$lib/stores/roomStore';
-	import { flowStep } from '$lib/stores/flowStore';
 	import Video from './Video.svelte';
 	import Cameratoggle from './Cameratoggle.svelte';
 	import AudioToggle from './AudioToggle.svelte';
@@ -22,7 +21,6 @@
 
 	const goBack = () => {
 		goto('/').then(() => {
-			$flowStep = 'create';
 			$roomInfoStore.id = '';
 		});
 	};
@@ -39,7 +37,6 @@
 				throw new Error('Failed to join room.');
 			}
 
-			$flowStep = 'join';
 			onJoinRoom(e);
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');

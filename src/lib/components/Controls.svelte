@@ -49,10 +49,10 @@
 			</button>
 		{/if}
 	</div>
-	<div class="flex gap-2">
+	<div class="flex">
 		<button
 			onclick={toggleParticipants}
-			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+			class="flex min-h-14 min-w-14 items-center justify-center rounded-full p-4 hover:bg-[var(--accent)]"
 			class:text-[var(--highlight)]={showParticipants}
 			class:text-[var(--text-primary)]={!showParticipants}
 			aria-label="toggle participants"
@@ -61,7 +61,7 @@
 		</button>
 		<button
 			onclick={toggleChat}
-			class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+			class="flex min-h-14 min-w-14 items-center justify-center rounded-full p-4 hover:bg-[var(--accent)]"
 			class:text-[var(--highlight)]={showChat}
 			class:text-[var(--text-primary)]={!showChat}
 			aria-label="toggle chat"

@@ -2,7 +2,6 @@ import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { roomInfoStore } from '$lib/stores/roomStore';
 import { resetRoomState } from '$lib/stores/reset';
-import { flowStep } from '$lib/stores/flowStore';
 
 export async function navigateToRoom(roomId: string) {
 	await goto(`/${roomId}`);
@@ -41,5 +40,4 @@ export function leaveRoom(webrtcReset: () => void) {
 	document.title = 'echos';
 	webrtcReset();
 	resetRoomState();
-	flowStep.set('create');
 }
