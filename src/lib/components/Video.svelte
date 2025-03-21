@@ -23,9 +23,9 @@
 	}
 </script>
 
-{#if !localStream}
+{#if !localStream || !localStream.getVideoTracks()[0]}
 	<div class="flex h-[200px] w-[350px] items-center justify-center bg-[var(--bg-primary)]">
-		<span>No media device found</span>
+		<span>{`No ${localStream?.getVideoTracks()[0] ? 'media' : 'video'} device found`}</span>
 	</div>
 {:else}
 	<video

@@ -43,9 +43,7 @@
 	{/if}
 	<Wave isAudioActive={isAudioActive && !isLocalStream} />
 
-	<div
-		class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black p-1"
-	>
+	<div class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black">
 		{#if !isScreen}
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		{/if}
