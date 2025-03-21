@@ -5,7 +5,7 @@ import { resetRoomState } from '$lib/stores/reset';
 import { flowStep } from '$lib/stores/flowStore';
 
 export async function navigateToRoom(roomId: string) {
-	await goto(`?room=${roomId}`);
+	await goto(`/${roomId}`);
 	document.title = `echos - ${roomId}`;
 }
 

@@ -25,8 +25,6 @@ export function setupWebRTCCallbacks(webrtc: WRTC, websocket: WS, id: string | n
 }
 
 export function handleTrackEvent(event: RTCTrackEvent) {
-	if (event.track.kind === 'audio') return;
-
 	mediaStore.update((state) => {
 		const stream = event.streams[0];
 		const updatedRemoteStreams = state.remoteStreams;

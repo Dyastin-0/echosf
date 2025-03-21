@@ -3,12 +3,9 @@
 	import { flowStep } from '$lib/stores/flowStore';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { updateParams } from '$lib/helpers/url';
-	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { showAlert } from '$lib/stores/alertStore';
 	import { goto } from '$app/navigation';
-
-	$roomInfoStore.id = page.url.searchParams.get('room') || '';
 
 	const createNewRoom = async () => {
 		try {
@@ -20,7 +17,7 @@
 
 			$flowStep = 'join';
 			$roomInfoStore.id = room;
-			updateParams({ room });
+			goto(`/${room}`);
 		} catch (error) {
 			alert('Failed to create, room already exists. Join instead.');
 		}
@@ -42,7 +39,7 @@
 			updateParams({ room: $roomInfoStore.id });
 		} catch (error) {
 			showAlert('Failed to join, room does not exist.', 'info');
-			goto('?').then(() => ($roomInfoStore.id = ''));
+			goto('/').then(() => ($roomInfoStore.id = ''));
 		}
 	};
 

@@ -9,6 +9,7 @@
 	import { goto } from '$app/navigation';
 	import { showAlert } from '$lib/stores/alertStore';
 	import { copyCode } from '$lib/helpers/clip';
+	import { page } from '$app/state';
 
 	export let toggleCamera: () => void;
 	export let toggleMute: () => void;
@@ -17,8 +18,10 @@
 
 	onMount(initMedia);
 
+	$roomInfoStore.id = page.params.room || '';
+
 	const goBack = () => {
-		goto('?').then(() => {
+		goto('/').then(() => {
 			$flowStep = 'create';
 			$roomInfoStore.id = '';
 		});

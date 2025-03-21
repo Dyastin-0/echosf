@@ -33,7 +33,7 @@
 		class:max-h-75vh={isExpanded}
 		class:min-w-64={isExpanded}
 		autoplay
-		muted={isLocalStream}
+		muted={isMuted || isLocalStream}
 	>
 		<track kind="captions" />
 	</video>
