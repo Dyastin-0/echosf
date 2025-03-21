@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import { flowStep } from '$lib/stores/flowStore';
-	import { generatecode } from '$lib/helpers/code';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { updateParams } from '$lib/helpers/url';
 	import { page } from '$app/state';
@@ -13,14 +12,15 @@
 
 	const createNewRoom = async () => {
 		try {
-			const newRoom = generatecode(3, 4, 3);
-			$roomInfoStore.id = newRoom;
-			await fetch(`${PUBLIC_API_URL}/create?room=${$roomInfoStore.id}`, {
+			const response = await fetch(`${PUBLIC_API_URL}/create?room=${$roomInfoStore.id}`, {
 				method: 'POST'
 			});
 
+			const { room } = await response.json();
+
 			$flowStep = 'join';
-			updateParams({ room: newRoom });
+			$roomInfoStore.id = room;
+			updateParams({ room });
 		} catch (error) {
 			alert('Failed to create, room already exists. Join instead.');
 		}
