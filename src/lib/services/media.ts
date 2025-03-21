@@ -118,6 +118,9 @@ export function handleStreamRemoval(stream: MediaStream) {
 		const updatedMapper = state.streamIdMapper;
 		const updatedParticipants = state.participants;
 
+		if (stream.id === updatedParticipants[updatedMapper[stream.id]]?.screen)
+			updatedParticipants[updatedMapper[stream.id]].screen === 'disabled';
+
 		if (updatedParticipants[updatedMapper[stream.id]])
 			delete updatedParticipants[updatedMapper[stream.id]].streams[stream.id];
 		delete updatedMapper[stream.id];

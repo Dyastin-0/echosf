@@ -74,13 +74,15 @@
 
 		<form onsubmit={handleContinue} class="flex flex-col gap-4">
 			<div>
-				<label for="room" class="mb-2 block font-medium text-[var(--text-primary)]"
+				<label for="roomId" class="mb-2 block font-medium text-[var(--text-primary)]"
 					>Enter Room Code</label
 				>
 				<input
+					id="roomId"
 					type="text"
 					bind:value={$roomInfoStore.id}
 					required
+					autocomplete="on"
 					placeholder="Code"
 					class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"
 				/>

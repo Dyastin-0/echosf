@@ -136,7 +136,6 @@ export function handleStateRequestMessage(msg: App.WebsocketMessage, websocket: 
 		data: get(mediaStore).localStream?.id,
 		adData: webrtc.screenStream?.id,
 		target: msg.target,
-		name: get(roomInfoStore).userName,
 		audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
 		videoState: get(mediaStore).localStream?.getVideoTracks()[0]?.enabled
 	});
@@ -204,10 +203,6 @@ export function sendChatMessage(message: string, websocket: WS) {
 
 	websocket.sendMessage({
 		event: 'message',
-		data: message,
-		name: roomInfo.userName,
-		id: roomInfo.userId,
-		type: '',
-		target: ''
+		data: message
 	});
 }

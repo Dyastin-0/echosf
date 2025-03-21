@@ -167,14 +167,14 @@ export class WRTC {
 		}
 	}
 
-	public async startScreenSharing(stopScreenSharing: () => void): Promise<boolean> {
+	public async startScreenSharing(): Promise<boolean> {
 		try {
 			this.screenStream = await navigator.mediaDevices.getDisplayMedia({
 				video: true,
 				audio: true
 			});
 			this.screenStream.getTracks().forEach((track) => {
-				track.onended = () => stopScreenSharing();
+				track.onended = () => this.stopScreenSharing();
 				this.pc.addTrack(track, this.screenStream as MediaStream);
 			});
 

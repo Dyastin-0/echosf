@@ -3,7 +3,6 @@ import { goto } from '$app/navigation';
 import { roomInfoStore } from '$lib/stores/roomStore';
 import { resetRoomState } from '$lib/stores/reset';
 import { flowStep } from '$lib/stores/flowStore';
-import type { WS } from './websocket';
 
 export async function navigateToRoom(roomId: string) {
 	await goto(`?room=${roomId}`);

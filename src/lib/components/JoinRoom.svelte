@@ -68,6 +68,7 @@
 				<div>
 					<input
 						id="name"
+						autocomplete="on"
 						type="text"
 						bind:value={$roomInfoStore.userName}
 						required
@@ -104,6 +105,7 @@
 			</p>
 			<div class="flex items-center gap-2">
 				<input
+					id="meetingCode"
 					type="text"
 					readonly
 					value={$roomInfoStore.id}

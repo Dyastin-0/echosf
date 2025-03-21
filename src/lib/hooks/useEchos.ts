@@ -36,7 +36,7 @@ export function useWRTC() {
 	async function joinRoom(roomId: string, name: string, id: string) {
 		await navigateToRoom(roomId);
 
-		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${roomId}&id=${id}`, webrtc);
+		websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${roomId}&id=${id}&name=${name}`, webrtc);
 		setupWebRTCCallbacks(webrtc, websocket, id);
 
 		updateRoomInfo(roomId, name, id);
@@ -68,9 +68,7 @@ export function useWRTC() {
 		const isCurrentlySharing = webrtc.screenStream;
 
 		if (!isCurrentlySharing) {
-			await webrtc.startScreenSharing(() => {
-				webrtc.stopScreenSharing();
-			});
+			await webrtc.startScreenSharing();
 		} else {
 			webrtc.stopScreenSharing();
 		}

@@ -3,7 +3,7 @@
 </script>
 
 {#if isAudioActive}
-	<div class="absolute right-0 top-0 flex h-11 w-11 items-center justify-center gap-1">
+	<div class="absolute top-0 right-0 flex h-11 w-11 items-center justify-center gap-1">
 		<div class="animate-height w-1 rounded-md bg-[var(--highlight)]"></div>
 		<div class="animate-height-1 w-1 rounded-md bg-[var(--highlight)]"></div>
 		<div class="animate-height-2 w-1 rounded-md bg-[var(--highlight)]"></div>
@@ -16,7 +16,7 @@
 			height: 5px;
 		}
 		50% {
-			height: 14px;
+			height: 12px;
 		}
 		100% {
 			height: 5px;

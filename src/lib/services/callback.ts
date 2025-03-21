@@ -51,7 +51,6 @@ export function handleWebSocketOpen(websocket: WS) {
 
 	websocket.sendMessage({
 		id: roomInfo.userId,
-		name: roomInfo.userName,
 		event: 'message',
 		data: 'Joined the room 👋',
 		type: 'join'
@@ -62,7 +61,6 @@ export function handleWebSocketOpen(websocket: WS) {
 		type: 'initialStates',
 		audioState: localStream?.getAudioTracks()[0]?.enabled,
 		videoState: localStream?.getVideoTracks()[0]?.enabled,
-		name: roomInfo.userName,
 		target: roomInfo.userId,
 		data: localStream?.id
 	});

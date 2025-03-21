@@ -17,45 +17,43 @@
 
 	$: isAudioActive = audioLevel > 0.05;
 	$: isLocalStream = ownerId === $roomInfoStore.userId;
+	$: displayedName = `${ownerId === $roomInfoStore.userId ? 'You' : owner} ${isScreen ? '(Presenting)' : ''}`;
 </script>
 
 <div
-	class="group relative flex h-fit items-center justify-center p-1 transition-all duration-200"
+	class="group relative flex h-fit items-center justify-center transition-all duration-200"
 	in:fly={{ y: 100, opacity: 1 }}
 	out:fly={{ opacity: 1 }}
 >
-	<div
-		class="absolute inset-0 rounded-lg bg-[var(--accent)] opacity-0 transition-opacity duration-200"
-		class:opacity-100={isAudioActive && !isLocalStream}
-	></div>
-
 	<video
 		use:setVideoStream={stream}
-		class="relative min-w-64 rounded-lg bg-[var(--bg-secondary)] {isExpanded
-			? 'max-h-[75vh]'
-			: 'max-h-[150px]'}"
+		class="relative rounded-lg bg-[var(--bg-secondary)]"
+		class:min-h-[150px]={!isExpanded}
+		class:w-64={!isExpanded}
+		class:max-h-75vh={isExpanded}
+		class:min-w-64={isExpanded}
 		autoplay
 		muted={isLocalStream}
 	>
 		<track kind="captions" />
 	</video>
 
-	{#if owner !== 'undefined' && !isScreen}
+	{#if !isScreen}
 		<Avatar {owner} {isAudioActive} {isCameraOpen} />
 	{/if}
 	<Wave isAudioActive={isAudioActive && !isLocalStream} />
 
-	<div class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black">
+	<div
+		class="absolute bottom-3 left-3 flex items-center justify-center gap-1 rounded-md bg-black p-1"
+	>
 		{#if !isScreen}
 			<i class="fa-solid" class:fa-microphone={!isMuted} class:fa-microphone-slash={isMuted}></i>
 		{/if}
-		<span
-			>{`${ownerId === $roomInfoStore.userId ? 'You' : owner}${isScreen ? ' (Presenting)' : ''}`}</span
-		>
+		<span>{displayedName}</span>
 	</div>
 
 	<button
-		class="absolute right-3 bottom-3 rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
+		class="absolute right-3 bottom-3 flex h-6 w-6 items-center justify-center rounded-full bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
 		on:click={() => onExpand(streamId)}
 		aria-label="toggle expand"
 	>
