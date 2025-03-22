@@ -21,7 +21,7 @@
 		class="flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] p-4"
 		onclick={copyCode}
 	>
-		<span>{$roomInfoStore.id}</span>
+		<span class="text-nowrap">{$roomInfoStore.id}</span>
 	</button>
 	<div class="flex gap-4">
 		<AudioToggle {toggleMute} />

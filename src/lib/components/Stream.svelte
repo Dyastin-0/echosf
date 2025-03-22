@@ -27,9 +27,9 @@
 	class:border-[var(--accent)]={isAudioActive}
 	class:border-transparent={!isAudioActive}
 	class:h-full={isExpanded}
-	class:h-[170px]={!isExpanded}
+	class:h-[150px]={!isExpanded}
 	class:w-full={isExpanded}
-	class:w-74={!isExpanded}
+	class:min-w-74={!isExpanded}
 	class:bg-transparent={isExpanded}
 	class:bg-[var(--bg-secondary)]={!isExpanded}
 	in:fly={{ y: 100, opacity: 1 }}
