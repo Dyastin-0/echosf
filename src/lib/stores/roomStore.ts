@@ -5,6 +5,7 @@ export const roomInfoStore = writable<{
 	userName: string;
 	userId: string;
 	joined: boolean;
+	pinnedStream: string;
 	streamIdMapper: Record<string, string>;
 	participants: Record<string, App.Participant>;
 }>({
@@ -12,6 +13,7 @@ export const roomInfoStore = writable<{
 	userName: '',
 	userId: crypto.randomUUID(),
 	joined: false,
+	pinnedStream: '',
 	streamIdMapper: {},
 	participants: {}
 });

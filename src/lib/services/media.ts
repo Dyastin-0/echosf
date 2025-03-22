@@ -127,6 +127,7 @@ export function handleStreamRemoval(stream: MediaStream) {
 
 		return {
 			...state,
+			pinnedStream: state.pinnedStream === stream.id ? '' : state.pinnedStream,
 			streamIdMapper: updatedMapper,
 			participants: updatedParticipants
 		};

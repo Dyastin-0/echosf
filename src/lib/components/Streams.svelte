@@ -4,32 +4,24 @@
 	import { roomInfoStore } from '$lib/stores/roomStore';
 	import Avatar from './Avatar.svelte';
 
-	let expandedId: string | null = null;
-
-	function toggleExpand(videoId: string) {
-		expandedId = expandedId === videoId ? null : videoId;
-	}
-
 	$: participants = Object.entries($roomInfoStore.participants);
 </script>
 
 <div class="flex h-full w-full">
-	{#if expandedId}
+	{#if $roomInfoStore.pinnedStream}
 		<div class="flex h-full w-full gap-4">
 			<div class="flex flex-grow items-center justify-center">
 				{#each participants as [id, info]}
-					{#if Object.keys(info.streams || {}).includes(expandedId)}
+					{#if Object.keys(info.streams || {}).includes($roomInfoStore.pinnedStream)}
 						<Stream
-							stream={$mediaStore.remoteStreams[expandedId]}
+							stream={$mediaStore.remoteStreams[$roomInfoStore.pinnedStream]}
 							isExpanded={true}
-							onExpand={toggleExpand}
-							streamId={expandedId}
 							audioLevel={$mediaStore.audioLevels[
-								$mediaStore.remoteStreams[expandedId]?.getAudioTracks()[0]?.id
+								$mediaStore.remoteStreams[$roomInfoStore.pinnedStream]?.getAudioTracks()[0]?.id
 							]}
 							isMuted={info.audio === 'disabled' || info.audio === 'missing'}
 							owner={info.name}
-							isScreen={info.screen === expandedId}
+							isScreen={info.screen === $roomInfoStore.pinnedStream}
 							isCameraOpen={info.camera === 'enabled'}
 							ownerId={id}
 						/>
@@ -40,12 +32,10 @@
 				{#each participants as [id, info]}
 					{#if Object.keys(info.streams || {}).length > 0}
 						{#each Object.entries(info.streams) as [streamId, _]}
-							{#if streamId !== expandedId}
+							{#if streamId !== $roomInfoStore.pinnedStream}
 								<Stream
 									stream={$mediaStore.remoteStreams[streamId]}
 									isExpanded={false}
-									onExpand={toggleExpand}
-									{streamId}
 									audioLevel={Number(
 										$mediaStore.audioLevels[
 											$mediaStore.remoteStreams[streamId]?.getAudioTracks()[0]?.id
@@ -78,8 +68,6 @@
 						<Stream
 							stream={$mediaStore.remoteStreams[streamId]}
 							isExpanded={false}
-							onExpand={toggleExpand}
-							{streamId}
 							audioLevel={Number(
 								$mediaStore.audioLevels[
 									$mediaStore.remoteStreams[streamId]?.getAudioTracks()[0]?.id
