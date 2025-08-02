@@ -3,9 +3,9 @@ Description=echosf
 After=network.target multi-user.target
 
 [Service]
-User=ubuntu
+User=admin
 
-WorkingDirectory=/home/ubuntu/echosf
+WorkingDirectory=/home/admin/echosf
 ExecStart=/usr/bin/npm start
 StandardOutput=journal
 StandardError=journal
