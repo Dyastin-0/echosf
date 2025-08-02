@@ -108,6 +108,8 @@ export function handleStreamRemoval(stream: MediaStream) {
 		const updatedRemoteStreams = state.remoteStreams;
 		delete updatedRemoteStreams[`${stream.id}`];
 
+		console.log("deleted: " + stream.id)
+
 		return {
 			...state,
 			remoteStreams: updatedRemoteStreams
