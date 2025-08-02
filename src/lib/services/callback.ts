@@ -36,10 +36,6 @@ export function handleTrackEvent(event: RTCTrackEvent) {
       }
     };
 
-    event.track.onended = () => {
-      handleStreamRemoval(stream);
-    };
-
     return {
       ...state,
       remoteStreams: updatedRemoteStreams
