@@ -157,7 +157,7 @@ export function handleStateAnswerMessage(msg: App.WebsocketMessage) {
   if (msg?.target !== get(roomInfoStore).userId) return;
 
   const {
-    target: id,
+    id,
     streamId,
     screenStreamId,
     audioState,
