@@ -32,7 +32,7 @@ export function handleParticipantStatusMessage(msg: App.WebsocketMessage) {
 }
 
 export function handleStreamMessage(msg: App.WebsocketMessage) {
-  const { data: streamId, name, id } = msg;
+  const { streamId, name, id } = msg;
   if (!id || !name) return;
 
   roomInfoStore.update((state) => {

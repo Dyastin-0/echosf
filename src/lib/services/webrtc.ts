@@ -220,7 +220,7 @@ export class WRTC {
         event: 'message',
         type: 'stream',
         name: get(roomInfoStore).userName,
-        data: this.screenStream.id
+        screenStreamId: this.screenStream.id
       });
 
       return true;
