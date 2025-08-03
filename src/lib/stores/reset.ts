@@ -5,27 +5,28 @@ import { uiStore } from './uiStore';
 import { messagesStore } from './messagesStore';
 
 export function resetRoomState() {
-	const media = get(mediaStore);
+  const media = get(mediaStore);
 
-	roomInfoStore.set({
-		id: '',
-		userName: '',
-		joined: false,
-		userId: crypto.randomUUID(),
-		streamIdMapper: {},
-		participants: {}
-	});
+  roomInfoStore.set({
+    id: '',
+    userName: '',
+    userId: crypto.randomUUID(),
+    joined: false,
+    pinnedStream: '',
+    streamIdMapper: {},
+    participants: {}
+  });
 
-	uiStore.set({
-		showChat: false,
-		showParticipants: false
-	});
+  uiStore.set({
+    showChat: false,
+    showParticipants: false
+  });
 
-	mediaStore.set({
-		localStream: media?.localStream,
-		remoteStreams: {},
-		audioLevels: {}
-	});
+  mediaStore.set({
+    localStream: media?.localStream,
+    remoteStreams: {},
+    audioLevels: {}
+  });
 
-	messagesStore.set([]);
+  messagesStore.set([]);
 }
