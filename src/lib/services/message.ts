@@ -146,10 +146,10 @@ export function handleStateRequestMessage(
     target: msg.target,
     audioState: get(mediaStore).localStream
       ?.getAudioTracks()[0]
-      .enabled,
+      ?.enabled,
     videoState: get(mediaStore).localStream
       ?.getVideoTracks()[0]
-      .enabled
+      ?.enabled
   });
 }
 
