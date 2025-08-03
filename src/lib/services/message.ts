@@ -32,22 +32,22 @@ export function handleParticipantStatusMessage(msg: App.WebsocketMessage) {
 }
 
 export function handleStreamMessage(msg: App.WebsocketMessage) {
-  const { streamId, name, id } = msg;
+  const { screenStreamId, name, id } = msg;
   if (!id || !name) return;
 
   roomInfoStore.update((state) => {
     const updatedParticipants = state.participants;
     updatedParticipants[id] = {
       ...updatedParticipants[id],
-      screen: streamId,
+      screen: screenStreamId,
       streams: {
         ...updatedParticipants[id].streams,
-        [`${streamId}`]: true
+        [`${screenStreamId}`]: true
       }
     };
 
     const updatedMapper = state.streamIdMapper;
-    updatedMapper[streamId] = id;
+    updatedMapper[screenStreamId] = id;
 
     return {
       ...state,
