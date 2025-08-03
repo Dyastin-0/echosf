@@ -30,8 +30,9 @@ declare global {
       type: string | null | undefined;
       event: string;
       data: string;
-      adData: string;
       state: boolean;
+      streamId: string;
+      screenStreamId: string;
       audioState: boolean;
       videoState: boolean;
       target: string | null;

@@ -11,7 +11,11 @@ export function handleParticipantDisconnect(msg: App.WebsocketMessage) {
     const updatedParticipants = state.participants;
 
     if (msg?.target) {
-      showToast(`${updatedParticipants[msg.target].name} left the room 🤷‍♀️`, 'info', 3000);
+      showToast(
+        `${updatedParticipants[msg.target].name} left the room 🤷‍♀️`,
+        'info',
+        3000
+      );
       delete updatedParticipants[msg.target];
     }
 
@@ -92,7 +96,7 @@ export function handleCameraToggleMessage(msg: App.WebsocketMessage) {
 }
 
 export function handleInitialStatesMessage(msg: App.WebsocketMessage) {
-  const { data: streamId, audioState, videoState, name, target } = msg;
+  const { streamId, audioState, videoState, name, target } = msg;
 
   roomInfoStore.update((state) => {
     const updatedParticipants = state.participants;
@@ -129,22 +133,37 @@ export function handleInitialStatesMessage(msg: App.WebsocketMessage) {
   });
 }
 
-export function handleStateRequestMessage(msg: App.WebsocketMessage, websocket: WS, webrtc: WRTC) {
+export function handleStateRequestMessage(
+  msg: App.WebsocketMessage,
+  websocket: WS,
+  webrtc: WRTC
+) {
   websocket.sendMessage({
     event: 'message',
     type: 'stateAnswer',
-    data: get(mediaStore).localStream?.id,
-    adData: webrtc.screenStream?.id,
+    streamId: get(mediaStore).localStream?.id,
+    screenStreamId: webrtc.screenStream?.id,
     target: msg.target,
-    audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
-    videoState: get(mediaStore).localStream?.getVideoTracks()[0]?.enabled
+    audioState: get(mediaStore).localStream
+      ?.getAudioTracks()[0]
+      .enabled,
+    videoState: get(mediaStore).localStream
+      ?.getVideoTracks()[0]
+      .enabled
   });
 }
 
 export function handleStateAnswerMessage(msg: App.WebsocketMessage) {
   if (msg?.target !== get(roomInfoStore).userId) return;
 
-  const { id, data: streamId, adData: screenStreamId, audioState, videoState, name } = msg;
+  const {
+    id,
+    streamId,
+    screenStreamId,
+    audioState,
+    videoState,
+    name
+  } = msg;
 
   roomInfoStore.update((state) => {
     const updatedStates = state.participants;

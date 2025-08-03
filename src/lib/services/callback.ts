@@ -16,7 +16,11 @@ import {
 import type { WRTC } from './webrtc';
 import type { WS } from './websocket';
 
-export function setupWebRTCCallbacks(webrtc: WRTC, websocket: WS, id: string | null) {
+export function setupWebRTCCallbacks(
+  webrtc: WRTC,
+  websocket: WS,
+  id: string | null
+) {
   webrtc.setOnTrackCallback((event: RTCTrackEvent) => handleTrackEvent(event));
   websocket.setOnOpenCallback(() => handleWebSocketOpen(websocket));
   websocket.setChatMessageCallback((message) =>
