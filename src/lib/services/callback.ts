@@ -64,6 +64,7 @@ export function handleWebSocketOpen(websocket: WS) {
     audioState: localStream?.getAudioTracks()[0]?.enabled,
     videoState: localStream?.getVideoTracks()[0]?.enabled,
     target: roomInfo.userId,
+    name: roomInfo.userName,
     streamId: localStream?.id
   });
 
