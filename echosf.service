@@ -3,10 +3,11 @@ Description=echosf
 After=network.target multi-user.target
 
 [Service]
-User=admin
+User=mrps
 
-WorkingDirectory=/home/admin/echosf
-ExecStart=/usr/bin/npm start
+WorkingDirectory=/home/mrps/prod/echosf/build
+ExecStart=node index.js
+Environment=PORT=42020
 StandardOutput=journal
 StandardError=journal
 SyslogIdentifier=echosf
