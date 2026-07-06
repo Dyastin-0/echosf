@@ -1,19 +1,19 @@
-import { PUBLIC_WEBSOCKET_URL } from '$env/static/public';
+import { PUBLIC_WEBSOCKET_URL } from "$env/static/public";
 
-import { newWRTC, WRTC } from '$lib/services/webrtc';
-import { newWS, WS } from '$lib/services/websocket';
+import { newWRTC, WRTC } from "$lib/services/webrtc";
+import { newWS, WS } from "$lib/services/websocket";
 import {
   getAvailableMedia,
   handleNoMediaAvailable,
   updateMediaStoreWithLocalStream,
   updateParticipantMediaState,
-  addLocalTracksToWebRTC
-} from '$lib/services/media';
-import { navigateToRoom, updateRoomInfo, leaveRoom } from '$lib/services/room';
-import { setupWebRTCCallbacks } from '$lib/services/callback';
-import { sendChatMessage as sendMessage } from '$lib/services/message';
-import { get } from 'svelte/store';
-import { roomInfoStore } from '$lib/stores/roomStore';
+  addLocalTracksToWebRTC,
+} from "$lib/services/media";
+import { navigateToRoom, updateRoomInfo, leaveRoom } from "$lib/services/room";
+import { setupWebRTCCallbacks } from "$lib/services/callback";
+import { sendChatMessage as sendMessage } from "$lib/services/message";
+import { get } from "svelte/store";
+import { roomInfoStore } from "$lib/stores/roomStore";
 
 export function useWRTC() {
   let webrtc: WRTC;
@@ -36,7 +36,10 @@ export function useWRTC() {
   async function joinRoom(roomId: string, name: string, id: string) {
     await navigateToRoom(roomId);
 
-    websocket = newWS(`${PUBLIC_WEBSOCKET_URL}?room=${roomId}&id=${id}&name=${name}`, webrtc);
+    websocket = newWS(
+      `${PUBLIC_WEBSOCKET_URL}?room=${roomId}&id=${id}&name=${name}`,
+      webrtc,
+    );
     setupWebRTCCallbacks(webrtc, websocket, id);
 
     updateRoomInfo(roomId, name, id);
@@ -83,6 +86,6 @@ export function useWRTC() {
     toggleMute,
     toggleScreenShare,
     getWebRTC: () => webrtc,
-    getWebSocket: () => websocket
+    getWebSocket: () => websocket,
   };
 }

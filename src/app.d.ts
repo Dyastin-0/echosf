@@ -5,9 +5,15 @@ declare global {
     export interface IWRTCService {
       setRemoteDescription(desc: RTCSessionDescriptionInit): Promise<void>;
       createAnswer(): Promise<RTCSessionDescriptionInit>;
-      setLocalDescription(desc: RTCLocalSessionDescriptionInit | undefined): Promise<void>;
-      addIceCandidate(candidate: RTCIceCandidateInit | null | undefined): Promise<void>;
-      setOnIceCandidateCallback(callback: (e: { candidate: any }) => void): void;
+      setLocalDescription(
+        desc: RTCLocalSessionDescriptionInit | undefined,
+      ): Promise<void>;
+      addIceCandidate(
+        candidate: RTCIceCandidateInit | null | undefined,
+      ): Promise<void>;
+      setOnIceCandidateCallback(
+        callback: (e: { candidate: any }) => void,
+      ): void;
     }
     export interface IWebSocketService {
       sendMessage(message): void;
@@ -39,12 +45,12 @@ declare global {
     }
     export interface Participant {
       streams: Record<string, boolean>;
-      camera: 'enabled' | 'disabled' | 'missing';
-      audio: 'enabled' | 'disabled' | 'missing';
+      camera: "enabled" | "disabled" | "missing";
+      audio: "enabled" | "disabled" | "missing";
       screen: string;
       name: string;
     }
   }
 }
 
-export { };
+export {};

@@ -1,10 +1,10 @@
-import { get } from 'svelte/store';
-import { showToast } from '$lib/stores/toastStore';
-import { roomInfoStore } from '$lib/stores/roomStore';
-import { messagesStore } from '$lib/stores/messagesStore';
-import { mediaStore } from '$lib/stores/mediaStore';
-import type { WS } from './websocket';
-import type { WRTC } from './webrtc';
+import { get } from "svelte/store";
+import { showToast } from "$lib/stores/toastStore";
+import { roomInfoStore } from "$lib/stores/roomStore";
+import { messagesStore } from "$lib/stores/messagesStore";
+import { mediaStore } from "$lib/stores/mediaStore";
+import type { WS } from "./websocket";
+import type { WRTC } from "./webrtc";
 
 export function handleParticipantDisconnect(msg: App.WebsocketMessage) {
   roomInfoStore.update((state) => {
@@ -13,21 +13,21 @@ export function handleParticipantDisconnect(msg: App.WebsocketMessage) {
     if (msg?.target) {
       showToast(
         `${updatedParticipants[msg.target].name} left the room 🤷‍♀️`,
-        'info',
-        3000
+        "info",
+        3000,
       );
       delete updatedParticipants[msg.target];
     }
 
     return {
       ...state,
-      updatedParticipants
+      updatedParticipants,
     };
   });
 }
 
 export function handleParticipantStatusMessage(msg: App.WebsocketMessage) {
-  showToast(`${msg.name} ${msg.data}`, 'info');
+  showToast(`${msg.name} ${msg.data}`, "info");
   messagesStore.update((messages) => [...messages, msg]);
 }
 
@@ -42,8 +42,8 @@ export function handleStreamMessage(msg: App.WebsocketMessage) {
       screen: screenStreamId,
       streams: {
         ...updatedParticipants[id].streams,
-        [`${screenStreamId}`]: true
-      }
+        [`${screenStreamId}`]: true,
+      },
     };
 
     const updatedMapper = state.streamIdMapper;
@@ -52,7 +52,7 @@ export function handleStreamMessage(msg: App.WebsocketMessage) {
     return {
       ...state,
       participants: updatedParticipants,
-      streamIdMapper: updatedMapper
+      streamIdMapper: updatedMapper,
     };
   });
 }
@@ -66,12 +66,12 @@ export function handleAudioToggleMessage(msg: App.WebsocketMessage) {
 
     updatedStates[id] = {
       ...updatedStates[id],
-      audio: audioState ? 'enabled' : 'disabled'
+      audio: audioState ? "enabled" : "disabled",
     };
 
     return {
       ...state,
-      participants: updatedStates
+      participants: updatedStates,
     };
   });
 }
@@ -85,12 +85,12 @@ export function handleCameraToggleMessage(msg: App.WebsocketMessage) {
 
     updatedStates[id] = {
       ...updatedStates[id],
-      camera: videoState ? 'enabled' : 'disabled'
+      camera: videoState ? "enabled" : "disabled",
     };
 
     return {
       ...state,
-      participants: updatedStates
+      participants: updatedStates,
     };
   });
 }
@@ -107,28 +107,28 @@ export function handleInitialStatesMessage(msg: App.WebsocketMessage) {
     if (streamId) {
       updatedParticipants[target] = {
         ...updatedParticipants[target],
-        camera: videoState ? 'enabled' : 'disabled',
-        audio: audioState ? 'enabled' : 'disabled',
+        camera: videoState ? "enabled" : "disabled",
+        audio: audioState ? "enabled" : "disabled",
         name,
         streams: {
-          [`${streamId}`]: true
-        }
+          [`${streamId}`]: true,
+        },
       };
 
       updatedMapper[streamId] = target;
     } else {
       updatedParticipants[target] = {
         ...updatedParticipants[target],
-        camera: videoState ? 'enabled' : 'disabled',
-        audio: audioState ? 'enabled' : 'disabled',
-        name
+        camera: videoState ? "enabled" : "disabled",
+        audio: audioState ? "enabled" : "disabled",
+        name,
       };
     }
 
     return {
       ...state,
       streamIdMapper: updatedMapper,
-      participants: updatedParticipants
+      participants: updatedParticipants,
     };
   });
 }
@@ -136,34 +136,23 @@ export function handleInitialStatesMessage(msg: App.WebsocketMessage) {
 export function handleStateRequestMessage(
   msg: App.WebsocketMessage,
   websocket: WS,
-  webrtc: WRTC
+  webrtc: WRTC,
 ) {
   websocket.sendMessage({
-    event: 'message',
-    type: 'stateAnswer',
+    event: "message",
+    type: "stateAnswer",
     streamId: get(mediaStore).localStream?.id,
     screenStreamId: webrtc.screenStream?.id,
     target: msg.target,
-    audioState: get(mediaStore).localStream
-      ?.getAudioTracks()[0]
-      ?.enabled,
-    videoState: get(mediaStore).localStream
-      ?.getVideoTracks()[0]
-      ?.enabled
+    audioState: get(mediaStore).localStream?.getAudioTracks()[0]?.enabled,
+    videoState: get(mediaStore).localStream?.getVideoTracks()[0]?.enabled,
   });
 }
 
 export function handleStateAnswerMessage(msg: App.WebsocketMessage) {
   if (msg?.target !== get(roomInfoStore).userId) return;
 
-  const {
-    id,
-    streamId,
-    screenStreamId,
-    audioState,
-    videoState,
-    name
-  } = msg;
+  const { id, streamId, screenStreamId, audioState, videoState, name } = msg;
 
   roomInfoStore.update((state) => {
     const updatedStates = state.participants;
@@ -172,21 +161,21 @@ export function handleStateAnswerMessage(msg: App.WebsocketMessage) {
 
     if (streamId) {
       updatedStates[id] = {
-        camera: videoState ? 'enabled' : 'disabled',
-        audio: audioState ? 'enabled' : 'disabled',
+        camera: videoState ? "enabled" : "disabled",
+        audio: audioState ? "enabled" : "disabled",
         screen: screenStreamId,
         name,
         streams: {
-          [`${streamId}`]: true
-        }
+          [`${streamId}`]: true,
+        },
       };
     } else {
       updatedStates[id] = {
         ...updatedStates[id],
-        camera: videoState ? 'enabled' : 'disabled',
-        audio: audioState ? 'enabled' : 'disabled',
+        camera: videoState ? "enabled" : "disabled",
+        audio: audioState ? "enabled" : "disabled",
         screen: screenStreamId,
-        name
+        name,
       };
     }
 
@@ -195,14 +184,14 @@ export function handleStateAnswerMessage(msg: App.WebsocketMessage) {
         ...updatedStates[id],
         streams: {
           ...updatedStates[id].streams,
-          [`${screenStreamId}`]: true
-        }
+          [`${screenStreamId}`]: true,
+        },
       };
     }
 
     return {
       ...state,
-      participants: updatedStates
+      participants: updatedStates,
     };
   });
 }
@@ -213,15 +202,15 @@ export function sendChatMessage(message: string, websocket: WS) {
   messagesStore.update((state) => [
     ...state,
     {
-      event: 'message',
+      event: "message",
       data: message,
       name: roomInfo.userName,
-      id: roomInfo.userId
-    }
+      id: roomInfo.userId,
+    },
   ]);
 
   websocket.sendMessage({
-    event: 'message',
-    data: message
+    event: "message",
+    data: message,
   });
 }

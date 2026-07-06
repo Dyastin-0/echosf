@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 export const roomInfoStore = writable<{
   id: string;
@@ -9,11 +9,11 @@ export const roomInfoStore = writable<{
   streamIdMapper: Record<string, string>;
   participants: Record<string, App.Participant>;
 }>({
-  id: '',
-  userName: '',
+  id: "",
+  userName: "",
   userId: crypto.randomUUID(),
   joined: false,
-  pinnedStream: '',
+  pinnedStream: "",
   streamIdMapper: {},
-  participants: {}
+  participants: {},
 });

@@ -1,20 +1,21 @@
 <script lang="ts">
-	import { roomInfoStore } from '$lib/stores/roomStore';
+  import { roomInfoStore } from "$lib/stores/roomStore";
 
-	export let toggleCamera: () => void;
+  export let toggleCamera: () => void;
 
-	$: mediaState = $roomInfoStore.participants[$roomInfoStore.userId];
+  $: mediaState = $roomInfoStore.participants[$roomInfoStore.userId];
 </script>
 
 <button
-	on:click={toggleCamera}
-	class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
-	aria-label="toggle camera"
+  on:click={toggleCamera}
+  class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+  aria-label="toggle camera"
 >
-	<i
-		class="fa-solid text-lg"
-		class:fa-video={mediaState?.camera === 'enabled'}
-		class:fa-video-slash={mediaState?.camera === 'disabled' || mediaState?.camera === 'missing'}
-		class:text-[var(--red)]={mediaState?.camera === 'missing'}
-	></i>
+  <i
+    class="fa-solid text-lg"
+    class:fa-video={mediaState?.camera === "enabled"}
+    class:fa-video-slash={mediaState?.camera === "disabled" ||
+      mediaState?.camera === "missing"}
+    class:text-[var(--red)]={mediaState?.camera === "missing"}
+  ></i>
 </button>

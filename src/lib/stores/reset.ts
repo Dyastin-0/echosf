@@ -1,31 +1,31 @@
-import { get } from 'svelte/store';
-import { mediaStore } from './mediaStore';
-import { roomInfoStore } from './roomStore';
-import { uiStore } from './uiStore';
-import { messagesStore } from './messagesStore';
+import { get } from "svelte/store";
+import { mediaStore } from "./mediaStore";
+import { roomInfoStore } from "./roomStore";
+import { uiStore } from "./uiStore";
+import { messagesStore } from "./messagesStore";
 
 export function resetRoomState() {
   const media = get(mediaStore);
 
   roomInfoStore.set({
-    id: '',
-    userName: '',
+    id: "",
+    userName: "",
     userId: crypto.randomUUID(),
     joined: false,
-    pinnedStream: '',
+    pinnedStream: "",
     streamIdMapper: {},
-    participants: {}
+    participants: {},
   });
 
   uiStore.set({
     showChat: false,
-    showParticipants: false
+    showParticipants: false,
   });
 
   mediaStore.set({
     localStream: media?.localStream,
     remoteStreams: {},
-    audioLevels: {}
+    audioLevels: {},
   });
 
   messagesStore.set([]);

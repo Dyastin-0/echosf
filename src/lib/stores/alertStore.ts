@@ -1,18 +1,18 @@
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 export const alertStore = writable<{
   message: string;
   isVisible: boolean;
-  type: 'success' | 'error' | 'info' | 'warning';
+  type: "success" | "error" | "info" | "warning";
 }>({
-  message: '',
+  message: "",
   isVisible: false,
-  type: 'info'
+  type: "info",
 });
 
 export function showAlert(
   message: string,
-  type: 'success' | 'error' | 'info' | 'warning' = 'info'
+  type: "success" | "error" | "info" | "warning" = "info",
 ) {
   alertStore.set({ message, isVisible: true, type });
 

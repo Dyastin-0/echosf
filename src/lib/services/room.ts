@@ -1,7 +1,7 @@
-import { get } from 'svelte/store';
-import { goto } from '$app/navigation';
-import { roomInfoStore } from '$lib/stores/roomStore';
-import { resetRoomState } from '$lib/stores/reset';
+import { get } from "svelte/store";
+import { goto } from "$app/navigation";
+import { roomInfoStore } from "$lib/stores/roomStore";
+import { resetRoomState } from "$lib/stores/reset";
 
 export async function navigateToRoom(roomId: string) {
   await goto(`/${roomId}`);
@@ -14,7 +14,7 @@ export function updateRoomInfo(roomId: string, name: string, id: string) {
     joined: true,
     id: roomId,
     userName: name,
-    userId: id
+    userId: id,
   }));
 
   roomInfoStore.update((state) => {
@@ -26,18 +26,18 @@ export function updateRoomInfo(roomId: string, name: string, id: string) {
 
     updatedParticipants[roomInfo.userId] = {
       ...participant,
-      name: roomInfo.userName
+      name: roomInfo.userName,
     };
 
     return {
       ...state,
-      participants: updatedParticipants
+      participants: updatedParticipants,
     };
   });
 }
 
 export function leaveRoom(webrtcReset: () => void) {
-  document.title = 'echos';
+  document.title = "echos";
   webrtcReset();
   resetRoomState();
 }

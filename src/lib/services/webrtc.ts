@@ -1,7 +1,8 @@
-import { mediaStore } from '$lib/stores/mediaStore';
-import { roomInfoStore } from '$lib/stores/roomStore';
-import { showToast } from '$lib/stores/toastStore';
-import { get } from 'svelte/store';
+import { mediaStore } from "$lib/stores/mediaStore";
+import { roomInfoStore } from "$lib/stores/roomStore";
+import { showToast } from "$lib/stores/toastStore";
+import { get } from "svelte/store";
+import { handleStreamRemoval } from "./media";
 
 export class WRTC {
   private pc: RTCPeerConnection;
@@ -72,7 +73,7 @@ export class WRTC {
     const report = await this.pc.getStats();
 
     report.forEach((stats) => {
-      if (stats.type === 'media-source' && stats.kind === 'audio') {
+      if (stats.type === "media-source" && stats.kind === "audio") {
         mediaStore.update((state) => {
           const updatedStates = state.audioLevels;
 
@@ -80,12 +81,12 @@ export class WRTC {
 
           return {
             ...state,
-            audioLevels: updatedStates
+            audioLevels: updatedStates,
           };
         });
       }
 
-      if (stats.type === 'inbound-rtp' && stats.kind === 'audio') {
+      if (stats.type === "inbound-rtp" && stats.kind === "audio") {
         mediaStore.update((state) => {
           const updatedStates = state.audioLevels;
 
@@ -93,7 +94,7 @@ export class WRTC {
 
           return {
             ...state,
-            audioLevels: updatedStates
+            audioLevels: updatedStates,
           };
         });
       }
@@ -102,7 +103,7 @@ export class WRTC {
 
   public toggleAudio(): void {
     if (!this.audioTrack) {
-      showToast('Audio device missing.', 'info', 3000);
+      showToast("Audio device missing.", "info", 3000);
       return;
     }
 
@@ -115,29 +116,30 @@ export class WRTC {
 
         if (!updatedStates) return { ...state };
 
-        updatedStates[get(roomInfoStore)?.userId].audio = this.audioTrack?.enabled
-          ? 'enabled'
-          : 'disabled';
+        updatedStates[get(roomInfoStore)?.userId].audio = this.audioTrack
+          ?.enabled
+          ? "enabled"
+          : "disabled";
 
         return {
           ...state,
-          participants: updatedStates
+          participants: updatedStates,
         };
       });
     }
 
     if (this.ws) {
       this.ws.sendMessage({
-        event: 'message',
-        type: 'audioToggle',
-        audioState: localStream?.getAudioTracks()[0].enabled
+        event: "message",
+        type: "audioToggle",
+        audioState: localStream?.getAudioTracks()[0].enabled,
       });
     }
   }
 
   public toggleVideo(): void {
     if (!this.videoTrack) {
-      showToast('Video device is missing.', 'info', 3000);
+      showToast("Video device is missing.", "info", 3000);
       return;
     }
 
@@ -148,21 +150,22 @@ export class WRTC {
 
       if (!updatedStates) return { ...state };
 
-      updatedStates[get(roomInfoStore)?.userId].camera = this.videoTrack?.enabled
-        ? 'enabled'
-        : 'disabled';
+      updatedStates[get(roomInfoStore)?.userId].camera = this.videoTrack
+        ?.enabled
+        ? "enabled"
+        : "disabled";
 
       return {
         ...state,
-        participants: updatedStates
+        participants: updatedStates,
       };
     });
 
     if (this.ws) {
       this.ws.sendMessage({
-        event: 'message',
-        type: 'cameraToggle',
-        videoState: this.videoTrack.enabled
+        event: "message",
+        type: "cameraToggle",
+        videoState: this.videoTrack.enabled,
       });
     }
   }
@@ -171,7 +174,7 @@ export class WRTC {
     try {
       this.screenStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
-        audio: true
+        audio: true,
       });
       this.screenStream.getTracks().forEach((track) => {
         track.onended = () => this.stopScreenSharing();
@@ -189,7 +192,7 @@ export class WRTC {
 
         return {
           ...state,
-          remoteStreams: updatedRemoteStreams
+          remoteStreams: updatedRemoteStreams,
         };
       });
 
@@ -200,38 +203,40 @@ export class WRTC {
         const participant = updatedParticipants[get(roomInfoStore).userId];
         updatedParticipants[get(roomInfoStore).userId] = {
           ...participant,
-          screen: this?.screenStream?.id || '',
+          screen: this?.screenStream?.id || "",
           streams: {
             ...participant.streams,
-            [`${this.screenStream?.id}`]: true
-          }
+            [`${this.screenStream?.id}`]: true,
+          },
         };
 
-        if (this.screenStream) updatedMapper[this.screenStream?.id] = get(roomInfoStore).userId;
+        if (this.screenStream)
+          updatedMapper[this.screenStream?.id] = get(roomInfoStore).userId;
 
         return {
           ...state,
           participants: updatedParticipants,
-          streamIdMapper: updatedMapper
+          streamIdMapper: updatedMapper,
         };
       });
 
       this.ws?.sendMessage({
-        event: 'message',
-        type: 'stream',
+        event: "message",
+        type: "stream",
         name: get(roomInfoStore).userName,
-        screenStreamId: this.screenStream.id
+        screenStreamId: this.screenStream.id,
       });
 
       return true;
     } catch (error) {
-      console.error('Error starting screen share:', error);
+      console.error("Error starting screen share:", error);
       return false;
     }
   }
 
   public stopScreenSharing(): void {
     if (this.screenStream) {
+      const stream = this.screenStream;
       this.screenStream.getTracks().forEach((track) => {
         track.stop();
         const sender = this.pc.getSenders().find((s) => s.track === track);
@@ -242,16 +247,7 @@ export class WRTC {
       this.renegotiate();
       this.screenStream = null;
 
-      roomInfoStore.update((state) => {
-        const updatedParticipants = state.participants;
-
-        updatedParticipants[state.userId].screen = 'disabled';
-
-        return {
-          ...state,
-          updatedParticipants
-        };
-      });
+      handleStreamRemoval(stream);
     }
   }
 
@@ -261,12 +257,12 @@ export class WRTC {
       await this.pc.setLocalDescription(offer);
       if (this.ws) {
         this.ws.sendMessage({
-          event: 'renegotiate',
-          data: JSON.stringify(offer)
+          event: "renegotiate",
+          data: JSON.stringify(offer),
         });
       }
     } catch (error) {
-      console.error('Renegotiation failed:', error);
+      console.error("Renegotiation failed:", error);
     }
   }
 
@@ -275,13 +271,14 @@ export class WRTC {
   }
 
   public setOnTrackCallback(
-    callback: ((this: RTCPeerConnection, ev: RTCTrackEvent) => any) | null
+    callback: ((this: RTCPeerConnection, ev: RTCTrackEvent) => any) | null,
   ): void {
     this.pc.ontrack = callback;
   }
 
   public setOnIceCandidateCallback(
-    callback: ((this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) => any) | null
+    callback:
+      ((this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) => any) | null,
   ): void {
     this.pc.onicecandidate = callback;
   }
@@ -294,11 +291,15 @@ export class WRTC {
     return this.pc.createAnswer();
   }
 
-  public setLocalDescription(desc: RTCLocalSessionDescriptionInit | undefined): Promise<void> {
+  public setLocalDescription(
+    desc: RTCLocalSessionDescriptionInit | undefined,
+  ): Promise<void> {
     return this.pc.setLocalDescription(desc);
   }
 
-  public addIceCandidate(candidate: RTCIceCandidateInit | null | undefined): Promise<void> {
+  public addIceCandidate(
+    candidate: RTCIceCandidateInit | null | undefined,
+  ): Promise<void> {
     return this.pc.addIceCandidate(candidate);
   }
 }

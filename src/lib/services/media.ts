@@ -1,32 +1,32 @@
-import { get } from 'svelte/store';
-import { showToast } from '$lib/stores/toastStore';
-import { mediaStore } from '$lib/stores/mediaStore';
-import { roomInfoStore } from '$lib/stores/roomStore';
-import type { WRTC } from './webrtc';
+import { get } from "svelte/store";
+import { showToast } from "$lib/stores/toastStore";
+import { mediaStore } from "$lib/stores/mediaStore";
+import { roomInfoStore } from "$lib/stores/roomStore";
+import type { WRTC } from "./webrtc";
 
 export async function getAvailableMedia(): Promise<MediaStream | null> {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const hasVideo = devices.some((device) => device.kind === 'videoinput');
-    const hasAudio = devices.some((device) => device.kind === 'audioinput');
+    const hasVideo = devices.some((device) => device.kind === "videoinput");
+    const hasAudio = devices.some((device) => device.kind === "audioinput");
 
-    if (!hasVideo) showToast('Video device missing', 'warning', 3000);
-    if (!hasAudio) showToast('Audio device missing', 'warning', 3000);
+    if (!hasVideo) showToast("Video device missing", "warning", 3000);
+    if (!hasAudio) showToast("Audio device missing", "warning", 3000);
 
     if (!hasAudio && !hasVideo) return null;
 
     return await navigator.mediaDevices.getUserMedia({
       video: hasVideo,
-      audio: hasAudio
+      audio: hasAudio,
     });
   } catch (error) {
-    console.error('Failed to get media devices: ', error);
+    console.error("Failed to get media devices: ", error);
     return null;
   }
 }
 
 export function handleNoMediaAvailable() {
-  showToast('No media device available.', 'warning', 3000);
+  showToast("No media device available.", "warning", 3000);
 
   roomInfoStore.update((state) => {
     const updatedParticipants = state.participants;
@@ -37,14 +37,14 @@ export function handleNoMediaAvailable() {
 
     updatedParticipants[roomInfo.userId] = {
       ...participant,
-      audio: 'missing',
-      camera: 'missing',
-      screen: 'disabled'
+      audio: "missing",
+      camera: "missing",
+      screen: "disabled",
     };
 
     return {
       ...state,
-      participants: updatedParticipants
+      participants: updatedParticipants,
     };
   });
 }
@@ -54,8 +54,8 @@ export function updateMediaStoreWithLocalStream(stream: MediaStream) {
     ...state,
     localStream: stream,
     remoteStreams: {
-      [`${stream.id}`]: stream
-    }
+      [`${stream.id}`]: stream,
+    },
   }));
 }
 
@@ -73,17 +73,17 @@ export function updateParticipantMediaState(stream: MediaStream) {
       ...participant,
       audio: getTrackState(stream.getAudioTracks()[0]),
       camera: getTrackState(stream.getVideoTracks()[0]),
-      screen: 'disabled',
+      screen: "disabled",
       streams: {
-        [`${stream.id}`]: true
-      }
+        [`${stream.id}`]: true,
+      },
     };
 
     updatedMapper[stream.id] = get(roomInfoStore).userId;
     return {
       ...state,
       streamIdMapper: updatedMapper,
-      participants: updatedParticipants
+      participants: updatedParticipants,
     };
   });
 }
@@ -98,9 +98,11 @@ export function addLocalTracksToWebRTC(webrtc: WRTC) {
   }
 }
 
-export function getTrackState(track?: MediaStreamTrack): 'enabled' | 'disabled' | 'missing' {
-  if (!track) return 'missing';
-  return track.enabled ? 'enabled' : 'disabled';
+export function getTrackState(
+  track?: MediaStreamTrack,
+): "enabled" | "disabled" | "missing" {
+  if (!track) return "missing";
+  return track.enabled ? "enabled" : "disabled";
 }
 
 export function handleStreamRemoval(stream: MediaStream) {
@@ -108,11 +110,11 @@ export function handleStreamRemoval(stream: MediaStream) {
     const updatedRemoteStreams = state.remoteStreams;
     delete updatedRemoteStreams[`${stream.id}`];
 
-    console.log("deleted: " + stream.id)
+    console.log("deleted: " + stream.id);
 
     return {
       ...state,
-      remoteStreams: updatedRemoteStreams
+      remoteStreams: updatedRemoteStreams,
     };
   });
 
@@ -120,8 +122,9 @@ export function handleStreamRemoval(stream: MediaStream) {
     const updatedMapper = state.streamIdMapper;
     const updatedParticipants = state.participants;
 
-    if (stream.id === updatedParticipants[updatedMapper[stream.id]]?.screen)
-      updatedParticipants[updatedMapper[stream.id]].screen === 'disabled';
+    if (stream.id === updatedParticipants[updatedMapper[stream.id]]?.screen) {
+      updatedParticipants[updatedMapper[stream.id]].screen = "disabled";
+    }
 
     if (updatedParticipants[updatedMapper[stream.id]])
       delete updatedParticipants[updatedMapper[stream.id]].streams[stream.id];
@@ -129,9 +132,9 @@ export function handleStreamRemoval(stream: MediaStream) {
 
     return {
       ...state,
-      pinnedStream: state.pinnedStream === stream.id ? '' : state.pinnedStream,
+      pinnedStream: state.pinnedStream === stream.id ? "" : state.pinnedStream,
       streamIdMapper: updatedMapper,
-      participants: updatedParticipants
+      participants: updatedParticipants,
     };
   });
 }

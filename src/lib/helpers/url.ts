@@ -1,4 +1,4 @@
-import { goto } from '$app/navigation';
+import { goto } from "$app/navigation";
 
 export function updateParams(newParams: Record<string, string | null>) {
   const url = new URL(window.location.href);
