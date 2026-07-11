@@ -54,7 +54,7 @@
 </script>
 
 <div
-  class="flex w-[400px] max-w-md flex-col gap-6 rounded-lg bg-[var(--bg-secondary)] p-6 shadow-lg"
+  class="flex w-full max-w-md flex-col gap-6 rounded-lg bg-[var(--bg-secondary)] p-6 shadow-lg sm:w-[400px]"
 >
   <div class="flex items-center justify-center gap-2">
     <h1 class="text-center text-2xl font-bold text-[var(--text-primary)]">

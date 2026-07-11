@@ -6,16 +6,32 @@
 
   $: showParticipants = $uiStore.showParticipants;
   $: participants = Object.entries($roomInfoStore.participants);
+
+  function getStreamId(id: string, info: App.Participant): string {
+    const keys = Object.keys(info.streams);
+    return keys.length > 0 ? keys[0] : id;
+  }
+
+  function togglePin(id: string, info: App.Participant) {
+    const sid = getStreamId(id, info);
+    $roomInfoStore.pinnedStream = $roomInfoStore.pinnedStream === sid ? "" : sid;
+  }
+
+  function togglePinScreen(info: App.Participant) {
+    const sid = info.screen;
+    if (!sid || sid === "disabled") return;
+    $roomInfoStore.pinnedStream = $roomInfoStore.pinnedStream === sid ? "" : sid;
+  }
 </script>
 
 <div
-  class="h-[500px] flex-shrink-0 overflow-hidden transition-all duration-300 ease-out"
+  class="flex-shrink-0 overflow-hidden transition-all duration-300 ease-out max-md:w-full md:h-[500px]"
   class:w-[300px]={showParticipants}
   class:w-[0px]={!showParticipants}
 >
   {#if showParticipants}
     <section
-      class="flex h-full w-[300px] flex-col gap-4 rounded-md bg-[var(--bg-secondary)] p-4"
+      class="flex h-full flex-col gap-4 bg-[var(--bg-secondary)] p-4 max-md:w-full md:h-full md:w-[300px] md:rounded-md"
       in:fly={{ x: -100, duration: 300, opacity: 1, easing: quintOut }}
       out:fly={{ x: -100, duration: 200, opacity: 1 }}
     >
@@ -33,11 +49,29 @@
                   >{info.name ? info.name.charAt(0).toUpperCase() : "?"}</span
                 >
               </div>
-              <div class="flex w-full justify-between gap-2">
-                <span class="font-medium"
+              <div class="flex w-full items-center justify-between gap-2">
+                <span class="font-medium truncate"
                   >{`${info.name} ${id === $roomInfoStore.userId ? "(You)" : ""}`}</span
                 >
-                <div class="flex items-center gap-2 text-sm">
+                <div class="flex items-center gap-1 text-sm flex-shrink-0">
+                  <button
+                    class="pin-btn"
+                    class:active={$roomInfoStore.pinnedStream === getStreamId(id, info)}
+                    onclick={() => togglePin(id, info)}
+                    title="Pin camera"
+                  >
+                    <i class="fa-solid fa-thumbtack"></i>
+                  </button>
+                  {#if info.screen && info.screen !== "disabled"}
+                    <button
+                      class="pin-btn"
+                      class:active={$roomInfoStore.pinnedStream === info.screen}
+                      onclick={() => togglePinScreen(info)}
+                      title="Pin screen"
+                    >
+                      <i class="fa-solid fa-display"></i>
+                    </button>
+                  {/if}
                   <i
                     class="fa-solid"
                     class:fa-microphone={info.audio === "enabled"}
@@ -66,3 +100,27 @@
     </section>
   {/if}
 </div>
+
+<style>
+  .pin-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pin-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  .pin-btn.active {
+    color: var(--highlight);
+  }
+</style>

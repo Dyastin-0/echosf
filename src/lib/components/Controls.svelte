@@ -16,23 +16,25 @@
   $: mediaState = $roomInfoStore.participants[$roomInfoStore.userId];
 </script>
 
-<div class="bottom-4 flex w-full justify-between gap-4">
+<div class="bottom-4 flex w-full items-center justify-center gap-2 max-md:gap-1 md:justify-between md:gap-4">
   <button
-    class="flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] p-4"
+    class="flex items-center justify-center gap-2 rounded-full bg-[var(--accent)] p-4 max-md:min-w-10 max-md:p-2"
     onclick={copyCode}
+    aria-label="copy room code"
   >
-    <span class="text-nowrap">{$roomInfoStore.id}</span>
+    <i class="fa-solid fa-copy md:hidden"></i>
+    <span class="text-nowrap max-md:hidden">{$roomInfoStore.id}</span>
   </button>
-  <div class="flex gap-4">
+  <div class="flex gap-2 max-md:gap-1">
     <AudioToggle {toggleMute} />
     <Cameratoggle {toggleCamera} />
     <button
       onclick={toggleScreenShare}
-      class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+      class="flex items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)] max-md:min-h-10 max-md:min-w-10 max-md:p-2 md:min-h-14 md:min-w-14"
       aria-label="toggle screen share"
     >
       <i
-        class="fa-solid text-lg"
+        class="fa-solid text-lg max-md:text-base"
         class:text-[var(--red)]={mediaState?.screen !== "disabled"}
         class:text-[var(--text-primary)]={mediaState?.screen === "disabled"}
         class:fa-desktop={mediaState?.screen === "disabled"}
@@ -42,10 +44,10 @@
     {#if joined && leaveRoom}
       <button
         onclick={leaveRoom}
-        class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+        class="flex items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)] max-md:min-h-10 max-md:min-w-10 max-md:p-2 md:min-h-14 md:min-w-14"
         aria-label="leave room"
       >
-        <i class="fa-solid fa-phone rotate-[135deg] text-lg text-[var(--red)]"
+        <i class="fa-solid fa-phone rotate-[135deg] text-lg text-[var(--red)] max-md:text-base"
         ></i>
       </button>
     {/if}
@@ -53,21 +55,21 @@
   <div class="flex">
     <button
       onclick={toggleParticipants}
-      class="flex min-h-14 min-w-14 items-center justify-center rounded-full p-4 hover:bg-[var(--accent)]"
+      class="flex items-center justify-center rounded-full p-4 hover:bg-[var(--accent)] max-md:min-h-10 max-md:min-w-10 max-md:p-2 md:min-h-14 md:min-w-14"
       class:text-[var(--highlight)]={showParticipants}
       class:text-[var(--text-primary)]={!showParticipants}
       aria-label="toggle participants"
     >
-      <i class="fa-solid fa-users"></i>
+      <i class="fa-solid fa-users max-md:text-sm"></i>
     </button>
     <button
       onclick={toggleChat}
-      class="flex min-h-14 min-w-14 items-center justify-center rounded-full p-4 hover:bg-[var(--accent)]"
+      class="flex items-center justify-center rounded-full p-4 hover:bg-[var(--accent)] max-md:min-h-10 max-md:min-w-10 max-md:p-2 md:min-h-14 md:min-w-14"
       class:text-[var(--highlight)]={showChat}
       class:text-[var(--text-primary)]={!showChat}
       aria-label="toggle chat"
     >
-      <i class="fa-solid fa-message text-lg"></i>
+      <i class="fa-solid fa-message text-lg max-md:text-base"></i>
     </button>
   </div>
 </div>

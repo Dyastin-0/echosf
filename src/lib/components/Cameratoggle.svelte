@@ -8,11 +8,11 @@
 
 <button
   on:click={toggleCamera}
-  class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)]"
+  class="flex min-h-14 min-w-14 items-center justify-center rounded-full bg-[var(--bg-secondary)] p-4 hover:bg-[var(--accent)] max-md:min-h-10 max-md:min-w-10 max-md:p-2"
   aria-label="toggle camera"
 >
   <i
-    class="fa-solid text-lg"
+    class="fa-solid text-lg max-md:text-base"
     class:fa-video={mediaState?.camera === "enabled"}
     class:fa-video-slash={mediaState?.camera === "disabled" ||
       mediaState?.camera === "missing"}

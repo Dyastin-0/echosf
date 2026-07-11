@@ -31,13 +31,13 @@
 </script>
 
 <div
-  class="h-[500px] flex-shrink-0 overflow-hidden transition-all duration-300 ease-out"
+  class="flex-shrink-0 overflow-hidden transition-all duration-300 ease-out max-md:w-full md:h-[500px]"
   class:w-[300px]={showChat}
   class:w-[0px]={!showChat}
 >
   {#if showChat}
     <section
-      class="flex h-full w-[300px] flex-col gap-4 rounded-md bg-[var(--bg-secondary)] p-4"
+      class="flex h-full flex-col gap-4 bg-[var(--bg-secondary)] p-4 max-md:w-full md:h-full md:w-[300px] md:rounded-md"
       in:fly={{ x: 100, duration: 300, opacity: 1, easing: quintOut }}
       out:fly={{ x: 100, duration: 200, opacity: 1 }}
     >

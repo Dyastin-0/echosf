@@ -20,9 +20,8 @@
   $roomInfoStore.id = page.params.room || "";
 
   const goBack = () => {
-    goto("/").then(() => {
-      $roomInfoStore.id = "";
-    });
+    $roomInfoStore.id = "";
+    goto("/");
   };
 
   const join = async (e: { preventDefault: () => void }) => {
@@ -49,9 +48,9 @@
 </script>
 
 <div
-  class="flex w-full max-w-4xl flex-row gap-4 rounded-lg bg-[var(--bg-secondary)] p-4 shadow-lg"
+  class="flex w-full max-w-4xl flex-col gap-4 rounded-lg bg-[var(--bg-secondary)] p-4 shadow-lg md:flex-row"
 >
-  <div class="flex w-1/2 flex-col gap-4">
+  <div class="flex w-full flex-col gap-4 md:w-1/2">
     <div
       class="relative w-full overflow-hidden rounded-lg bg-[var(--bg-tertiary)]"
     >
@@ -66,7 +65,7 @@
     </div>
   </div>
 
-  <div class="flex w-1/2 flex-col justify-between gap-4">
+  <div class="flex w-full flex-col justify-between gap-4 md:w-1/2">
     <div class="flex flex-col gap-4">
       <div class="flex items-center justify-center gap-2">
         <h1 class="text-center text-2xl font-bold text-[var(--text-primary)]">
@@ -88,7 +87,7 @@
           />
         </div>
 
-        <div class="flex justify-end gap-2">
+        <div class="flex gap-2">
           <button
             type="button"
             onclick={goBack}
@@ -120,7 +119,7 @@
           type="text"
           readonly
           value={$roomInfoStore.id}
-          class="flex-grow rounded-lg bg-[var(--bg-secondary)] p-2 outline-none"
+          class="min-w-0 flex-grow rounded-lg bg-[var(--bg-secondary)] p-2 outline-none"
         />
         <button
           onclick={copyCode}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { setVideoStream } from "$lib/helpers/video";
   import { fly } from "svelte/transition";
   import Avatar from "./Avatar.svelte";
   import Wave from "./Wave.svelte";
@@ -14,9 +13,19 @@
   export let audioLevel: number = 0;
   export let isScreen: boolean = false;
 
+  let videoEl: HTMLVideoElement;
+
   $: isAudioActive = audioLevel > 0.05;
   $: isLocalStream = ownerId === $roomInfoStore.userId;
   $: displayedName = `${ownerId === $roomInfoStore.userId ? "You" : owner} ${isScreen ? "(Presenting)" : ""}`;
+
+  $: if (videoEl && stream) {
+    if (videoEl.srcObject !== stream) {
+      videoEl.srcObject = null;
+      videoEl.srcObject = stream;
+    }
+    videoEl.play().catch(() => {});
+  }
 
   function togglePinnedStream() {
     $roomInfoStore.pinnedStream =
@@ -32,10 +41,10 @@
 >
   <div class="video-container">
     <video
+      bind:this={videoEl}
       class="video-el"
       class:mirrored={isLocalStream && !isScreen}
       style="object-fit: {isScreen ? 'contain' : 'cover'};"
-      use:setVideoStream={stream}
       autoplay
       muted={isMuted || isLocalStream}
     >
@@ -47,34 +56,33 @@
     <Avatar {owner} {isAudioActive} {isCameraOpen} />
   {/if}
 
-  <!-- Top-right: mute indicator / wave -->
-  <div class="indicator-top-right">
+  <div class="top-right">
     {#if isMuted}
-      <i class="fa-solid fa-microphone-slash"></i>
+      <div class="muted-badge">
+        <i class="fa-solid fa-microphone-slash"></i>
+      </div>
     {:else}
       <Wave isAudioActive={isAudioActive && !isLocalStream} />
     {/if}
   </div>
 
-  <!-- Bottom-left: participant name -->
-  <span class="name-label">{displayedName}</span>
-
-  <!-- Bottom-right: pin button (shown on hover) -->
-  <button
-    class="pin-btn"
-    on:click={togglePinnedStream}
-    aria-label="toggle expand"
-  >
-    <i
-      class="fa-solid"
-      class:fa-thumbtack={!isExpanded}
-      class:fa-thumbtack-slash={isExpanded}
-    ></i>
-  </button>
+  <div class="bottom-bar">
+    <span class="name-label">{displayedName}</span>
+    <button
+      class="pin-btn"
+      on:click={togglePinnedStream}
+      aria-label="toggle expand"
+    >
+      <i
+        class="fa-solid"
+        class:fa-thumbtack={!isExpanded}
+        class:fa-thumbtack-slash={isExpanded}
+      ></i>
+    </button>
+  </div>
 </div>
 
 <style>
-  /* Grid tile: fills its grid cell */
   .stream-tile {
     position: relative;
     width: 100%;
@@ -86,24 +94,17 @@
     overflow: hidden;
     background: var(--bg-secondary);
     border: 2px solid transparent;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   .stream-tile.audio-active {
     border-color: var(--highlight);
+    box-shadow: inset 0 0 30px rgba(77, 170, 252, 0.05);
   }
 
-  /*
-	 * Expanded / spotlight: the tile sizes to the video's natural
-	 * aspect ratio, constrained by the parent's available space.
-	 * The spotlight-main flex container centres it.
-	 */
   .stream-tile.expanded {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: 100%;
     border-radius: 16px;
   }
 
@@ -119,28 +120,14 @@
     display: block;
   }
 
-  .indicator-top-right {
+  .top-right {
     position: absolute;
     top: 8px;
     right: 10px;
     z-index: 10;
   }
 
-  .name-label {
-    position: absolute;
-    bottom: 8px;
-    left: 10px;
-    font-size: 0.75rem;
-    color: #e2e8f0;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .pin-btn {
-    position: absolute;
-    bottom: 8px;
-    right: 10px;
+  .muted-badge {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -148,16 +135,63 @@
     height: 28px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.5);
-    padding: 6px;
+    color: var(--red);
+    font-size: 0.75rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+    z-index: 10;
+  }
+
+  .name-label {
+    font-size: 0.75rem;
+    color: #e2e8f0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+  }
+
+  .pin-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 5px;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, background 0.2s ease;
     cursor: pointer;
     z-index: 10;
     border: none;
     color: #e2e8f0;
+    font-size: 0.65rem;
+    backdrop-filter: blur(4px);
   }
 
-  .stream-tile:hover .pin-btn {
-    opacity: 1;
+  .pin-btn:hover {
+    background: rgba(77, 170, 252, 0.6);
+  }
+
+  @media (hover: hover) {
+    .stream-tile:hover .pin-btn {
+      opacity: 1;
+    }
+  }
+
+  @media (hover: none) {
+    .pin-btn {
+      opacity: 0.6;
+    }
   }
 </style>

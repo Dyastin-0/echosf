@@ -25,7 +25,7 @@
 
 {#if !localStream || !localStream.getVideoTracks()[0]}
   <div
-    class="flex h-[200px] w-[350px] items-center justify-center bg-[var(--bg-primary)]"
+    class="flex aspect-video w-full items-center justify-center bg-[var(--bg-primary)]"
   >
     <span
       >{`No ${localStream?.getVideoTracks()[0] ? "media" : "video"} device found`}</span

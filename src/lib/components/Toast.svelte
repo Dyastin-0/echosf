@@ -12,7 +12,7 @@
 {#if toast.isVisible}
   <div
     transition:fade={{ duration: 300 }}
-    class="fixed bottom-4 left-4 flex items-center justify-center"
+    class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center justify-center"
   >
     <div class="w-[200px] rounded-lg bg-[var(--bg-secondary)] p-4 shadow-lg">
       <p class="mb-2 text-[var(--text-secondary)]">{toast.type}</p>

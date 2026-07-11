@@ -12,7 +12,7 @@
 {#if alert.isVisible}
   <div
     transition:fade={{ duration: 300 }}
-    class="fixed inset-0 flex items-center justify-center bg-black/50"
+    class="fixed inset-0 z-index-999 flex items-center justify-center bg-black/50"
   >
     <div class="rounded-lg bg-[var(--bg-secondary)] p-6 shadow-lg">
       <p class="mb-4 text-[var(--text-secondary)]">{alert.type}</p>
