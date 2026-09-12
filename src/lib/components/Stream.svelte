@@ -38,10 +38,20 @@
     if (attempt) attempt.catch(() => {});
   }
 
+  // NOTE: set muted imperatively, not just via the template attribute.
+  // Svelte's `muted={...}` only touches the content attribute, which browsers
+  // do not reliably propagate to the live muted state (especially removals),
+  // so an autoplay-muted tile could stay blocked despite the attribute.
+  function syncMuted() {
+    if (!videoEl) return;
+    videoEl.muted = isMuted || isLocalStream || autoplayMuted;
+  }
+
   function attachSource() {
     if (!videoEl) return;
     const next = stream ?? null;
     if (videoEl.srcObject !== next) videoEl.srcObject = next;
+    syncMuted();
     if (next) tryPlay();
   }
 
@@ -50,6 +60,7 @@
   onMount(() => {
     const resume = () => {
       audioUnlocked = true;
+      syncMuted();
       tryPlay();
     };
     document.addEventListener("pointerdown", resume);
