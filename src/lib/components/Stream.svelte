@@ -20,18 +20,11 @@
   $: isLocalStream = ownerId === $roomInfoStore.userId;
   $: displayedName = `${ownerId === $roomInfoStore.userId ? "You" : owner} ${isScreen ? "(Presenting)" : ""}`;
 
-  // Screen shares arrive mid-call, long after any click gesture expired, so
-  // browsers block their audible autoplay and the tile would sit black until
-  // the user happens to click. Screen content is overwhelmingly visual, so
-  // start muted (muted autoplay is always allowed) and unmute on the first
-  // gesture anywhere. Unmuting a playing video needs no gesture.
-  let audioUnlocked = false;
-
-  $: autoplayMuted = isScreen && !isMuted && !audioUnlocked;
-
-  // play() can also reject when there is no data yet. The rejection used to
-  // be swallowed with no retry, so tiles stayed black until something
-  // remounted them. Retry on media readiness events and gestures instead.
+  // play() can reject when there is no data yet or when the browser blocks
+  // audible autoplay (remote tiles arriving mid-call, after any click
+  // gesture expired). The rejection used to be swallowed with no retry, so
+  // tiles stayed black until something remounted them. Retry on media
+  // readiness events and on the next user gesture instead.
   function tryPlay() {
     if (!videoEl) return;
     const attempt = videoEl.play();
@@ -48,10 +41,7 @@
   $: videoEl, stream, attachSource();
 
   onMount(() => {
-    const resume = () => {
-      audioUnlocked = true;
-      tryPlay();
-    };
+    const resume = () => tryPlay();
     document.addEventListener("pointerdown", resume);
     document.addEventListener("keydown", resume);
     return () => {
@@ -80,7 +70,7 @@
       style="object-fit: {isScreen ? 'contain' : 'cover'};"
       autoplay
       playsinline
-      muted={isMuted || isLocalStream || autoplayMuted}
+      muted={isMuted || isLocalStream}
       on:loadedmetadata={tryPlay}
       on:canplay={tryPlay}
     >

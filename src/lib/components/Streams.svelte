@@ -104,13 +104,6 @@
     layoutMode = "spotlight";
   }
 
-  // A pin pointing at a vanished stream (share stopped, peer left) would
-  // leave spotlight staring at the empty state with no way back. Fall
-  // through to the grid instead. Skipped for a deliberately cleared pin.
-  $: if (layoutMode === "spotlight" && !focusTile && pinnedStream) {
-    $roomInfoStore.pinnedStream = "";
-  }
-
   function isPinned(tile: Tile): boolean {
     return tile.streamId !== null && tile.streamId === pinnedStream;
   }
