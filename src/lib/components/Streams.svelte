@@ -51,6 +51,31 @@
     ? (allTiles.find((t: Tile) => t.streamId === pinnedStream) ?? null)
     : null;
 
+  // Meet-style takeover: a screen share pins itself to the stage the moment
+  // it appears, so it shows instantly without manual pinning. Remembers the
+  // previous pin and restores it when the share ends — unless the user pinned
+  // something else meanwhile, in which case hands off quietly.
+  let autoPinnedScreen: string | null = null;
+  let preSharePin = "";
+
+  $: {
+    const liveScreens = allTiles.filter(
+      (t: Tile) => t.streamId !== null && t.info.screen === t.streamId,
+    );
+    const current = liveScreens.length > 0 ? liveScreens[liveScreens.length - 1].streamId : null;
+    if (current && current !== autoPinnedScreen) {
+      if (!autoPinnedScreen) preSharePin = pinnedStream;
+      autoPinnedScreen = current;
+      $roomInfoStore.pinnedStream = current;
+    } else if (!current && autoPinnedScreen) {
+      if ($roomInfoStore.pinnedStream === autoPinnedScreen) {
+        $roomInfoStore.pinnedStream = preSharePin;
+      }
+      autoPinnedScreen = null;
+      preSharePin = "";
+    }
+  }
+
   $: restTiles = pinnedStream
     ? allTiles.filter((t: Tile) => t.streamId !== pinnedStream)
     : allTiles;
@@ -318,11 +343,24 @@
 
   .layout-spotlight .tile:not(.tile-pinned):not(.more-tile) {
     grid-column: 2;
+    /* Rail cells share the column height — cap them so a lone tile
+       doesn't stretch into a giant card. */
+    max-height: 200px;
+  }
+
+  .layout-spotlight .more-tile {
+    grid-column: 2;
+    max-height: 200px;
   }
 
   @media (max-width: 640px) {
     .layout-spotlight {
       grid-template-columns: minmax(0, 1fr) 120px;
+    }
+
+    .layout-spotlight .tile:not(.tile-pinned):not(.more-tile),
+    .layout-spotlight .more-tile {
+      max-height: 140px;
     }
   }
 
