@@ -7,7 +7,11 @@
   import { onMount } from "svelte";
 
   type Tile = { id: string; info: App.Participant; streamId: string | null };
-  type LayoutMode = "auto" | "spotlight" | "sidebar";
+  // Only two modes: grid shows everyone, spotlight pins one tile with a rail.
+  type LayoutMode = "auto" | "spotlight";
+
+  // Rail capacity: 2 tiles + the overflow indicator.
+  const STRIP_MAX = 2;
 
   let layoutMode: LayoutMode = "auto";
   let isMobile = false;
@@ -51,19 +55,25 @@
     ? allTiles.filter((t: Tile) => t.streamId !== pinnedStream)
     : allTiles;
 
-  // How many non-focused tiles fit in the spotlight strip / sidebar.
-  // Culled tiles unmount, but switching layouts never touches the visible set,
-  // so video elements stay mounted and never flash black.
-  $: stripMax =
-    layoutMode === "sidebar" ? (isMobile ? 2 : 5) : isMobile ? 2 : 6;
+  // The floating self-view duplicates the local tile, so leave the local
+  // tiles out of the rail while it is shown (unless screen sharing, where
+  // the screen tile stays in the rail). Culled tiles unmount, but switching
+  // layouts never touches the visible set, so videos never flash black.
+  $: localSharing =
+    !!localTile?.info.screen && localTile.info.screen !== "disabled";
 
-  // When overflowing, the "+N" indicator takes the last strip cell.
+  $: stripPool =
+    showFloating && !localSharing
+      ? restTiles.filter((t: Tile) => t.id !== $roomInfoStore.userId)
+      : restTiles;
+
+  // When overflowing, the "+N" indicator takes the last rail cell.
   $: shownRest =
     layoutMode === "auto" || !focusTile
       ? restTiles
-      : restTiles.length > stripMax
-        ? restTiles.slice(0, stripMax - 1)
-        : restTiles.slice(0, stripMax);
+      : stripPool.length > STRIP_MAX
+        ? stripPool.slice(0, STRIP_MAX - 1)
+        : stripPool.slice(0, STRIP_MAX);
 
   $: visibleTiles =
     layoutMode === "auto" || !focusTile ? allTiles : [focusTile, ...shownRest];
@@ -71,7 +81,7 @@
   $: extraCount =
     layoutMode === "auto" || !focusTile
       ? 0
-      : Math.max(0, restTiles.length - shownRest.length);
+      : Math.max(0, stripPool.length - shownRest.length);
 
   $: localTile = allTiles.find((t: Tile) => t.id === $roomInfoStore.userId) ?? null;
 
@@ -158,7 +168,6 @@
   class="streams-container"
   class:layout-auto={layoutMode === "auto"}
   class:layout-spotlight={layoutMode === "spotlight"}
-  class:layout-sidebar={layoutMode === "sidebar"}
   bind:this={containerRef}
   onclick={toggleSelector}
   onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSelector(e); }}
@@ -187,18 +196,9 @@
     >
       <i class="fa-solid fa-expand"></i>
     </button>
-    <button
-      class="layout-btn"
-      class:active={layoutMode === "sidebar"}
-      disabled={!pinnedStream}
-      onclick={() => layoutMode = "sidebar"}
-      title="Sidebar"
-    >
-      <i class="fa-solid fa-table-columns"></i>
-    </button>
   </div>
 
-  {#if (layoutMode === "spotlight" || layoutMode === "sidebar") && !focusTile}
+  {#if layoutMode === "spotlight" && !focusTile}
     <div class="empty">
       <p class="text-sm text-[var(--text-secondary)]">Pin a tile to spotlight</p>
     </div>
@@ -303,45 +303,25 @@
     align-content: stretch;
   }
 
-  /* Spotlight (Meet-style): pinned tile fills, rest form a bottom filmstrip. */
+  /* Spotlight (Meet-style): pinned tile takes the whole left, other tiles
+     stack in a rail on the right (max 2 + the overflow indicator). */
   .layout-spotlight {
-    grid-template-rows: minmax(0, 1fr) 112px;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    overflow: hidden;
-  }
-
-  .layout-spotlight .tile-pinned {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-
-  .layout-spotlight .tile:not(.tile-pinned):not(.more-tile) {
-    grid-row: 2;
-  }
-
-  /* Sidebar (Meet-style): pinned tile fills, rest stack on the right. */
-  .layout-sidebar {
     grid-template-columns: minmax(0, 1fr) 168px;
     grid-auto-rows: minmax(0, 1fr);
     overflow: hidden;
   }
 
-  .layout-sidebar .tile-pinned {
+  .layout-spotlight .tile-pinned {
     grid-column: 1;
     grid-row: 1 / -1;
   }
 
-  .layout-sidebar .tile:not(.tile-pinned):not(.more-tile) {
+  .layout-spotlight .tile:not(.tile-pinned):not(.more-tile) {
     grid-column: 2;
   }
 
   @media (max-width: 640px) {
     .layout-spotlight {
-      grid-template-rows: minmax(0, 1fr) 84px;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .layout-sidebar {
       grid-template-columns: minmax(0, 1fr) 120px;
     }
   }
