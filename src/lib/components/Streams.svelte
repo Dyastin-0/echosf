@@ -7,11 +7,27 @@
   import { onMount } from "svelte";
 
   type Tile = { id: string; info: App.Participant; streamId: string | null };
-  // Only two modes: grid shows everyone, spotlight pins one tile with a rail.
   type LayoutMode = "auto" | "spotlight";
 
-  // Rail capacity: 2 tiles + the overflow indicator.
   const STRIP_MAX = 3;
+
+  const GRID_COL_CLASSES = [
+    "grid-cols-1",
+    "grid-cols-2",
+    "grid-cols-3",
+    "grid-cols-4",
+    "grid-cols-5",
+    "grid-cols-6",
+  ];
+
+  function gridColsFor(count: number, mobile: boolean): number {
+    const n = Math.max(1, count);
+    const root = Math.floor(Math.sqrt(n));
+    const cols = root * root === n ? root : Math.ceil(Math.sqrt(n));
+    return Math.min(Math.max(1, cols), mobile ? 3 : 6);
+  }
+
+  $: gridColsClass = GRID_COL_CLASSES[gridColsFor(allTiles.length, isMobile) - 1];
 
   let layoutMode: LayoutMode = "auto";
   let isMobile = false;
@@ -189,7 +205,7 @@
 />
 
 <div
-  class="streams-container"
+  class="streams-container {layoutMode === 'auto' ? gridColsClass : ''}"
   class:layout-auto={layoutMode === "auto"}
   class:layout-spotlight={layoutMode === "spotlight"}
   bind:this={containerRef}
@@ -319,9 +335,7 @@
     overflow: hidden;
   }
 
-  /* Grid: every tile equal, scrolls when there are many. */
   .layout-auto {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     grid-auto-rows: minmax(160px, 1fr);
     overflow-y: auto;
     align-content: stretch;
