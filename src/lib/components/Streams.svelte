@@ -24,7 +24,7 @@
     const n = Math.max(1, count);
     const root = Math.floor(Math.sqrt(n));
     const cols = root * root === n ? root : Math.ceil(Math.sqrt(n));
-    return Math.min(Math.max(1, cols), mobile ? 3 : 6);
+    return Math.min(Math.max(1, cols), mobile ? 2 : 6);
   }
 
   $: gridColsClass = GRID_COL_CLASSES[gridColsFor(allTiles.length, isMobile) - 1];
@@ -121,9 +121,7 @@
     };
   });
 
-  $: if (isMobile && layoutMode !== "spotlight") {
-    layoutMode = "spotlight";
-  }
+
 
   function isPinned(tile: Tile): boolean {
     return tile.streamId !== null && tile.streamId === pinnedStream;
