@@ -10,7 +10,6 @@
   type LayoutMode = "auto" | "spotlight" | "sidebar";
 
   let layoutMode: LayoutMode = "auto";
-  let maxTiles = 0;
   let isMobile = false;
 
   let showSelector = false;
@@ -48,21 +47,31 @@
     ? (allTiles.find((t: Tile) => t.streamId === pinnedStream) ?? null)
     : null;
 
-  $: remainingTiles = pinnedStream
+  $: restTiles = pinnedStream
     ? allTiles.filter((t: Tile) => t.streamId !== pinnedStream)
-    : [];
-
-  $: displayTiles = layoutMode === "auto" && maxTiles > 0 && allTiles.length > maxTiles
-    ? allTiles.slice(0, maxTiles - 1)
     : allTiles;
 
-  $: overflowCount = layoutMode === "auto" && maxTiles > 0 && allTiles.length > maxTiles
-    ? allTiles.length - (maxTiles - 1)
-    : 0;
+  // How many non-focused tiles fit in the spotlight strip / sidebar.
+  // Culled tiles unmount, but switching layouts never touches the visible set,
+  // so video elements stay mounted and never flash black.
+  $: stripMax =
+    layoutMode === "sidebar" ? (isMobile ? 2 : 5) : isMobile ? 2 : 6;
 
-  $: overflowParticipants = layoutMode === "auto" && maxTiles > 0 && allTiles.length > maxTiles
-    ? allTiles.slice(maxTiles - 1)
-    : [];
+  // When overflowing, the "+N" indicator takes the last strip cell.
+  $: shownRest =
+    layoutMode === "auto" || !focusTile
+      ? restTiles
+      : restTiles.length > stripMax
+        ? restTiles.slice(0, stripMax - 1)
+        : restTiles.slice(0, stripMax);
+
+  $: visibleTiles =
+    layoutMode === "auto" || !focusTile ? allTiles : [focusTile, ...shownRest];
+
+  $: extraCount =
+    layoutMode === "auto" || !focusTile
+      ? 0
+      : Math.max(0, restTiles.length - shownRest.length);
 
   $: localTile = allTiles.find((t: Tile) => t.id === $roomInfoStore.userId) ?? null;
 
@@ -83,6 +92,17 @@
 
   $: if (isMobile && layoutMode !== "spotlight") {
     layoutMode = "spotlight";
+  }
+
+  function isPinned(tile: Tile): boolean {
+    return tile.streamId !== null && tile.streamId === pinnedStream;
+  }
+
+  function audioLevelFor(tile: Tile): number {
+    const sourceId = tile.streamId
+      ? ($mediaStore.remoteStreams[tile.streamId]?.getAudioTracks()[0]?.id ?? tile.id)
+      : tile.id;
+    return Number($mediaStore.audioLevels[sourceId] ?? 0);
   }
 
   function toggleSelector(e: Event) {
@@ -136,6 +156,9 @@
 
 <div
   class="streams-container"
+  class:layout-auto={layoutMode === "auto"}
+  class:layout-spotlight={layoutMode === "spotlight"}
+  class:layout-sidebar={layoutMode === "sidebar"}
   bind:this={containerRef}
   onclick={toggleSelector}
   onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSelector(e); }}
@@ -147,229 +170,78 @@
     <span>{participants.length}</span>
   </div>
   <div class="layout-selector" class:visible={showSelector}>
-      <button
-        class="layout-btn"
-        class:active={layoutMode === "auto"}
-        onclick={() => { layoutMode = "auto"; $roomInfoStore.pinnedStream = ""; }}
-        title="Auto grid"
-      >
-        <i class="fa-solid fa-table-cells-large"></i>
-      </button>
-      {#if layoutMode === "auto"}
-        <div class="selector-divider"></div>
-        <button
-          class="layout-btn num-btn"
-          class:active={maxTiles === 0}
-          onclick={() => maxTiles = 0}
-          title="No limit"
-        >A</button>
-        <button
-          class="layout-btn num-btn"
-          class:active={maxTiles === 1}
-          onclick={() => maxTiles = 1}
-          title="1 tile"
-        >1</button>
-        <button
-          class="layout-btn num-btn"
-          class:active={maxTiles === 2}
-          onclick={() => maxTiles = 2}
-          title="2 tiles"
-        >2</button>
-        <button
-          class="layout-btn num-btn"
-          class:active={maxTiles === 4}
-          onclick={() => maxTiles = 4}
-          title="4 tiles"
-        >4</button>
-        <button
-          class="layout-btn num-btn"
-          class:active={maxTiles === 6}
-          onclick={() => maxTiles = 6}
-          title="6 tiles"
-        >6</button>
-        <button
-          class="layout-btn num-btn"
-          class:active={maxTiles === 9}
-          onclick={() => maxTiles = 9}
-          title="9 tiles"
-        >9</button>
-      {/if}
-      <button
-        class="layout-btn"
-        class:active={layoutMode === "spotlight"}
-        disabled={!pinnedStream}
-        onclick={() => layoutMode = "spotlight"}
-        title="Spotlight"
-      >
-        <i class="fa-solid fa-expand"></i>
-      </button>
-      <button
-        class="layout-btn"
-        class:active={layoutMode === "sidebar"}
-        disabled={!pinnedStream}
-        onclick={() => layoutMode = "sidebar"}
-        title="Sidebar"
-      >
-        <i class="fa-solid fa-rectangle-ad"></i>
-      </button>
-    </div>
+    <button
+      class="layout-btn"
+      class:active={layoutMode === "auto"}
+      onclick={() => { layoutMode = "auto"; $roomInfoStore.pinnedStream = ""; }}
+      title="Grid"
+    >
+      <i class="fa-solid fa-table-cells-large"></i>
+    </button>
+    <button
+      class="layout-btn"
+      class:active={layoutMode === "spotlight"}
+      disabled={!pinnedStream}
+      onclick={() => layoutMode = "spotlight"}
+      title="Spotlight"
+    >
+      <i class="fa-solid fa-expand"></i>
+    </button>
+    <button
+      class="layout-btn"
+      class:active={layoutMode === "sidebar"}
+      disabled={!pinnedStream}
+      onclick={() => layoutMode = "sidebar"}
+      title="Sidebar"
+    >
+      <i class="fa-solid fa-table-columns"></i>
+    </button>
+  </div>
 
-  {#if layoutMode === "auto"}
-    <div class="tile-grid">
-      {#each displayTiles as tile (tile.streamId ?? tile.id)}
-        <div class="grid-cell" in:fly={{ y: 20, opacity: 0, duration: 200 }}>
-          {#if tile.streamId}
-            <Stream
-              stream={$mediaStore.remoteStreams[tile.streamId]}
-              isExpanded={false}
-              audioLevel={Number(
-                $mediaStore.audioLevels[
-                  $mediaStore.remoteStreams[tile.streamId]?.getAudioTracks()[0]
-                    ?.id
-                ],
-              )}
-              isMuted={tile.info.audio === "disabled" ||
-                tile.info.audio === "missing"}
+  {#if (layoutMode === "spotlight" || layoutMode === "sidebar") && !focusTile}
+    <div class="empty">
+      <p class="text-sm text-[var(--text-secondary)]">Pin a tile to spotlight</p>
+    </div>
+  {:else}
+    {#each visibleTiles as tile (tile.streamId ?? tile.id)}
+      <div
+        class="tile"
+        class:tile-pinned={isPinned(tile)}
+        in:fly={{ y: 16, opacity: 0, duration: 200 }}
+      >
+        {#if tile.streamId}
+          <Stream
+            stream={$mediaStore.remoteStreams[tile.streamId]}
+            isExpanded={isPinned(tile)}
+            audioLevel={audioLevelFor(tile)}
+            isMuted={tile.info.audio === "disabled" ||
+              tile.info.audio === "missing"}
+            owner={tile.info.name}
+            isScreen={tile.info.screen === tile.streamId}
+            isCameraOpen={tile.info.camera === "enabled"}
+            ownerId={tile.id}
+          />
+        {:else}
+          <div class="avatar-tile">
+            <Avatar
               owner={tile.info.name}
-              isScreen={tile.info.screen === tile.streamId}
-              isCameraOpen={tile.info.camera === "enabled"}
-              ownerId={tile.id}
+              isCameraOpen={false}
+              isAudioActive={tile.info.audio === "enabled" &&
+                Boolean($mediaStore.audioLevels[tile.id]) &&
+                Number($mediaStore.audioLevels[tile.id]) > 0.05}
             />
-          {:else}
-            <div class="avatar-tile">
-              <Avatar
-                owner={tile.info.name}
-                isCameraOpen={false}
-                isAudioActive={tile.info.audio === "enabled" &&
-                  Boolean($mediaStore.audioLevels[tile.id]) &&
-                  Number($mediaStore.audioLevels[tile.id]) > 0.05}
-              />
-              <span class="tile-name">{tile.info.name}</span>
-            </div>
-          {/if}
-        </div>
-      {/each}
-
-      {#if overflowCount > 0}
-        <div class="grid-cell" in:fly={{ y: 20, opacity: 0, duration: 200 }}>
-          <div class="overflow-tile">
-            <span class="overflow-count">+{overflowCount}</span>
-            <span class="overflow-label">more</span>
-          </div>
-        </div>
-      {/if}
-    </div>
-  {:else if layoutMode === "spotlight"}
-    <div class="spotlight-layout">
-      {#if focusTile}
-        <div class="spotlight-main">
-          {#if focusTile.streamId}
-            <Stream
-              stream={$mediaStore.remoteStreams[focusTile.streamId]}
-              isExpanded={true}
-              audioLevel={$mediaStore.audioLevels[
-                $mediaStore.remoteStreams[focusTile.streamId]?.getAudioTracks()[0]?.id
-              ]}
-              isMuted={focusTile.info.audio === "disabled" ||
-                focusTile.info.audio === "missing"}
-              owner={focusTile.info.name}
-              isScreen={focusTile.info.screen === focusTile.streamId}
-              isCameraOpen={focusTile.info.camera === "enabled"}
-              ownerId={focusTile.id}
-            />
-          {:else}
-            <div class="avatar-tile">
-              <Avatar
-                owner={focusTile.info.name}
-                isCameraOpen={false}
-                isAudioActive={focusTile.info.audio === "enabled" &&
-                  Boolean($mediaStore.audioLevels[focusTile.id]) &&
-                  Number($mediaStore.audioLevels[focusTile.id]) > 0.05}
-              />
-              <span class="tile-name">{focusTile.info.name}</span>
-            </div>
-          {/if}
-        </div>
-      {:else}
-        <div class="empty">
-          <p class="text-sm text-[var(--text-secondary)]">Pin a tile to spotlight</p>
-        </div>
-      {/if}
-    </div>
-  {:else if layoutMode === "sidebar"}
-    <div class="sidebar-layout">
-      {#if focusTile}
-        <div class="sidebar-main">
-          {#if focusTile.streamId}
-            <Stream
-              stream={$mediaStore.remoteStreams[focusTile.streamId]}
-              isExpanded={true}
-              audioLevel={$mediaStore.audioLevels[
-                $mediaStore.remoteStreams[focusTile.streamId]?.getAudioTracks()[0]?.id
-              ]}
-              isMuted={focusTile.info.audio === "disabled" ||
-                focusTile.info.audio === "missing"}
-              owner={focusTile.info.name}
-              isScreen={focusTile.info.screen === focusTile.streamId}
-              isCameraOpen={focusTile.info.camera === "enabled"}
-              ownerId={focusTile.id}
-            />
-          {:else}
-            <div class="avatar-tile">
-              <Avatar
-                owner={focusTile.info.name}
-                isCameraOpen={false}
-                isAudioActive={focusTile.info.audio === "enabled" &&
-                  Boolean($mediaStore.audioLevels[focusTile.id]) &&
-                  Number($mediaStore.audioLevels[focusTile.id]) > 0.05}
-              />
-              <span class="tile-name">{focusTile.info.name}</span>
-            </div>
-          {/if}
-        </div>
-
-        {#if remainingTiles.length > 0}
-          <div class="strip">
-            {#each remainingTiles as tile (tile.streamId ?? tile.id)}
-              <div class="strip-cell" in:fly={{ y: 20, opacity: 0, duration: 200 }}>
-                {#if tile.streamId}
-                  <Stream
-                    stream={$mediaStore.remoteStreams[tile.streamId]}
-                    isExpanded={false}
-                    audioLevel={Number(
-                      $mediaStore.audioLevels[
-                        $mediaStore.remoteStreams[tile.streamId]?.getAudioTracks()[0]?.id
-                      ],
-                    )}
-                    isMuted={tile.info.audio === "disabled" ||
-                      tile.info.audio === "missing"}
-                    owner={tile.info.name}
-                    isScreen={tile.info.screen === tile.streamId}
-                    isCameraOpen={tile.info.camera === "enabled"}
-                    ownerId={tile.id}
-                  />
-                {:else}
-                  <div class="avatar-tile">
-                    <Avatar
-                      owner={tile.info.name}
-                      isCameraOpen={false}
-                      isAudioActive={tile.info.audio === "enabled" &&
-                        Boolean($mediaStore.audioLevels[tile.id]) &&
-                        Number($mediaStore.audioLevels[tile.id]) > 0.05}
-                    />
-                    <span class="tile-name">{tile.info.name}</span>
-                  </div>
-                {/if}
-              </div>
-            {/each}
+            <span class="tile-name">{tile.info.name}</span>
           </div>
         {/if}
-      {:else}
-        <div class="empty">
-          <p class="text-sm text-[var(--text-secondary)]">Pin a tile for sidebar view</p>
-        </div>
-      {/if}
-    </div>
+      </div>
+    {/each}
+
+    {#if extraCount > 0}
+      <div class="tile more-tile">
+        <span class="overflow-count">+{extraCount}</span>
+        <span class="overflow-label">more</span>
+      </div>
+    {/if}
   {/if}
 
   {#if showFloating && localTile}
@@ -416,11 +288,82 @@
 <style>
   .streams-container {
     position: relative;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    gap: 8px;
     width: 100%;
     height: 100%;
     overflow: hidden;
+  }
+
+  /* Grid: every tile equal, scrolls when there are many. */
+  .layout-auto {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    grid-auto-rows: minmax(160px, 1fr);
+    overflow-y: auto;
+    align-content: stretch;
+  }
+
+  /* Spotlight (Meet-style): pinned tile fills, rest form a bottom filmstrip. */
+  .layout-spotlight {
+    grid-template-rows: minmax(0, 1fr) 112px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    overflow: hidden;
+  }
+
+  .layout-spotlight .tile-pinned {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .layout-spotlight .tile:not(.tile-pinned):not(.more-tile) {
+    grid-row: 2;
+  }
+
+  /* Sidebar (Meet-style): pinned tile fills, rest stack on the right. */
+  .layout-sidebar {
+    grid-template-columns: minmax(0, 1fr) 168px;
+    grid-auto-rows: minmax(0, 1fr);
+    overflow: hidden;
+  }
+
+  .layout-sidebar .tile-pinned {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+
+  .layout-sidebar .tile:not(.tile-pinned):not(.more-tile) {
+    grid-column: 2;
+  }
+
+  @media (max-width: 640px) {
+    .layout-spotlight {
+      grid-template-rows: minmax(0, 1fr) 84px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .layout-sidebar {
+      grid-template-columns: minmax(0, 1fr) 120px;
+    }
+  }
+
+  .tile {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .more-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .layout-selector {
@@ -448,40 +391,35 @@
     pointer-events: auto;
   }
 
-  @media (max-width: 640px) {
   .mobile-count-badge {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(15, 21, 21, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 6px 12px;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    color: var(--text-primary);
-    font-size: 0.8rem;
-    font-weight: 600;
+    display: none;
   }
 
-  .layout-selector {
+  @media (max-width: 640px) {
+    .mobile-count-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 21, 21, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 12px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      color: var(--text-primary);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .layout-selector {
       top: 8px;
       left: 8px;
       right: auto;
-    }
-
-    .num-btn {
-      display: none;
-    }
-
-    .layout-selector:hover .num-btn,
-    .layout-selector:focus-within .num-btn {
-      display: flex;
     }
   }
 
@@ -518,134 +456,12 @@
   .layout-btn.active {
     background: var(--highlight);
     color: white;
-    box-shadow: 0 0 12px rgba(77, 170, 252, 0.4);
+    box-shadow: 0 0 12px rgba(63, 131, 196, 0.35);
   }
 
   .layout-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
-  }
-
-  .selector-divider {
-    width: 1px;
-    height: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    margin: 0 2px;
-    align-self: center;
-  }
-
-  .num-btn {
-    font-family: inherit;
-    font-weight: 700;
-    font-size: 0.7rem;
-  }
-
-  .tile-grid {
-    display: grid;
-    gap: 8px;
-    width: 100%;
-    height: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    grid-auto-rows: 1fr;
-  }
-
-  @media (max-width: 640px) {
-    .tile-grid {
-      grid-template-columns: 1fr;
-      grid-auto-rows: 1fr;
-      max-height: 100%;
-    }
-
-    .streams-container {
-      overflow-y: auto;
-    }
-  }
-
-  .grid-cell {
-    position: relative;
-    width: 100%;
-    min-height: 0;
-    overflow: hidden;
-    border-radius: 16px;
-    min-height: 120px;
-  }
-
-  .spotlight-layout {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
-
-  .spotlight-main {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 16px;
-  }
-
-  .empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
-
-  .sidebar-layout {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    gap: 8px;
-    overflow: hidden;
-  }
-
-  .sidebar-main {
-    flex: 1 1 0;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 16px;
-  }
-
-  .strip {
-    display: flex;
-    flex-direction: row;
-    gap: 8px;
-    height: 130px;
-    flex-shrink: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 4px;
-  }
-
-  @media (max-width: 640px) {
-    .strip {
-      height: 80px;
-    }
-  }
-
-  .strip-cell {
-    position: relative;
-    flex-shrink: 0;
-    width: calc(130px * 16 / 9);
-    height: 100%;
-    border-radius: 10px;
-    overflow: hidden;
-  }
-
-  @media (max-width: 640px) {
-    .strip-cell {
-      width: calc(80px * 16 / 9);
-    }
   }
 
   .avatar-tile {
@@ -676,7 +492,7 @@
     z-index: 50;
     width: 160px;
     height: 120px;
-    border-radius: 16px;
+    border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.15);
@@ -687,21 +503,6 @@
 
   .float-tile:active {
     cursor: grabbing;
-  }
-
-  .overflow-tile {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    background: var(--bg-secondary);
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .overflow-count {
@@ -716,6 +517,14 @@
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  .empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
 
   @media (max-width: 640px) {

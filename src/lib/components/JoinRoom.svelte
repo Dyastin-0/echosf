@@ -103,7 +103,7 @@
             class="w-full rounded-full bg-[var(--highlight)] p-3.5 font-semibold text-white transition hover:brightness-110 active:scale-[0.99]"
           >
             <i class="fa-solid fa-right-to-bracket mr-2"></i>
-            Join Now
+            Join
           </button>
         </div>
       </form>

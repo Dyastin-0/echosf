@@ -99,7 +99,7 @@
 
   .stream-tile.audio-active {
     border-color: var(--highlight);
-    box-shadow: inset 0 0 30px rgba(77, 170, 252, 0.05);
+    box-shadow: inset 0 0 30px rgba(63, 131, 196, 0.05);
   }
 
   .stream-tile.expanded {
@@ -180,7 +180,7 @@
   }
 
   .pin-btn:hover {
-    background: rgba(77, 170, 252, 0.6);
+    background: rgba(63, 131, 196, 0.55);
   }
 
   @media (hover: hover) {
