@@ -97,7 +97,12 @@
     isMobile = mq.matches;
     const handler = (e: MediaQueryListEvent) => { isMobile = e.matches; };
     mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    const ro = new ResizeObserver(() => clampFloat());
+    if (containerRef) ro.observe(containerRef);
+    return () => {
+      mq.removeEventListener("change", handler);
+      ro.disconnect();
+    };
   });
 
   $: if (isMobile && layoutMode !== "spotlight") {
@@ -144,6 +149,25 @@
 
   function stopDrag() {
     dragging = false;
+  }
+
+  function clampFloat() {
+    if (floatLeft === null || !containerRef || !floatRef) return;
+    const margin = 8;
+    floatLeft = Math.max(
+      margin,
+      Math.min(
+        containerRef.clientWidth - floatRef.offsetWidth - margin,
+        floatLeft,
+      ),
+    );
+    floatTop = Math.max(
+      margin,
+      Math.min(
+        containerRef.clientHeight - floatRef.offsetHeight - margin,
+        floatTop ?? margin,
+      ),
+    );
   }
 
   function getFloatStream(tile: Tile): MediaStream | undefined {
@@ -307,7 +331,7 @@
      stack in a rail on the right (max 2 + the overflow indicator). */
   .layout-spotlight {
     grid-template-columns: minmax(0, 1fr) 168px;
-    grid-auto-rows: minmax(0, 1fr);
+    grid-template-rows: repeat(3, minmax(0, 1fr));
     overflow: hidden;
   }
 
