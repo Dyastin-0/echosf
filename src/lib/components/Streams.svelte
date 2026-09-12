@@ -366,12 +366,15 @@
 
   @media (max-width: 640px) {
     .layout-spotlight {
-      grid-template-columns: minmax(0, 1fr) 120px;
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    .layout-spotlight .tile:not(.tile-pinned):not(.more-tile),
-    .layout-spotlight .more-tile {
-      max-height: 140px;
+    .layout-spotlight .tile-pinned {
+      grid-column: 1 / -1;
+    }
+
+    .layout-spotlight .tile:not(.tile-pinned) {
+      display: none;
     }
   }
 
