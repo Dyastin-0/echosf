@@ -11,7 +11,7 @@
   type LayoutMode = "auto" | "spotlight";
 
   // Rail capacity: 2 tiles + the overflow indicator.
-  const STRIP_MAX = 2;
+  const STRIP_MAX = 3;
 
   let layoutMode: LayoutMode = "auto";
   let isMobile = false;
