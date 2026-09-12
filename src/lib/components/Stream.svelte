@@ -1,5 +1,6 @@
 <script lang="ts">
   import { fly } from "svelte/transition";
+  import { onMount } from "svelte";
   import Avatar from "./Avatar.svelte";
   import Wave from "./Wave.svelte";
   import { roomInfoStore } from "$lib/stores/roomStore";
@@ -19,13 +20,35 @@
   $: isLocalStream = ownerId === $roomInfoStore.userId;
   $: displayedName = `${ownerId === $roomInfoStore.userId ? "You" : owner} ${isScreen ? "(Presenting)" : ""}`;
 
-  $: if (videoEl && stream) {
-    if (videoEl.srcObject !== stream) {
-      videoEl.srcObject = null;
-      videoEl.srcObject = stream;
-    }
-    videoEl.play().catch(() => {});
+  // play() can reject when there is no data yet or when the browser blocks
+  // audible autoplay (remote tiles arriving mid-call, after any click
+  // gesture expired). The rejection used to be swallowed with no retry, so
+  // tiles stayed black until something remounted them. Retry on media
+  // readiness events and on the next user gesture instead.
+  function tryPlay() {
+    if (!videoEl) return;
+    const attempt = videoEl.play();
+    if (attempt) attempt.catch(() => {});
   }
+
+  function attachSource() {
+    if (!videoEl) return;
+    const next = stream ?? null;
+    if (videoEl.srcObject !== next) videoEl.srcObject = next;
+    if (next) tryPlay();
+  }
+
+  $: videoEl, stream, attachSource();
+
+  onMount(() => {
+    const resume = () => tryPlay();
+    document.addEventListener("pointerdown", resume);
+    document.addEventListener("keydown", resume);
+    return () => {
+      document.removeEventListener("pointerdown", resume);
+      document.removeEventListener("keydown", resume);
+    };
+  });
 
   function togglePinnedStream() {
     $roomInfoStore.pinnedStream =
@@ -46,7 +69,10 @@
       class:mirrored={isLocalStream && !isScreen}
       style="object-fit: {isScreen ? 'contain' : 'cover'};"
       autoplay
+      playsinline
       muted={isMuted || isLocalStream}
+      on:loadedmetadata={tryPlay}
+      on:canplay={tryPlay}
     >
       <track kind="captions" />
     </video>
