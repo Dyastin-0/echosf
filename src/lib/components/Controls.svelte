@@ -20,7 +20,7 @@
   class="no-scrollbar mx-auto flex w-fit max-w-[calc(100vw-2rem)] items-center gap-1 overflow-x-auto rounded-full border border-white/10 bg-[var(--bg-secondary)]/85 px-2 py-2 shadow-xl shadow-black/20 backdrop-blur-xl"
 >
   <button
-    class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--bg-primary)] px-4 transition hover:bg-[var(--accent)] md:h-12"
+    class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-[var(--bg-primary)] px-4 transition hover:bg-[var(--accent)] max-[400px]:hidden md:h-12"
     onclick={copyCode}
     aria-label="copy room code"
     title="Copy room code"
@@ -29,13 +29,13 @@
     <span class="max-w-24 truncate font-mono text-sm max-md:hidden">{$roomInfoStore.id}</span>
   </button>
 
-  <span class="h-6 w-px shrink-0 bg-[var(--accent)]"></span>
+  <span class="h-6 w-px shrink-0 bg-[var(--accent)] max-[400px]:hidden"></span>
 
   <AudioToggle {toggleMute} />
   <Cameratoggle {toggleCamera} />
   <button
     onclick={toggleScreenShare}
-    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition hover:bg-[var(--accent)] md:h-12 md:w-12"
+    class="ctrl-btn hover:bg-[var(--accent)]"
     aria-label="toggle screen share"
     title="Share screen"
   >
@@ -50,7 +50,7 @@
   {#if joined && leaveRoom}
     <button
       onclick={leaveRoom}
-      class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--red)] text-white transition hover:brightness-110 md:h-12 md:w-12"
+      class="ctrl-btn bg-[var(--red)] text-white hover:brightness-110"
       aria-label="leave room"
       title="Leave"
     >
@@ -58,11 +58,11 @@
     </button>
   {/if}
 
-  <span class="h-6 w-px shrink-0 bg-[var(--accent)]"></span>
+  <span class="h-6 w-px shrink-0 bg-[var(--accent)] max-[400px]:hidden"></span>
 
   <button
     onclick={toggleParticipants}
-    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition hover:bg-[var(--accent)] md:h-12 md:w-12"
+    class="ctrl-btn transition hover:bg-[var(--accent)]"
     class:text-[var(--highlight)]={showParticipants}
     class:text-[var(--text-primary)]={!showParticipants}
     aria-label="toggle participants"
@@ -72,7 +72,7 @@
   </button>
   <button
     onclick={toggleChat}
-    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition hover:bg-[var(--accent)] md:h-12 md:w-12"
+    class="ctrl-btn transition hover:bg-[var(--accent)]"
     class:text-[var(--highlight)]={showChat}
     class:text-[var(--text-primary)]={!showChat}
     aria-label="toggle chat"

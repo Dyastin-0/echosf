@@ -8,7 +8,7 @@
 
 <button
   on:click={toggleMute}
-  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition hover:bg-[var(--accent)] md:h-12 md:w-12"
+  class="ctrl-btn hover:bg-[var(--accent)]"
   aria-label="toggle audio"
 >
   <i
