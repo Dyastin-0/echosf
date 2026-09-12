@@ -64,8 +64,8 @@
 {:else if !$roomInfoStore.joined}
   <main
     class="flex h-screen w-full flex-wrap items-center justify-center gap-4 overflow-hidden bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
-    in:fly={{ duration: 300, y: 100 }}
-    out:fly={{ duration: 200, y: 100 }}
+    in:fly={{ duration: 300, y: 24 }}
+    out:fly={{ duration: 200, y: 24 }}
   >
     <div in:fly={{ duration: 300, x: 100 }}>
       <JoinRoom
@@ -81,8 +81,8 @@
 {:else}
   <main
     class="relative flex h-screen w-full flex-col justify-center gap-4 overflow-hidden bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
-    in:fly={{ duration: 300, y: 100 }}
-    out:fly={{ duration: 200, y: 100 }}
+    in:fly={{ duration: 300, y: 24 }}
+    out:fly={{ duration: 200, y: 24 }}
   >
     <div
       class="relative flex flex-grow min-h-0 gap-4 overflow-hidden"
@@ -90,7 +90,7 @@
     >
       <div
         class="flex-grow h-full min-h-0 overflow-hidden"
-        in:fly={{ duration: 400, y: 100 }}
+        in:fly={{ duration: 400, y: 24 }}
       >
         <Streams />
       </div>

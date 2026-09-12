@@ -37,7 +37,7 @@
   class="stream-tile group"
   class:audio-active={isAudioActive}
   class:expanded={isExpanded}
-  in:fly={{ y: 40, opacity: 0, duration: 220 }}
+  in:fly={{ y: 16, opacity: 0, duration: 220 }}
 >
   <div class="video-container">
     <video
@@ -90,7 +90,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     background: var(--bg-secondary);
     border: 2px solid transparent;

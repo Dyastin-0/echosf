@@ -1,7 +1,6 @@
 <script lang="ts">
   import { roomInfoStore } from "$lib/stores/roomStore";
   import { PUBLIC_API_URL } from "$env/static/public";
-  import { updateParams } from "$lib/helpers/url";
   import { onMount } from "svelte";
   import { showAlert } from "$lib/stores/alertStore";
   import { goto } from "$app/navigation";
@@ -54,49 +53,53 @@
 </script>
 
 <div
-  class="flex w-full max-w-md flex-col gap-6 rounded-lg bg-[var(--bg-secondary)] p-6 shadow-lg sm:w-[400px]"
+  class="flex w-full max-w-md flex-col gap-6 rounded-3xl border border-white/10 bg-[var(--bg-secondary)] p-6 shadow-2xl shadow-black/20 sm:w-[400px] sm:p-8"
 >
-  <div class="flex items-center justify-center gap-2">
-    <h1 class="text-center text-2xl font-bold text-[var(--text-primary)]">
+  <div class="flex items-center justify-center gap-3">
+    <img src="icon.ico" alt="echos logo" class="h-10 w-10" />
+    <h1
+      class="text-center text-2xl font-bold tracking-tight text-[var(--text-primary)]"
+    >
       Echos
     </h1>
-    <img src="icon.ico" alt="logo" class="h-11 w-11" />
   </div>
 
   <div class="flex flex-col gap-4">
     <button
       onclick={createNewRoom}
-      class="rounded-full bg-[var(--bg-primary)] p-4 hover:bg-[var(--accent)]"
+      class="rounded-full bg-[var(--highlight)] p-3.5 font-semibold text-white transition hover:brightness-110 active:scale-[0.99]"
     >
-      <i class="fa fa-plus-circle mr-2"></i>
+      <i class="fa-solid fa-plus mr-2"></i>
       Create New Meeting
     </button>
 
-    <span class="text-center font-bold text-[var(--text-secondary)]">or</span>
+    <div class="flex items-center gap-3 text-[var(--text-secondary)]">
+      <span class="h-px flex-1 bg-[var(--accent)]"></span>
+      <span class="text-xs font-medium uppercase tracking-widest">or</span>
+      <span class="h-px flex-1 bg-[var(--accent)]"></span>
+    </div>
 
-    <form onsubmit={handleContinue} class="flex flex-col gap-4">
-      <div>
-        <label
-          for="roomId"
-          class="mb-2 block font-medium text-[var(--text-primary)]"
-          >Enter Room Code</label
-        >
-        <input
-          id="roomId"
-          type="text"
-          bind:value={$roomInfoStore.id}
-          required
-          autocomplete="on"
-          placeholder="Code"
-          class="w-full rounded-lg bg-[var(--bg-primary)] p-4 outline-none"
-        />
-      </div>
+    <form onsubmit={handleContinue} class="flex flex-col gap-3">
+      <label
+        for="roomId"
+        class="text-sm font-medium text-[var(--text-primary)]"
+        >Enter Room Code</label
+      >
+      <input
+        id="roomId"
+        type="text"
+        bind:value={$roomInfoStore.id}
+        required
+        autocomplete="on"
+        placeholder="e.g. abc-def-ghi"
+        class="w-full rounded-xl border border-transparent bg-[var(--bg-primary)] p-3.5 outline-none transition placeholder:text-[var(--text-secondary)] focus:border-[var(--highlight)]"
+      />
 
       <button
         type="submit"
-        class="rounded-full bg-[var(--bg-primary)] p-4 hover:bg-[var(--accent)]"
+        class="rounded-full bg-[var(--bg-primary)] p-3.5 font-semibold transition hover:bg-[var(--accent)] active:scale-[0.99]"
       >
-        <i class="fa fa-arrow-right mr-2"></i>
+        <i class="fa-solid fa-arrow-right mr-2"></i>
         Continue
       </button>
     </form>

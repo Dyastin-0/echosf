@@ -7,8 +7,8 @@
 
 <main
   class="flex h-screen w-full flex-wrap items-center justify-center gap-4 overflow-hidden bg-[var(--bg-primary)] p-4 text-sm text-[var(--text-primary)]"
-  in:fly={{ duration: 300, y: 100 }}
-  out:fly={{ duration: 200, y: 100 }}
+  in:fly={{ duration: 300, y: 24 }}
+  out:fly={{ duration: 200, y: 24 }}
 >
   <CreateRoom />
   <Alert />

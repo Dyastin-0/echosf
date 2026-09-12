@@ -566,7 +566,7 @@
     width: 100%;
     min-height: 0;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 16px;
     min-height: 120px;
   }
 
@@ -586,7 +586,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 16px;
   }
 
   .empty {
@@ -613,7 +613,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 16px;
   }
 
   .strip {
@@ -656,7 +656,7 @@
     align-items: center;
     justify-content: center;
     background: var(--bg-secondary);
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
   }
 
@@ -676,7 +676,7 @@
     z-index: 50;
     width: 160px;
     height: 120px;
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.15);
@@ -699,7 +699,7 @@
     justify-content: center;
     gap: 4px;
     background: var(--bg-secondary);
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.06);
   }

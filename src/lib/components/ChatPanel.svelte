@@ -37,7 +37,7 @@
 >
   {#if showChat}
     <section
-      class="flex h-full flex-col gap-4 bg-[var(--bg-secondary)] p-4 max-md:w-full md:h-full md:w-[300px] md:rounded-md"
+      class="flex h-full flex-col gap-4 bg-[var(--bg-secondary)] p-4 max-md:w-full md:h-full md:w-[300px] md:rounded-2xl"
       in:fly={{ x: 100, duration: 300, opacity: 1, easing: quintOut }}
       out:fly={{ x: 100, duration: 200, opacity: 1 }}
     >

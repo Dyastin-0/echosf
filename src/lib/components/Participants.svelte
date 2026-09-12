@@ -31,7 +31,7 @@
 >
   {#if showParticipants}
     <section
-      class="flex h-full flex-col gap-4 bg-[var(--bg-secondary)] p-4 max-md:w-full md:h-full md:w-[300px] md:rounded-md"
+      class="flex h-full flex-col gap-4 bg-[var(--bg-secondary)] p-4 max-md:w-full md:h-full md:w-[300px] md:rounded-2xl"
       in:fly={{ x: -100, duration: 300, opacity: 1, easing: quintOut }}
       out:fly={{ x: -100, duration: 200, opacity: 1 }}
     >
@@ -40,7 +40,7 @@
         {#each participants as [id, info]}
           <div in:fly|local={{ y: 20, duration: 200 }}>
             <div
-              class="hover:bg-opacity-80 flex items-center gap-3 rounded-lg bg-[var(--bg-primary)] p-3"
+              class="flex items-center gap-3 rounded-xl bg-[var(--bg-primary)] p-3 transition hover:bg-[var(--accent)]"
             >
               <div
                 class="flex min-h-10 min-w-10 items-center justify-center rounded-full bg-[var(--accent)]"

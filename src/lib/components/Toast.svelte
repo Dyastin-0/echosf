@@ -11,15 +11,17 @@
 
 {#if toast.isVisible}
   <div
-    transition:fade={{ duration: 300 }}
-    class="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center justify-center"
+    transition:fade={{ duration: 200 }}
+    class="fixed bottom-4 left-1/2 z-50 flex w-[calc(100vw-2rem)] max-w-xs -translate-x-1/2 items-center justify-center"
   >
-    <div class="w-[200px] rounded-lg bg-[var(--bg-secondary)] p-4 shadow-lg">
-      <p class="mb-2 text-[var(--text-secondary)]">{toast.type}</p>
-      <p class="mb-2 text-[var(--text-primary)]">{toast.message}</p>
+    <div
+      class="w-full rounded-2xl border border-white/10 bg-[var(--bg-secondary)] p-4 shadow-xl shadow-black/20"
+    >
+      <p class="mb-1 text-xs font-medium uppercase tracking-widest text-[var(--text-secondary)]">{toast.type}</p>
+      <p class="mb-3 text-[var(--text-primary)]">{toast.message}</p>
       <button
         on:click={closeToast}
-        class="w-full rounded-full bg-[var(--bg-primary)] p-2 hover:bg-[var(--accent)]"
+        class="w-full rounded-full bg-[var(--bg-primary)] p-2 transition hover:bg-[var(--accent)]"
       >
         Close
       </button>
